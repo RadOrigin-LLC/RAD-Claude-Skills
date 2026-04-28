@@ -11,6 +11,8 @@ description: >
 
 # Keyboard Navigation and Focus Management
 
+> **Skill type: Reference.** This is teaching/pattern content — it explains keyboard contracts, focus management strategies, and focus-restoration patterns for modals/dialogs. It is not a scanner. Static review (`/a11y-review`) catches common keyboard/focus source patterns; *runtime keyboard feel* (Tab order making sense, focus indicator quality) requires browser testing.
+
 Keyboard accessibility is non-negotiable for WCAG 2.1.1 (Keyboard) and required for motor-impaired users, power users, and assistive technology users. Every interactive element must be reachable and operable via keyboard alone.
 
 ---

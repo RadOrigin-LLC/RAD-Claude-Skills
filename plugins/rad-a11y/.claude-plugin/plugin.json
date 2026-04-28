@@ -1,7 +1,7 @@
 {
   "name": "rad-a11y",
-  "version": "1.0.0",
-  "description": "Digital accessibility toolkit for WCAG 2.2 AA compliance. Covers semantic HTML, ARIA patterns, keyboard navigation, focus management, color contrast, motion, form accessibility, SVG accessibility, and automated testing with axe-core. Deep support for React, Astro, and Tailwind CSS stacks. Includes a proactive accessibility reviewer agent.",
+  "version": "2.0.0",
+  "description": "WCAG 2.2 AA accessibility toolkit for Claude Code. Six skills covering semantic HTML, ARIA patterns, keyboard/focus, forms, automated testing setup, and a static-analysis review pass; one autonomous reviewer agent. The /a11y-review skill performs static pattern matching over .tsx/.jsx/.astro/.html/.css source — it is not an audit and does not run axe-core, does not test runtime focus behavior, does not measure real contrast ratios, and does not test with screen readers. Findings are tagged [STATIC] (deterministic), [HEURISTIC] (LLM judgment), or [NEEDS-MANUAL] (browser/AT verification required). Pair with the a11y-testing skill for real axe-core / jest-axe / Playwright integration, and with manual screen reader testing for full coverage. React, Astro, and Tailwind have first-class checks; other stacks fall back to framework-agnostic HTML rules. 2.0 honesty pass — every claim is what the plugin actually does, nothing more.",
   "author": {
     "name": "RAD",
     "url": "https://github.com/radesjardins"

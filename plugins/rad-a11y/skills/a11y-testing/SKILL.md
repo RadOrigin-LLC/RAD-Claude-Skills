@@ -9,12 +9,30 @@ description: >
   catch. Also use when asked to add automated a11y testing to a project.
 ---
 
-# Accessibility Testing
+# Accessibility Testing (real axe in your project)
 
-Automated accessibility testing catches the "low-hanging fruit" — about 30–80% of WCAG issues. It is necessary but not sufficient. Always pair it with manual keyboard testing and real screen reader testing.
+This skill helps you set up **real accessibility testing** — eslint-plugin-jsx-a11y at write-time, jest-axe for components, @axe-core/playwright for e2e. Unlike `a11y-review` (which is static source analysis inside this plugin), this skill installs and configures the actual axe engine in *your* project so it runs against real rendered DOM.
 
-**Automation catches:** Missing alt text, form labels, duplicate IDs, invalid ARIA, contrast failures, empty button names.
-**Requires manual testing:** Meaningful alt text, reading order, live region timing, keyboard interaction feel, screen reader announcement quality.
+Automated accessibility testing catches the well-known "low-hanging fruit" — roughly 30–80% of WCAG issues, depending on the page and the tooling. It is necessary but not sufficient. Always pair it with manual keyboard testing and real screen reader testing.
+
+**Real axe (this skill's setup) catches:**
+- Missing alt text (presence)
+- Missing form labels and broken associations
+- Duplicate IDs in rendered DOM
+- Invalid ARIA attribute values against resolved roles
+- Many contrast failures (when both colors are computed and resolvable at runtime)
+- Empty button names / missing accessible names
+- Some keyboard accessibility failures
+
+**Real axe does NOT catch — requires manual testing:**
+- Whether alt text is *meaningful* (not just present)
+- Reading order matches visual order
+- Live region announcement timing
+- Keyboard interaction feel (does Tab order *make sense*?)
+- Screen reader announcement coherence
+- Custom widget keyboard contracts implemented end-to-end against the WAI-ARIA APG spec
+
+**Real axe also misses some things `a11y-review` catches** — like Tailwind `outline-none` written without `focus-visible:ring-*` (axe sees the resolved `:focus` style; the source-pattern bug is invisible to it), and hardcoded ARIA state literals in JSX. Use both.
 
 ---
 

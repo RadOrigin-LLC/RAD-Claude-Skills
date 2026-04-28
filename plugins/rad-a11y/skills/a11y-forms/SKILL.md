@@ -11,6 +11,8 @@ description: >
 
 # Form Accessibility
 
+> **Skill type: Reference.** This is teaching/pattern content — it explains label association, error announcement, fieldset/legend grouping, and validation patterns. It is not a scanner. For static review of existing forms, use `/a11y-review`. For runtime verification of error announcements and validation behavior, set up real axe via the `a11y-testing` skill and pair with manual screen reader testing.
+
 Forms are the most interaction-critical UI element — and the most commonly broken for assistive technology users. Missing labels, inaccessible errors, and placeholder-as-label are among the top WCAG failures on the web.
 
 ---

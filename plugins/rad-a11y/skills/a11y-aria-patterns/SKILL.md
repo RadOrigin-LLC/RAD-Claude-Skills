@@ -11,6 +11,8 @@ description: >
 
 # ARIA Patterns and Authoring Practices
 
+> **Skill type: Reference.** This is teaching/pattern content — it explains the WAI-ARIA APG keyboard contracts and ARIA state rules for custom widgets. It is not a scanner. For static review of existing ARIA usage, use `/a11y-review`. For runtime verification of ARIA validity against resolved roles, use the `a11y-testing` skill to set up real axe.
+
 ARIA (Accessible Rich Internet Applications) extends HTML semantics for custom, dynamic UI components. It supplements — never replaces — native HTML.
 
 **The ARIA First Principles:**

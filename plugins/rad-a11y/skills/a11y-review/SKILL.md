@@ -1,18 +1,50 @@
 ---
 name: a11y-review
 description: >
-  This skill should be used when the user asks for an accessibility review, accessibility audit,
-  a11y check, WCAG compliance review, screen reader audit, "is this accessible?", "does my site
-  meet WCAG?", "check my component for accessibility", "accessibility overview of this page",
-  "review accessibility of", "check for a11y issues", "fix accessibility issues", or any request
-  to audit a web page, component, or codebase for WCAG 2.2 AA compliance.
+  Static analysis pass over JSX/HTML/CSS source for WCAG 2.2 AA failure patterns. Does NOT run
+  axe-core, does NOT measure real contrast, does NOT test runtime behavior — pair with a11y-testing
+  for that. Use when the user asks for an accessibility review, a11y check, WCAG review, "is this
+  accessible?", "does my site meet WCAG?", "check my component for accessibility", "review
+  accessibility of", "check for a11y issues", "fix accessibility issues", or any request to scan
+  a web page, component, or codebase for WCAG 2.2 AA failure patterns. Findings are tagged by
+  detection confidence; the report does not produce a Pass/Fail verdict because static analysis
+  cannot defensibly produce one.
 argument-hint: "[path/to/component, directory, or 'all' for full codebase scan]"
 allowed-tools: Read, Glob, Grep, Bash
 ---
 
-# Accessibility Review
+# Accessibility Review (static analysis)
 
-Perform a structured WCAG 2.2 AA accessibility audit of the specified component, page, or codebase. Execute all eight phases in order and produce an actionable, severity-ranked report.
+Perform a structured **static analysis pass** over the specified component, page, or codebase. Execute all eight phases in order and produce an actionable, severity-ranked report with each finding tagged by confidence level.
+
+## What this skill is — and what it isn't
+
+This skill performs **pattern-based static analysis** over `.tsx` / `.jsx` / `.astro` / `.html` / `.css` source. It is **not** a WCAG audit, does **not** run axe-core, does **not** test runtime focus behavior, does **not** measure real contrast ratios, and does **not** test with screen readers.
+
+**What this skill catches well (high confidence):**
+- Missing `alt` on `<img>`, missing `<label>` association, missing accessible name on icon buttons
+- `outline: none` / `outline-none` without a focus-visible replacement (Tailwind users — axe often misses this because it inspects computed styles)
+- `aria-hidden="true"` on focusable elements or their ancestors
+- Hardcoded ARIA states (`aria-expanded="true"` as a string literal, not driven by component state)
+- `<div onClick>` / `<span onClick>` without role + keyboard handlers
+- Skipped heading levels, missing landmarks
+- React-specific focus drift (modal close handlers without focus restoration)
+
+**What this skill flags but cannot confirm (medium confidence):**
+- Color contrast — flags suspect Tailwind class combinations by name; real sRGB → WCAG ratio math and Tailwind palette parsing is not yet implemented
+- ARIA state synchronization beyond the simplest cases
+- Whether a `<fieldset>` correctly wraps a logical group
+
+**What this skill cannot see at all (requires runtime / manual):**
+- Whether `alt` text is *meaningful* — only checks presence and obvious anti-patterns
+- Reading order matches visual order — needs DOM traversal at runtime
+- Focus indicator is *sufficiently visible* — needs a browser
+- Live region announcements arrive at the right time — needs real assistive tech
+- Keyboard interactions feel logical to a user — needs a human
+- Custom widget keyboard contracts implemented end-to-end — needs APG-pattern verification with a screen reader
+- Screen reader announcement coherence — needs NVDA / JAWS / VoiceOver
+
+For runtime verification, use `a11y-testing` to set up real axe via jest-axe and @axe-core/playwright. For manual verification, use a real screen reader.
 
 ## Audit Scope
 
@@ -225,58 +257,91 @@ Check all SVG usage.
 
 ## Reporting Format
 
-Group findings into four severity levels. Report only findings with evidence.
+Group findings into four severity levels. Report only findings with evidence. **Every finding must carry a detection-confidence tag** in addition to its severity — readers should be able to see which findings the static scan can prove and which are pattern-based heuristics or hand-offs to manual verification.
 
-### Critical (blocks PR)
+### Detection-confidence tags
+
+- **`[STATIC]`** — Deterministic detection: the pattern is present in source and the failure mode is unambiguous from source alone. Example: `<img>` with no `alt`, `aria-hidden="true"` on a `<button>`, `outline-none` with no `focus-visible:` replacement on the same element. These are PR-blockers when they're also Critical/Serious severity.
+- **`[HEURISTIC]`** — LLM judgment over patterns where source isn't dispositive. Example: "this `aria-label` looks redundant with adjacent visible text," "this `<div role="button">` *probably* needs keyboard handlers." These should be reviewed before fixing — the model can be wrong.
+- **`[NEEDS-MANUAL]`** — The pattern *suggests* a problem, but only a browser, axe runtime, or screen reader can confirm. Example: contrast pair flagged by class name (no real ratio computed), live region timing, focus indicator visibility quality, alt-text meaningfulness. Surfaced so the reader knows what to verify next.
+
+### Severity levels (orthogonal to confidence)
+
+#### Critical (blocks PR when `[STATIC]`)
 Issues that make the UI completely unusable for keyboard or screen reader users.
-- Keyboard traps (no Escape, focus stuck)
-- Missing focus indicators (bare `outline-none` with no replacement)
-- `aria-hidden="true"` on focusable elements
-- Interactive `<div>` with no keyboard handler
+- Keyboard traps (no Escape, focus stuck) — `[HEURISTIC]` from source; needs runtime confirmation
+- Missing focus indicators (bare `outline-none` with no replacement) — `[STATIC]`
+- `aria-hidden="true"` on focusable elements — `[STATIC]`
+- Interactive `<div>` with no keyboard handler — `[STATIC]`
 
-### Serious (fix before ship)
+#### Serious (fix before ship)
 Issues that significantly impair assistive technology users.
-- Missing form labels
-- Icon-only buttons with no accessible name
-- Missing heading structure on pages
-- Dynamic content with no live region announcement
+- Missing form labels — `[STATIC]` (presence) / `[HEURISTIC]` (correct association)
+- Icon-only buttons with no accessible name — `[STATIC]`
+- Missing heading structure on pages — `[STATIC]`
+- Dynamic content with no live region announcement — `[STATIC]` (missing markup) / `[NEEDS-MANUAL]` (timing)
 
-### Moderate (fix in next sprint)
+#### Moderate (fix in next sprint)
 Issues that degrade the experience for some users.
-- Skipped heading levels
-- Missing skip links
-- Hardcoded ARIA states not driven by component state
-- Decorative SVGs not hidden from screen readers
+- Skipped heading levels — `[STATIC]`
+- Missing skip links — `[STATIC]`
+- Hardcoded ARIA states not driven by component state — `[STATIC]`
+- Decorative SVGs not hidden from screen readers — `[STATIC]`
 
-### Minor (best practice)
+#### Minor (best practice)
 Low-impact issues or recommendations.
-- Missing `lang` on `<html>`
-- Generic link text ("click here", "read more")
-- `tabindex > 0` values
-- Missing `aria-label` on duplicate landmarks
+- Missing `lang` on `<html>` — `[STATIC]`
+- Generic link text ("click here", "read more") — `[HEURISTIC]`
+- `tabindex > 0` values — `[STATIC]`
+- Missing `aria-label` on duplicate landmarks — `[STATIC]`
 
 For each finding, output:
 ```
-[SEVERITY] WCAG X.X.X — Short description
+[SEVERITY] [CONFIDENCE] WCAG X.X.X — Short description
 File: path/to/file.tsx:line
 Code: <the problematic snippet>
 Fix: Specific remediation
+[Notes: <any caveat — e.g., "real contrast ratio not computed; verify with axe DevTools">]
 ```
 
-End the report with:
-- Total count by severity
-- WCAG 2.2 AA compliance summary (Pass / Fail / Needs Manual Verification)
-- Top 3 priority fixes
+### End-of-report summary
+
+Do **not** issue a Pass / Fail / Compliance verdict. Static analysis cannot produce a defensible WCAG 2.2 AA pass/fail — that requires runtime + manual + assistive-tech verification. Instead, end with:
+
+```
+Static scan summary
+-------------------
+[STATIC]      findings: <N> Critical, <N> Serious, <N> Moderate, <N> Minor
+[HEURISTIC]   findings: <N> total — review before fixing, model can be wrong
+[NEEDS-MANUAL] flags:    <N> total — verify with axe DevTools / screen reader
+
+Top 3 priority fixes (highest severity × highest confidence):
+  1. <file:line> — <description>
+  2. <file:line> — <description>
+  3. <file:line> — <description>
+
+Recommended next steps:
+  - Set up real axe runtime (use the a11y-testing skill) — covers categories static scan can't
+  - Manual screen reader pass on <list any [NEEDS-MANUAL] flagged components>
+  - Browser-based contrast verification on <list any color-related [NEEDS-MANUAL] flags>
+```
 
 ---
 
-## What Automated Tools Catch vs. Manual Review
+## What real axe / Lighthouse catches that this skill doesn't, and vice versa
 
-Automated scanning (axe-core, Lighthouse) catches ~30–80% of issues. These require manual verification:
-- Whether alt text is *meaningful* (not just present)
-- Reading order matches visual order
-- Focus indicator is *sufficiently visible* (not just technically present)
-- Live region announcements are timed correctly
-- Keyboard interactions feel logical to a user
+Real axe (running in a browser via jest-axe or @axe-core/playwright) catches a different subset than this static skill. They overlap heavily but each catches things the other misses.
 
-Always note when a finding requires manual verification with a screen reader.
+**Real axe catches but this static skill cannot:**
+- Computed contrast ratios (real sRGB → WCAG math against rendered colors)
+- Duplicate `id` after dynamic component rendering
+- ARIA attribute validity against the resolved role
+- Some keyboard accessibility paths that depend on runtime DOM
+
+**This static skill catches but real axe often misses:**
+- Tailwind `outline-none` written without a `focus-visible:ring-*` replacement (axe sees the resolved `:focus` style, which may have a default UA outline depending on browser/version, leading to false negatives)
+- Hardcoded ARIA state literals in JSX source (`aria-expanded="true"` as a string instead of `={isOpen}`) — axe sees the value at the moment of scan, missing the bug that the value never updates
+- React modal close handlers that don't restore focus to the trigger (axe sees the focus state after close, but the underlying source pattern is invisible to it)
+- Astro `client:visible` / `client:idle` on keyboard-interactive components (hydration timing issues)
+
+The honest framing: **`/a11y-review` and real axe are complementary, not redundant.** Run both. The widely-cited "axe catches 30–80%" range refers to real axe — `/a11y-review` covers a subset of that range plus some patterns axe misses, which is why every finding here is tagged with detection confidence so you know what you actually have.

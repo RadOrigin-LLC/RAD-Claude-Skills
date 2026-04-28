@@ -11,6 +11,8 @@ description: >
 
 # Semantic HTML for Accessibility
 
+> **Skill type: Reference.** This is teaching/pattern content — it explains *which element to use when* and *why*. It is not a scanner. For static review of existing markup, use `/a11y-review`. For runtime verification, use the `a11y-testing` skill to set up real axe.
+
 Semantic HTML is the foundation of accessible web content. The right element provides built-in roles, keyboard behavior, and accessibility tree information that ARIA cannot fully replicate.
 
 **Core principle:** Always use the most semantically specific native HTML element available. ARIA is a supplement for custom widgets — not a replacement for correct HTML.
