@@ -8,8 +8,8 @@ Import `rad-brainstormer.zip` via **Settings > Customize > Skills** on Claude.ai
 
 The skill includes a SKILL.md orchestrator covering 3 workflows (ideation, evaluation, design sprint) plus 5 resource files:
 
-- Methodology catalog (12 brainstorming techniques with step-by-step processes)
-- Evaluation frameworks (7 frameworks: Impact/Effort, Assumption Mapping, Pre-Mortem, and more)
+- Methodology catalog (20 ideation and evaluation techniques: SCAMPER, Six Hats, Reverse Brainstorming, Starbursting, HMW, TRIZ, Morphological Analysis, Crazy 8s, 5 Whys, Random Entry, Brainwriting 6-3-5, Mind Mapping, Analogical Thinking, Worst Possible Idea, Impact/Effort Matrix, Assumption Mapping, Opportunity Solution Trees, JTBD, Dot Voting, Pre-Mortem)
+- Evaluation frameworks (7 frameworks: Impact/Effort, Assumption Mapping, Opportunity Solution Trees, JTBD, Pre-Mortem, Dot Voting, SWOT)
 - Facilitation principles (anti-anchoring, phase discipline, energy management)
 - Creative unblocking (8 warm-up exercises, block diagnosis, progressive engagement)
 - Domain research guide (web research methodology for unfamiliar topics)
@@ -25,12 +25,15 @@ The skill includes a SKILL.md orchestrator covering 3 workflows (ideation, evalu
 ## Example Prompts
 
 - "Let's brainstorm ideas for [topic]"
+- "Research [topic] before we brainstorm" — domain-research mode
 - "I'm stuck and don't know where to start"
 - "Help me think through [problem]"
 - "Evaluate these ideas and help me pick the best one"
-- "Run a pre-mortem on this idea"
+- "Run a pre-mortem on this idea" — idea-stress-test
+- "Stress-test this idea — what could go wrong?"
 - "Design this feature for me"
 - "Create a spec for [idea]"
+- "Review this spec for completeness"
 
 ## How It Works
 

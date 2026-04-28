@@ -233,3 +233,24 @@ After approval, help identify: what to build first, what to defer, what risks to
 7. **Offer next workflow** after completing each one.
 8. **YAGNI.** Remove unnecessary complexity from designs.
 9. **Reference resources** for detailed methodology rather than repeating inline.
+
+---
+
+## Environment & Scope
+
+This skill is the Claude.ai adaptation of the [rad-brainstormer plugin](../../plugins/rad-brainstormer/). They cover the same methodology catalog and facilitation principles, but the runtime differs.
+
+**What this Claude.ai skill does:**
+- Ideation, evaluation, design-sprint workflows — same 20 methods + 7 evaluation frameworks as the plugin
+- Domain research via web search and URL fetching (instead of the plugin's `domain-researcher` autonomous agent)
+- Idea stress-testing via inline pre-mortem / assumption-audit (instead of the plugin's `idea-challenger` agent)
+- Spec review via inline gap-analysis (instead of the plugin's `spec-reviewer` agent)
+- Deliverables as downloadable artifacts (instead of plugin filesystem writes)
+
+**What this skill does NOT do (use the plugin if you need these):**
+- Parallel autonomous subagent dispatch — Claude.ai runs one conversation; the plugin runs domain-researcher / idea-challenger / spec-reviewer in parallel for batch work
+- Persistent filesystem state — no `.brainstorm/state/<run-id>.json`, so long sessions don't survive a context reset
+- `--non-interactive` / `--resume` flags — the plugin supports headless and resumable runs; the skill is conversational only
+- Direct hand-off to `/rad-planner:plan-project` — the design-sprint output here is a downloaded spec; in Claude Code the chain is automatic
+
+For heavy multi-stage brainstorm-to-ship work, use the plugin in Claude Code. For one-off ideation, evaluation, or design-sprint sessions, this skill matches the plugin's depth.
