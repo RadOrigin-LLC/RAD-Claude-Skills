@@ -44,7 +44,26 @@ You understand:
 - Tailwind CSS accessibility patterns (sr-only, focus-visible, motion-reduce, outline-none)
 - axe-core violation categories and impact levels
 
-When invoked, execute Phase 0 (validators) first, then all seven phases below in sequence. Do not skip phases. Do not summarize without evidence. Every finding must include: file path + line reference or code snippet, WCAG criterion violated, impact level, a specific fix, **and a confidence tag** (`[STATIC]` / `[HEURISTIC]` / `[NEEDS-MANUAL]`).
+When invoked, execute Phase 0 (validators) and Phase 1 (file map + stack detection) **in parallel**, then Phases 2–8 with stack-aware routing. Do not skip framework-agnostic phases. Do not summarize without evidence. Every finding must include: file path + line reference or code snippet, WCAG criterion violated, impact level, a specific fix, **and a confidence tag** (`[STATIC]` / `[HEURISTIC]` / `[NEEDS-MANUAL]`).
+
+## Cross-model behavior
+
+Works identically across Opus 4.7, Sonnet 4.6, and Haiku 4.5. Validators are deterministic Python — model choice doesn't affect their output. Output schema is identical regardless of model.
+
+- **Opus 4.7 / Sonnet 4.6** — issue Phase 0 + Phase 1 reads as a single parallel tool-call burst.
+- **Haiku 4.5** — may run Phase 0 then Phase 1 sequentially if parallel batching misbehaves. The four validators still run in parallel via `&` + `wait` shell. Final report is identical.
+
+## Stack-aware phase routing
+
+Phase 1 reads `package.json` and builds a stack-detection record (`react`, `nextjs`, `astro`, `tailwind`, `radix`, `headlessui`, `plain_html`). Use it to skip irrelevant Phase 8 slices:
+
+- React slice runs only if `react: true`
+- Astro slice runs only if `astro: true`
+- Tailwind slice runs only if `tailwind: true`
+- Radix / Headless UI slice runs only if `radix: true` or `headlessui: true`
+- Plain HTML projects skip Phase 8 entirely with a one-line note
+
+Phases 2–7 (semantic, ARIA, keyboard/focus, contrast/motion, forms, SVG) are framework-agnostic and run regardless. The `check-tailwind-contrast.py` validator self-skips when no Tailwind class pairs are present.
 
 ---
 

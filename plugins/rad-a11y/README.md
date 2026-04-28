@@ -6,11 +6,11 @@
 
 **What it isn't.** It is **not** an audit. It does not run axe-core, does not test focus behavior at runtime, does not measure WCAG contrast ratios with sRGB math (planned for 2.1), and does not test with a screen reader. It cannot tell you whether your alt text is meaningful, whether your reading order makes sense, or whether your focus indicator is sufficiently visible — those need a browser, an AT, or a human. It is also **not** a compliance certifier; no static tool can produce a defensible WCAG 2.2 AA pass/fail verdict, and rad-a11y does not pretend to.
 
+> **v2.2 — Cross-model + stack-aware.** Phase 0 (validators) and Phase 1 (file map + stack detection) now run as a single parallel tool-call burst on Opus 4.7 / Sonnet 4.6; Haiku 4.5 falls back to sequential phases if parallel batching misbehaves. Phase 1 builds a stack-detection record from `package.json` and config files; framework-specific Phase 8 slices (React, Astro, Tailwind, Radix/Headless UI) only execute when the stack matches. Plain HTML projects skip Phase 8 entirely. Wall-time win on most projects; correctness is unchanged.
+>
 > **v2.1 — Mechanical validators.** Four pure-stdlib Python scripts in `scripts/` move deterministic detection out of the LLM and into deterministic code: `scan-jsx-patterns.py` (high-confidence WCAG patterns), `check-tailwind-contrast.py` (real sRGB → WCAG ratio math, no browser), `check-target-size.py` (WCAG 2.5.8 minimum target size), `lint-aria.py` (wraps `eslint-plugin-jsx-a11y` if installed; curated regex fallback if not). The `/a11y-review` skill and `a11y-reviewer` agent run all four in parallel before any LLM work, then layer judgment only on what scripts can't decide. See `scripts/README.md` for full schema and usage.
 >
 > **v2.0 — Honesty pass.** Every finding is tagged `[STATIC]` (deterministic detection), `[HEURISTIC]` (LLM judgment), or `[NEEDS-MANUAL]` (requires browser or assistive-tech verification). The Pass/Fail verdict is replaced with a confidence-tiered summary. Skill descriptions clarify what is reference content versus what is a scanner. Vue/Svelte support claims dropped — the skills cover React, Astro, plain HTML, and Tailwind CSS, and that's all that's actually backed.
->
-> Stack-aware phase routing is scoped for v2.2.
 
 ## What You Can Do With This
 
@@ -81,6 +81,14 @@ What's the right ARIA pattern for a combobox?
 - **Does not cover Vue or Svelte specifically.** Generic HTML rules apply, but no framework-specific checks for those stacks. React, Astro, and plain HTML/Tailwind are the first-class supported targets.
 
 ## Version
+
+**2.2.0** — **Cross-model + stack-aware.**
+- Phase 0 (validators) and Phase 1 (file map + stack detection) now issued as a single parallel tool-call burst on Opus 4.7 and Sonnet 4.6. Haiku 4.5 falls back to sequential phases if parallel batching misbehaves; the four validators still run in parallel via `&` + `wait` shell. Final report is identical regardless of model.
+- Phase 1 builds a stack-detection record from `package.json` + config files: `react`, `nextjs`, `astro`, `tailwind`, `radix`, `headlessui`, `plain_html`. Phase 8 (stack-specific) only executes slices matching detected stack. Plain HTML projects skip Phase 8 entirely with a one-line note.
+- `check-tailwind-contrast.py` self-skips when no Tailwind class pairs are present in source — no spurious "no findings" output for plain CSS projects.
+- New `Cross-model note` and `Execution: parallel-first` sections in `/a11y-review` SKILL.md document the parallel batch and Haiku fallback explicitly.
+- Same parallel-first + stack-aware pattern mirrored into the `a11y-reviewer` agent prompt.
+- No behavior change in the four validators — same JSON output schema, same correctness.
 
 **2.1.0** — **Mechanical validators (four Python scripts).**
 - `scripts/scan-jsx-patterns.py` — high-confidence static scan over JSX/HTML/CSS for `outline-none` w/o focus replacement, `aria-hidden` on focusable, missing/bad `alt`, hardcoded ARIA states, `<div onClick>` without role + handlers, redundant ARIA roles, positive `tabindex`, `<a>` without `href` used as click target. Pure stdlib, JSON output.

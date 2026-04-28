@@ -54,6 +54,34 @@ Exclude: `node_modules`, `dist`, `build`, `.next`, `coverage`, `.astro`.
 
 ---
 
+## Cross-model note
+
+Works identically across Opus 4.7, Sonnet 4.6, and Haiku 4.5. The validators in Phase 0 are deterministic Python — model choice doesn't affect their output. Output schema is identical regardless of model.
+
+**Execution differences by model:**
+- **Opus 4.7 / Sonnet 4.6** — issue Phase 0 + Phase 1 reads + stack detection as a single parallel tool-call burst (see "Execution: parallel-first" below). The four validators run concurrently in one Bash call.
+- **Haiku 4.5** — may follow phase order sequentially if parallel batching misbehaves. The four validators still run in parallel via the `&` + `wait` shell pattern; only the LLM-side reads fall back to sequential.
+
+If any model loses tool-call coherence on the parallel batch, fall back to running Phase 0 first, then Phase 1 — final report is identical, only wall time changes.
+
+---
+
+## Execution: parallel-first
+
+Phases 0 and 1 have no inter-phase dependencies — Phase 0 scripts scan files independently of Phase 1's file map, and Phase 1's file map is consumed only by Phases 2–8. Issue them as a single parallel batch:
+
+**Batch to issue at the start of the skill:**
+
+- **Bash (one command, scripts run concurrently)** — kick off all four validators with `&` and `wait`. They write JSON to `/tmp/rad-a11y-*.json`.
+- **Glob in parallel** — discover `**/*.tsx`, `**/*.jsx`, `**/*.astro`, `**/*.html`, `**/*.css`, `**/*.scss`, `**/tailwind.config.*`.
+- **Read in parallel** — `package.json` (stack detection), `tailwind.config.{js,ts,cjs,mjs}` if present, the four validator JSON outputs (after the Bash batch completes).
+
+Phase 1's file count + stack detection is a synthesis over the Glob and Read results; it doesn't gate the validators or the LLM phases that follow.
+
+Skip the parallel batch and run sequentially only if the model loses tool-call coherence — final report is identical regardless.
+
+---
+
 ## Phase 0: Run validators (deterministic Python scripts)
 
 **New in 2.1.** Before any LLM regex work, run all four rad-a11y validators in parallel. They emit JSON; their output populates the `[STATIC]` (and some `[HEURISTIC]`) findings deterministically. The LLM phases below then handle only what scripts can't decide — alt-text meaningfulness, complex ARIA logic, reading order, semantic intent — and tag those findings `[HEURISTIC]` or `[NEEDS-MANUAL]`.
@@ -105,9 +133,9 @@ Phases 1 (file map) and 2–8 below remain as written for the LLM-judgment slice
 
 ---
 
-## Phase 1: Orient — Build the File Map
+## Phase 1: Orient — Build the File Map (and detect stack)
 
-Before checking anything:
+In parallel with Phase 0 (see "Execution: parallel-first" above):
 
 1. Use Glob to discover all UI files:
    - `**/*.tsx`, `**/*.jsx`, `**/*.astro` — components and pages
@@ -115,12 +143,33 @@ Before checking anything:
    - `**/*.css`, `**/*.scss`, `**/*.module.css` — stylesheets
    - `**/tailwind.config.*` — Tailwind configuration
 
-2. Read `package.json` to detect the stack:
-   - React / Next.js / Astro / Vue / Svelte
-   - Radix UI / Headless UI / Tailwind CSS
-   - Testing libraries (jest-axe, @axe-core/playwright)
+2. Read `package.json` (if present) to detect the stack. Build a stack-detection record used by Phases 4 and 8 to skip irrelevant slices:
 
-3. Count total component files. Report: "Scanning X components across Y directories."
+   | Signal | Detected stack |
+   |---|---|
+   | `react` in dependencies | `react: true` |
+   | `next` in dependencies | `react: true, nextjs: true` |
+   | `astro` in dependencies | `astro: true` |
+   | `tailwindcss` in dependencies OR `tailwind.config.*` exists | `tailwind: true` |
+   | `@radix-ui/*` in dependencies | `radix: true` |
+   | `@headlessui/*` in dependencies | `headlessui: true` |
+   | None of the above + `.html` files exist | `plain_html: true` |
+
+3. Count total component files. Report: "Scanning X components across Y directories. Detected stack: [list]."
+
+### Stack-aware phase routing
+
+Use the detection record to decide which downstream phases run:
+
+- **Phase 4 (color/contrast/motion)** — runs always, but the contrast slice notes whether `check-tailwind-contrast.py` actually had Tailwind classes to evaluate. If `tailwind: false` AND no inline `text-*` / `bg-*` classes were found in source, the contrast phase reports "No Tailwind class pairs detected — runtime contrast verification required (use axe DevTools)" instead of running the LLM-judgment slice.
+- **Phase 8 (stack-specific)** — only execute the slices matching detected stack:
+  - **Tailwind slice** — runs if `tailwind: true`
+  - **React slice** — runs if `react: true`
+  - **Astro slice** — runs if `astro: true`
+  - **Radix / Headless UI slice** — runs if `radix: true` or `headlessui: true`
+  - **Plain HTML** — only the framework-agnostic checks from Phases 2–7 apply; Phase 8 is skipped entirely with one line: "Phase 8 (stack-specific): no framework detected; framework-agnostic phases already covered."
+
+Phases 2, 3, 5, 6, 7 (semantic, ARIA, contrast/motion, forms, SVG) are framework-agnostic and run regardless of stack.
 
 ---
 
