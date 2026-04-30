@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Curated marketplace of Claude Code plugins — developer frameworks, productivity, accessibility, SEO, writing, DevOps, and more.",
-    "version": "1.3.1",
+    "version": "1.4.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -32,6 +32,14 @@
       "description": "Digital accessibility toolkit for WCAG 2.2 AA compliance — semantic HTML, ARIA authoring practices, keyboard navigation, focus management, color contrast, motion/animation, form accessibility, SVG accessibility, and automated testing with axe-core.",
       "category": "development",
       "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-a11y",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "rad-website-design",
+      "source": "./plugins/rad-website-design",
+      "description": "Vision implementer for 2026 web design — translates a vision into code that meets modern standards, and proposes concrete fixes for existing sites. Nine skills across knowledge layer (must-do baseline, should-do recommendations, severity-tiered anti-patterns with damage cited from real research, aesthetic direction with Calm UX default, agentic UX patterns Intent Preview/Autonomy Dial/Action Audit, AEO/llms.txt) and action layer (implement = vision-to-code, improve = identify+propose fixes for source or live URLs, review = pure static report). One autonomous reviewer agent, three pure-stdlib Python validators (viewport-meta, pure-bw, tap-targets), six slash commands. Honest scope: does not brainstorm or plan (use rad-brainstormer / rad-planner upstream), does not run Lighthouse, does not take screenshots, does not render JS SPAs. Pair with chrome-devtools-mcp for runtime/visual layer.",
+      "category": "development",
+      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-website-design",
       "license": "Apache-2.0"
     },
     {

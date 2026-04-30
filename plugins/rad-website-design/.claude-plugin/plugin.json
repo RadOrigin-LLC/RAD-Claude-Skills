@@ -1,0 +1,36 @@
+{
+  "name": "rad-website-design",
+  "version": "0.2.0",
+  "description": "Vision-implementer for 2026 web design — translates a user's vision into code that meets modern standards, and proposes concrete fixes for existing sites. Nine skills: knowledge layer (must-do baseline, should-do recommendations, severity-tiered anti-patterns with damage cited from real research, aesthetic direction with Calm UX default, agentic UX patterns, AEO/llms.txt with adoption caveats), action layer (implement = vision-to-code execution discipline; improve = identify issues + propose fixes for source paths or live URLs; review = pure static-analysis report). **One autonomous reviewer agent** scans HTML/CSS/JSX source. **Three pure-stdlib Python validators** (viewport-meta, pure-bw, tap-targets) run before LLM judgment. **Honest scope:** does NOT brainstorm or plan (use rad-brainstormer / rad-planner upstream), does NOT run Lighthouse, does NOT run axe-core at runtime, does NOT measure real Core Web Vitals, does NOT take screenshots, does NOT render JS-heavy SPAs. Findings tagged [STATIC] / [HEURISTIC] / [NEEDS-MANUAL]; no Pass/Fail verdict. Pair with chrome-devtools-mcp for runtime/visual layer, Lighthouse for perf measurement, rad-a11y for deeper accessibility.",
+  "author": {
+    "name": "RAD",
+    "url": "https://github.com/radesjardins"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-website-design",
+  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "keywords": [
+    "web-design",
+    "ui",
+    "ux",
+    "frontend",
+    "2026",
+    "static-analysis",
+    "design-review",
+    "anti-patterns",
+    "calm-ux",
+    "agentic-ux",
+    "aeo",
+    "llms-txt",
+    "apca",
+    "wcag",
+    "design-tokens",
+    "css-grid",
+    "container-queries",
+    "dark-patterns",
+    "conversion",
+    "microcopy",
+    "typography",
+    "color-contrast"
+  ]
+}
