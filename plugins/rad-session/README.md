@@ -4,7 +4,7 @@
 
 **What it solves.** The default Claude Code experience loses session state at compaction, can't tell you what tools the project has, lets `CLAUDE.md` grow forever, and forgets everything when you switch machines. rad-session keeps a structured `HANDOFF.md` + capped session log so the next session (same or different machine) starts from a real briefing, prunes `CLAUDE.md` deliberately so it stays useful, and pulls/commits/pushes session files via git so your laptop sees what your PC did.
 
-**What it isn't.** It is **not** a memory replacement. Claude Code has native Auto Memory (v2.1.59+) for that — rad-session surfaces insights so the native system can pick them up, but never writes to the memory path. It is **not** an automation layer over your code: it never runs builds, never touches non-session files in commits, and never force-pushes.
+**What it isn't.** It is **not** an automation layer over your code: it never runs builds, never touches non-session files in commits, and never force-pushes.
 
 > **v3.5 — Speed: Haiku-pinned skills + cached resource scan + low-activity auto-quick.** `/startup` and `/wrapup` now pin to Haiku 4.5 via per-skill `model:` frontmatter (the override applies for that turn only — your session model resumes on the next prompt). Resource detection is cached under `.claude/cache/resources.json`, keyed by input-file mtimes, so `/startup` skips re-scanning entirely when nothing has changed. `/wrapup` Phase 1.3 auto-applies `--quick` semantics when fewer than 10 substantive turns have happened since the last signal (`/wrapup`, `/checkpoint`, `/startup` briefing, or PreCompact). Together these typically cut `/startup` and `/wrapup` wall-clock time by 4–5× while preserving identical output formats. Override with `/model opus` before either skill if you want Opus-level synthesis on a specific run (e.g., monthly deep-clean wrapup).
 >
@@ -24,7 +24,7 @@
 |---|---|---|---|
 | **Init** | Once, when you start work in a project | `/init` | Detects stack deterministically (Python scripts, no LLM guessing), finds MCPs and CLIs in the project, scaffolds CLAUDE.md or proposes additions, ensures session files aren't gitignored so cross-machine sync works, recommends which rad-* plugins fit your stack |
 | **Startup** | Every session | `/startup` | **Fetches origin and prompts to pull when behind** (3.3 — verifies sync before reading any handoff file; lists incoming commits first; `--auto-pull` skips prompt, `--no-pull` skips sync entirely), reads HANDOFF.md + session log + CLAUDE.md, runs Resource Discovery, presents a concise briefing including a cross-machine note if the most recent session commit was made on a different host |
-| **Wrapup** | Every session | `/wrapup` | Writes structured HANDOFF.md with "what NOT to do" field, derives a compressed session-log entry from it, prunes CLAUDE.md only if it's actually changed since the last wrapup (with diff confirmation; Resources protected), surfaces insights for native Auto Memory, **auto-commits session files and prompts to push** |
+| **Wrapup** | Every session | `/wrapup` | Writes structured HANDOFF.md with "what NOT to do" field, derives a compressed session-log entry from it, prunes CLAUDE.md only if it's actually changed since the last wrapup (with diff confirmation; Resources protected), **auto-commits session files and prompts to push** |
 
 Plus `/add-resource` (any time, registers a new tool) and a PreCompact hook (auto-fires on context compaction so state isn't silently lost).
 
@@ -34,7 +34,7 @@ Plus `/add-resource` (any time, registers a new tool) and a PreCompact hook (aut
 |---|---|---|
 | **`/init`** *(new in 3.0)* | start of project work, "set up rad-session here", "bootstrap" | One-time project bootstrap. Runs the two detection scripts, scaffolds CLAUDE.md with detected stack/resources, recommends rad-* plugins for your stack, sets up `.claude/session-log.md`. Safe to re-run (merges, doesn't overwrite). |
 | **`/startup`** | start of session, "/startup", "where did we leave off" | **Verifies sync with origin first** (3.3 — prompts to pull when behind, before reading any handoff files), then reads HANDOFF.md + session log, detects git state, runs Phase 2.5 Resource Discovery (uses `detect-resources.py` deterministically when Python is available), presents briefing |
-| **`/wrapup`** | end of session, "/wrapup", "wrap up" | Writes HANDOFF.md with "What NOT to do" field, appends session log (20-entry cap), prunes CLAUDE.md with diff confirmation (**Resources section protected**), surfaces insights for native Auto Memory, auto-commits session files and prompts to push |
+| **`/wrapup`** | end of session, "/wrapup", "wrap up" | Writes HANDOFF.md with "What NOT to do" field, appends session log (20-entry cap), prunes CLAUDE.md with diff confirmation (**Resources section protected**), auto-commits session files and prompts to push |
 | **`/add-resource`** | "add this MCP", "remember the supabase CLI", "register this resource" | Appends an MCP/CLI/script/note to CLAUDE.md's `## Resources` section so `/startup` picks it up next session |
 
 ### Slash commands and flags reference
@@ -77,8 +77,6 @@ Both are pure stdlib Python 3.8+. No `pip install` required. Used by `/init` and
 | `CLAUDE.md` | Permanent project rules + **`## Resources` section** (MCPs, CLIs, scripts, notes) | `/init` (scaffold), `/add-resource` (additions); pruned by `/wrapup` (Resources protected) | Yes |
 | `HANDOFF.md` | Current session state — status, decisions, what NOT to do, open work, insights | `/wrapup` (overwrites each session) | Yes — synced cross-machine |
 | `.claude/session-log.md` | Session history, newest first, capped at 20 entries | `/init` (creates header), `/wrapup` (prepends one entry per session) | Yes — synced cross-machine |
-
-Notably **not** managed: `~/.claude/projects/<project>/memory/` — that's owned by Claude Code's native Auto Memory (v2.1.59+). rad-session surfaces insights in the wrapup summary so native auto-memory can pick them up, but never writes to that path.
 
 ## Cross-machine continuity (PC ↔ GitHub ↔ Laptop)
 
@@ -224,23 +222,19 @@ Works with coding projects (captures git state + stack resources) and non-coding
 
 ## How this compares to alternatives
 
-| | **rad-session 3.3** | Native CC Auto Memory | claude-plugins-official/remember | claude-mem | thepushkarp/handoff |
-|---|---|---|---|---|---|
-| Project bootstrap (`/init`) | ✅ **unique** | ❌ | ❌ | ❌ | ❌ |
-| Resource discovery (MCPs/CLIs/stack) | ✅ **unique** | ❌ | ❌ | ❌ | ❌ |
-| Active CLAUDE.md prune w/ diff | ✅ **unique** | ❌ (grows) | compression | ❌ | ❌ |
-| Cross-machine sync via git (auto-commit + prompted push) | ✅ **unique** (3.1) | ❌ | ❌ | ❌ | ❌ |
-| Deterministic stack detection (Python scripts) | ✅ | ❌ | ❌ | ❌ | ❌ |
-| "What NOT to do" field | ✅ | ❌ | ❌ | ❌ | partial |
-| PreCompact safety net | ✅ | ✅ (built in) | ✅ | ✅ | ✅ |
-| Zero dependencies for skills (Python optional for scripts) | ✅ | ✅ | ❌ (Haiku) | ❌ (Chroma) | ✅ |
-| Setup cost | plugin install + `/init` | **zero — built in** | plugin install | plugin install | plugin install |
+| | **rad-session 3.5** | claude-plugins-official/remember | claude-mem | thepushkarp/handoff |
+|---|---|---|---|---|
+| Project bootstrap (`/init`) | ✅ **unique** | ❌ | ❌ | ❌ |
+| Resource discovery (MCPs/CLIs/stack) | ✅ **unique** | ❌ | ❌ | ❌ |
+| Active CLAUDE.md prune w/ diff | ✅ **unique** | compression | ❌ | ❌ |
+| Cross-machine sync via git (auto-commit + prompted push) | ✅ **unique** (3.1) | ❌ | ❌ | ❌ |
+| Deterministic stack detection (Python scripts) | ✅ | ❌ | ❌ | ❌ |
+| "What NOT to do" field | ✅ | ❌ | ❌ | partial |
+| PreCompact safety net | ✅ | ✅ | ✅ | ✅ |
+| Zero dependencies for skills (Python optional for scripts) | ✅ | ❌ (Haiku) | ❌ (Chroma) | ✅ |
+| Setup cost | plugin install + `/init` | plugin install | plugin install | plugin install |
 
 **When to use rad-session:** you want structured workflow lifecycle for a project — bootstrap once, orient each session, capture each session.
-
-**When you don't need it:** simple single-language projects where CLAUDE.md + native Auto Memory is enough. Don't install what you won't use.
-
-**Complementary:** rad-session pairs well with `basic-memory` MCP if you want semantic recall *across* projects — they're not competing.
 
 ## What's NOT in scope
 
@@ -252,6 +246,8 @@ Works with coding projects (captures git state + stack resources) and non-coding
 - **Does not orchestrate code reviews** — that role belonged to retired rad-stack-guide. Use the specialist reviewers directly (rad-code-review for general, rad-supabase / rad-coolify-orchestrator / rad-a11y / rad-chrome-extension for their domains).
 
 ## Version
+
+**3.5.1** — **Phase 5 removed.** The `/wrapup` "surface insights" phase has been deleted along with all references to it. Empirical evidence: across 12+ wrapups in one project, zero memory files were ever persisted from surfaced "Worth remembering" bullets — the surfacing was happening but nothing downstream was picking it up. The phase is gone in 3.5.1. The final state assertion no longer prints a "Worth remembering" line.
 
 **3.5.0** — **Speed: Haiku-pinned skills + cached resource scan + low-activity auto-quick.** Cuts `/startup` and `/wrapup` wall-clock time by roughly 4–5× by routing routine session work to a faster, cheaper model and short-circuiting work that doesn't need to run.
 - **Per-skill model pinning.** `/startup` and `/wrapup` SKILL.md frontmatter now pin to Haiku 4.5. The override applies for that turn only — the session model resumes automatically on the next prompt. The skills' explicit "tag-and-summarize" patterns and literal templates were already cross-model calibrated (Opus 4.7 / Sonnet 4.6 / Haiku 4.5), so output format and structure are unchanged. Override with `/model opus` before either skill if you want Opus-level synthesis on a specific run (e.g., a monthly deep-clean wrapup).
@@ -297,7 +293,7 @@ Works with coding projects (captures git state + stack resources) and non-coding
 
 **2.2.0** — Optimized for Opus 4.7. Parallel-batched `/startup` reads, explicit conversation-synthesis scan in `/wrapup`, auto-proceed threshold for low-risk CLAUDE.md prunes, stale-handoff auto-refresh from git log, canonical `TRIED / FAILED BECAUSE / CORRECT APPROACH` trap format, expanded stack marker table, PreCompact hook payload that enumerates capture targets explicitly.
 
-**2.1.0** — PreCompact hook for silent-context-loss prevention; Phase 5 stops writing to native Auto Memory path; repositioned pitch around Resource Discovery and wrapup discipline.
+**2.1.0** — PreCompact hook for silent-context-loss prevention; repositioned pitch around Resource Discovery and wrapup discipline.
 
 **2.0.0** — Added `/add-resource` skill, `/startup` Phase 2.5 Resource Discovery, `/wrapup` prune protection for the Resources section.
 

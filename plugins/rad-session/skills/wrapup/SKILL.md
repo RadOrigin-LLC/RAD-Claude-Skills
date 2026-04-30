@@ -3,11 +3,10 @@ name: wrapup
 description: >
   End-of-session skill that captures session state to HANDOFF.md, appends to the
   session log, and prunes CLAUDE.md of stale/ephemeral content (the ## Resources
-  section is protected from removal). Surfaces insights for Claude Code's native
-  Auto Memory but does not write to the memory path itself. Use at the end of any
-  work session for seamless handoffs. Trigger when the user says "/wrapup",
-  "wrap up", "end of session", "session handoff", "save session state",
-  "wrap this up", "let's wrap up", "close out this session".
+  section is protected from removal). Use at the end of any work session for
+  seamless handoffs. Trigger when the user says "/wrapup", "wrap up", "end of
+  session", "session handoff", "save session state", "wrap this up",
+  "let's wrap up", "close out this session".
 model: haiku
 allowed-tools:
   - Read
@@ -20,7 +19,7 @@ allowed-tools:
 
 # Session Wrapup
 
-Capture the current session's state, decisions, traps, and insights into structured handoff files, then prune CLAUDE.md to keep it lean. The `## Resources` section is protected from deletion. Insights worth remembering are surfaced in the final summary for Claude Code's native Auto Memory to pick up on its own schedule.
+Capture the current session's state, decisions, traps, and insights into structured handoff files, then prune CLAUDE.md to keep it lean. The `## Resources` section is protected from deletion.
 
 **Model selection (3.5).** The frontmatter pins this skill to **Haiku 4.5** for the duration of the wrapup turn. The session model resumes automatically on the next user prompt. Wrapup is mechanical labeling + templated formatting — Haiku handles it as well as Opus at a fraction of the wall-clock and token cost. The phase logic below is calibrated for Haiku; do not assume Opus-level latent reflection.
 
@@ -305,7 +304,7 @@ The prune evaluation is the slowest non-synthesis phase of wrapup. Most sessions
    # Skip Phase 4 if last_claude_commit < last_log_date
    ```
 
-If skipped, log: `CLAUDE.md unchanged since last wrapup — prune skipped.` Continue to Phase 5.
+If skipped, log: `CLAUDE.md unchanged since last wrapup — prune skipped.` Continue to Phase 6.
 
 In `--quick` mode, skip Phase 4 unconditionally (with the same one-line note).
 
@@ -388,55 +387,12 @@ The confirmation gate was added for safety on large or surprising prunes. For sm
 4. No removed line contains the word "must", "never", "always", "required", or "forbidden" (signals a permanent rule the user wrote)
 5. The session is not the first run on this project (i.e., CLAUDE.md existed before this wrapup)
 
-If all five hold: proceed without waiting, and the diff block above becomes the record of what happened. Continue to Phase 5.
+If all five hold: proceed without waiting, and the diff block above becomes the record of what happened. Continue to Phase 6.
 
 Otherwise: wait for the user to respond. Acceptable responses:
-- "looks good" / "fine" / "ok" / approval → proceed to Phase 5
+- "looks good" / "fine" / "ok" / approval → proceed to Phase 6
 - "undo [specific item]" → revert that change, show updated diff
 - If no changes were needed, say: "CLAUDE.md looks clean — no changes needed." and proceed
-
----
-
-## Phase 5: Surface Insights for Native Auto Memory
-
-**What changed in 2.1:** rad-session no longer writes to `~/.claude/projects/<project>/memory/` — that path is owned by Claude Code's **native Auto Memory** (shipped in v2.1.59). Writing there would collide with the native system and confuse `/memory` and `MEMORY.md` consolidation.
-
-Instead, Phase 5 **surfaces insights** by mentioning them in the final session summary. Claude Code's native Auto Memory will see them in the conversation context and save them on its own schedule — no duplicate write path, no collision.
-
-### What Qualifies as an Insight to Surface
-
-| Type | Example |
-|------|---------|
-| **reference** | "This project's API docs are at [URL]", "Bugs tracked in Linear project INGEST" |
-| **feedback** | User correction that applies beyond this project: "Prefer single PRs for refactors" |
-| **project** | Non-obvious project fact: "Auth rewrite driven by compliance, not tech debt" |
-| **user** | New info about the user's role/expertise: "First time working with GraphQL" |
-
-### What Does NOT Qualify
-
-- Anything already captured in HANDOFF.md or session-log.md — duplication wastes tokens
-- Code patterns, file paths, or architecture (derivable from the codebase)
-- Session-specific debugging details
-- Resource entries — those belong in CLAUDE.md's `## Resources` section via `/add-resource`, not memory
-
-### Presentation
-
-If insights exist, include them in the final summary block under a "Worth remembering" sub-section:
-
-```
-Worth remembering (for native Auto Memory):
-  - [insight 1] ([type])
-  - [insight 2] ([type])
-```
-
-Do **not** prompt the user to pick which ones to save — Claude Code's native Auto Memory decides on its own schedule. Your job is to surface the candidate; the harness persists it.
-
-**Do not** write to `~/.claude/projects/<project>/memory/` directly. **Do not** create or edit `MEMORY.md`. If you detect that a prior rad-session version wrote memory files there, leave them alone — do not migrate or delete, and note it once in the final summary:
-
-```
-Note: detected legacy rad-session memory files at ~/.claude/projects/<project>/memory/.
-These are no longer written to by /wrapup. Native Auto Memory manages that path.
-```
 
 ---
 
@@ -523,7 +479,7 @@ On success: continue. On rejection (non-fast-forward, diverged): do not force, d
 
 ### 6.6 Sync summary line
 
-Append one line to the Phase 5 final summary so the user knows what happened:
+Append one line to the final state assertion block (below) so the user knows what happened:
 
 - Committed + pushed: `Sync: committed + pushed (<short-sha>)`
 - Committed, push declined: `Sync: committed locally (<short-sha>) — N unpushed session commits`
@@ -551,7 +507,6 @@ Session wrapped up:
   - session-log: <N> entries / <N> KB  [cap: 20 entries / ~20 KB]  [⚠ if over]
   - Maintenance: <line from Phase 3.B.5>
   - CLAUDE.md: [pruned: N changes (auto-proceeded | confirmed) | unchanged | created]
-  [- Worth remembering: N insights surfaced for native Auto Memory]
   [- Sync: <one of the lines from 6.6>]
 ```
 

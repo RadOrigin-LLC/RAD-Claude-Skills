@@ -122,7 +122,7 @@ Read `CLAUDE.md` at the project root. Note:
 
 **Import resolution.** If CLAUDE.md contains lines matching `@<path>` (e.g., `@docs/architecture.md`, `@.claude/rules.md`), treat each as an imported file. Resolve each path relative to the CLAUDE.md location and Read the file in the same parallel batch. Include the imported content as additional project context in the briefing when relevant. Missing import targets are reported silently (note in the briefing under a subtle "⚠ missing import: <path>" line — do not error out).
 
-Do not follow imports recursively beyond one level — that is Claude Code's native Auto Memory behavior, and re-implementing it here risks divergence.
+Do not follow imports recursively beyond one level — imports of imports are out of scope for `/startup`, and following them risks pulling in unbounded content.
 
 ### 1.2 Read HANDOFF.md
 
