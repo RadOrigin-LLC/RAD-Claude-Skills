@@ -49,6 +49,50 @@ Single-writer rule: rad-session owns CLAUDE.md / HANDOFF.md / session-log; rad-p
 
 Plus `/add-resource` (any time, registers a new tool) and a PreCompact hook (auto-fires on context compaction so state isn't silently lost).
 
+## Upgrading from 3.x
+
+If you have a project that was set up with rad-planner 2.x / rad-session 3.x, run the bundled migration helper **before** installing rad-planner 3.0 / rad-session 4.0:
+
+```bash
+# Preview the changes (writes nothing)
+python3 ${rad-claude-skills}/plugins/rad-session/scripts/migrate-to-v4.py /path/to/your/project --dry-run
+
+# Apply (interactive — confirms each transformation)
+python3 ${rad-claude-skills}/plugins/rad-session/scripts/migrate-to-v4.py /path/to/your/project
+
+# Or apply non-interactively (safe transforms only; ambiguous items skipped for manual review)
+python3 ${rad-claude-skills}/plugins/rad-session/scripts/migrate-to-v4.py /path/to/your/project --non-interactive
+```
+
+**What gets transformed:**
+
+| v2.x / v3.x artifact | 4.0 outcome |
+|---|---|
+| `implementation_plan.md` (v2.x mega-doc) | Split into `PRD.md` / `ARCHITECTURE.md` / `ASSUMPTIONS.md` / `DECISIONS.md` / `PLAN.md` at project root. Section heading heuristics map sections 1–7 to the new layout; the "Key Design Decisions" table seeds DECISIONS.md as sequence-numbered entries. ASSUMPTIONS.md is a placeholder (no v2.x source). |
+| `HANDOFF.md` from `/checkpoint` | Archived. The next `/rad-session:wrapup` regenerates HANDOFF.md from session state in the wrapup-format. |
+| `EXECUTION-PROMPT.md` | Archived. Role replaced by `/rad-session:startup` briefing in 4.0. |
+| `docs/ARCHITECTURE.md` | Moved to project root (4.0 puts all strategic docs at root). When `implementation_plan.md` is also being split, the duplicate at `docs/` is archived to avoid two sources of truth. |
+| `CLAUDE.md` from `/rad-planner:generate-project-config` | Preserved as-is; `CLAUDE-FRAGMENT.md` is generated alongside so the next `/rad-session:init` can merge strategic `@-imports`. |
+
+All originals archive to `.rad-archive/<UTC-timestamp>/` (gitignored by default; override with `--no-gitignore`). The archive's `manifest.json` records every action with timestamps for audit and rollback.
+
+**After migration, verify the v4 layout:**
+
+```bash
+# Mechanical task-graph lint (unchanged from 2.x)
+python3 ${rad-claude-skills}/plugins/rad-planner/scripts/plan-lint.py --mode all tasks.md
+
+# Cheap 8-doc gap-check (new in 3.0)
+/rad-planner:plan --validate
+
+# Merge CLAUDE-FRAGMENT.md into CLAUDE.md
+/rad-session:init
+```
+
+**Rollback:** copy files back from `.rad-archive/<timestamp>/` (originals carry the `.orig` suffix with path separators flattened to `-`, e.g. `docs-ARCHITECTURE.md.orig`), then delete the new v4 files. The manifest lists every action and its source/destination.
+
+**Re-run safety:** the migration script is a no-op on projects already on the 8-doc standard. Safe to run multiple times.
+
 ## What's in the plugin
 
 | Component | Triggers | What it does |

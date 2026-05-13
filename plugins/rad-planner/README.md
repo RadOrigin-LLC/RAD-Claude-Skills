@@ -117,6 +117,43 @@ The `references/` directory contains the knowledge base agents and skills load o
 - Run the validators against a real artifact: `python3 scripts/plan-lint.py --mode all examples/example-tasks.md`.
 - Test the validator failure modes by introducing a cycle or stripping a field.
 
+## Upgrading from 2.x
+
+If you have a project that was set up with rad-planner 2.x, run the migration helper bundled with rad-session **before** installing rad-planner 3.0:
+
+```bash
+# Preview the changes (writes nothing)
+python3 ${rad-claude-skills}/plugins/rad-session/scripts/migrate-to-v4.py /path/to/your/project --dry-run
+
+# Apply (interactive — confirms each transformation)
+python3 ${rad-claude-skills}/plugins/rad-session/scripts/migrate-to-v4.py /path/to/your/project
+
+# Or apply non-interactively (safe transforms only; ambiguous items skipped for manual review)
+python3 ${rad-claude-skills}/plugins/rad-session/scripts/migrate-to-v4.py /path/to/your/project --non-interactive
+```
+
+**What gets transformed:**
+
+| v2.x artifact | 3.0 outcome |
+|---|---|
+| `implementation_plan.md` (mega-doc) | Split into `PRD.md` / `ARCHITECTURE.md` / `ASSUMPTIONS.md` / `DECISIONS.md` / `PLAN.md` at project root. Section-heading heuristics map the old 7-section template. The "Key Design Decisions" table seeds DECISIONS.md as sequence-numbered entries. ASSUMPTIONS.md is a placeholder (no v2.x source). |
+| `EXECUTION-PROMPT.md` | Archived. The rad-session 4.0 `/startup` briefing covers the same kickoff role. |
+| `docs/ARCHITECTURE.md` | Moved to `ARCHITECTURE.md` at project root (3.0 puts all strategic docs at root). When `implementation_plan.md` is also being split, the duplicate at `docs/` is archived to avoid two sources of truth. |
+| `HANDOFF.md` from `/checkpoint` | Archived. rad-planner 3.0's `/checkpoint` no longer writes HANDOFF.md (single-writer rule) — that file is owned by rad-session `/wrapup`. The next `/rad-session:wrapup` regenerates it. |
+| `CLAUDE.md` from `/rad-planner:generate-project-config` | Preserved as-is. The `generate-project-config` skill is removed in 3.0; `CLAUDE-FRAGMENT.md` is emitted alongside so the next `/rad-session:init` can merge strategic `@-imports`. |
+
+All originals archive to `.rad-archive/<UTC-timestamp>/` (gitignored by default). The archive's `manifest.json` records every action for audit and rollback. See `plugins/rad-session/scripts/README.md` for the script's full contract.
+
+**After migration, verify:**
+
+```bash
+python3 scripts/plan-lint.py --mode all tasks.md   # mechanical task-graph lint
+/rad-planner:plan --validate                       # cheap 8-doc gap-check
+/rad-session:init                                  # merges CLAUDE-FRAGMENT.md
+```
+
+**Rollback:** copy files back from `.rad-archive/<timestamp>/` (originals carry `.orig` suffix, path separators flattened to `-`), then delete the new v4 files. **Re-run safety:** the migration script is a no-op on projects already on the 8-doc standard.
+
 ## What's New in 3.0
 
 - **Document standardization — the RAD 8-doc standard.** `/plan` now emits five strategic/operational files (PRD.md, ARCHITECTURE.md, ASSUMPTIONS.md, DECISIONS.md, PLAN.md) at project root instead of a single 7-section `implementation_plan.md`. Each file has a single canonical purpose and one plugin owner. Canonical spec at `docs/file-conventions.md` (shared with rad-session 4.0).
