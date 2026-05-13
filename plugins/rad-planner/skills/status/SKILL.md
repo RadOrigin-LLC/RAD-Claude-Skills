@@ -13,7 +13,7 @@ allowed-tools: Read Glob Bash
 
 # Status — Plan Progress Report
 
-Read a tasks file (or implementation_plan.md with inline tasks) and report what's done, what's blocked, and what's eligible to work on next. Calls `scripts/plan-lint.py --mode status` for a deterministic state report — no LLM judgment required.
+Read a tasks file (or `PLAN.md` / `implementation_plan.md` with inline tasks) and report what's done, what's blocked, and what's eligible to work on next. Calls `scripts/plan-lint.py --mode status` for a deterministic state report — no LLM judgment required.
 
 ## When to use
 
@@ -30,8 +30,8 @@ For a deeper quality audit, use `/rad-planner:review-plan` instead. This skill i
 
 If a path was provided, use it. Otherwise Glob in parallel for:
 - `tasks.md`
-- `implementation_plan.md`
-- `PLAN.md`
+- `PLAN.md` (RAD 3.0+ standard)
+- `implementation_plan.md` (v2.x legacy)
 - `plan.md`
 - Any `.md` in `docs/plans/` or `plans/`
 

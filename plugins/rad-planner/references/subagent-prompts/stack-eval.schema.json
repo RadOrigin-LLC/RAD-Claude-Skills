@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "rad-planner/stack-eval.schema.json",
   "title": "rad-planner stack-advisor output contract",
-  "description": "JSON contract emitted by the stack-advisor agent. Validated by scripts/validate-json.py before the dispatching skill (plan-project / evaluate-stack) consumes it.",
+  "description": "JSON contract emitted by the stack-advisor agent. Validated by scripts/validate-json.py before the dispatching skill (plan / evaluate-stack) consumes it.",
   "type": "object",
   "required": ["evaluation_complete", "project_type", "summary", "recommendation", "compatibility_verified", "confidence", "escalation_required"],
   "properties": {

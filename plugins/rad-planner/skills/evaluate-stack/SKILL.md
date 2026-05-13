@@ -116,7 +116,7 @@ In `--non-interactive` mode, skip this step and emit the trailing JSON directly.
 ### 7. Next Steps
 
 After the user accepts the stack recommendation, suggest:
-- Run `/rad-planner:plan-project` to build a full implementation plan using this stack
+- Run `/rad-planner:plan` to build a full implementation plan using this stack
 - Or proceed directly if this was a standalone evaluation
 
 In `--non-interactive` mode, emit:

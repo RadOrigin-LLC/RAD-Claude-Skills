@@ -1,7 +1,7 @@
 {
   "name": "rad-planner",
-  "version": "2.1.0",
-  "description": "RAD Planner — structured implementation-planning scaffolding for Claude Code, with mechanical Python validators (DAG cycle detection, field-presence checklist, JSON Schema validation) backing the parts that templates can't enforce. Includes plan-project, evaluate-stack, review-plan, status, generate-project-config, and checkpoint skills.",
+  "version": "3.0.0",
+  "description": "**3.0 — Document standardization, split plan output, CLAUDE-FRAGMENT.md handoff to rad-session, /checkpoint no longer writes HANDOFF.md, /plan --reboot and --validate modes.** RAD Planner — structured implementation-planning scaffolding for Claude Code, with mechanical Python validators (DAG cycle detection, field-presence checklist, JSON Schema validation) backing the parts that templates can't enforce. /plan emits the RAD 8-doc standard at project root: PRD.md, ARCHITECTURE.md, ASSUMPTIONS.md, DECISIONS.md, PLAN.md, plus tasks.md and a transient CLAUDE-FRAGMENT.md consumed by rad-session /init. generate-project-config and EXECUTION-PROMPT.md are removed in 3.0 — single source of truth. Skills: plan (legacy trigger 'plan-project' still works), evaluate-stack, review-plan, status, checkpoint.",
   "author": {
     "name": "RAD",
     "url": "https://github.com/radesjardins"

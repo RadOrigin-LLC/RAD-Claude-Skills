@@ -1,35 +1,69 @@
-# Implementation Plan: URL Shortener API
+# Example Plan Output — URL Shortener API
+
+This file shows what `/rad-planner:plan` emits in 3.0+. The real output is **five separate files at project root** — PRD.md, ARCHITECTURE.md, ASSUMPTIONS.md, DECISIONS.md, PLAN.md — plus `tasks.md` (see `example-tasks.md`) and a transient `CLAUDE-FRAGMENT.md`. For readability the five strategic/operational files are concatenated below, separated by horizontal rules.
+
+The URL Shortener API is a hypothetical project — not a real one. Use this output to verify what a clean, validator-passing 3.0 plan looks like before invoking `/plan` on your own project.
+
+---
+
+# PRD.md
 
 **Generated:** 2026-04-25
 **Status:** APPROVED (example artifact — not a real project)
 **Approved by:** RAD (illustrative)
 
-## 1. Project Summary
+## Goal
 
-**Goal:** Ship a small JSON API that turns long URLs into short codes, redirects on lookup, and tracks click counts. Single-tenant, no auth, ~3 endpoints.
+Ship a small JSON API that turns long URLs into short codes, redirects on lookup, and tracks click counts. Single-tenant, no auth, ~3 endpoints.
 
-**Scope:**
-- In: `POST /shorten`, `GET /:code`, `GET /:code/stats`, persistence in PostgreSQL, Docker deploy.
-- Out: User accounts, custom slugs, rate limiting, analytics dashboard.
+## Scope
 
-**Success Criteria:**
+**In scope:**
+- `POST /shorten` — accept a URL, return a short code
+- `GET /:code` — redirect to the original URL, increment click count
+- `GET /:code/stats` — return click count + creation date
+- Persistence in PostgreSQL
+- Docker deploy + minimal CI
+
+**Out of scope:**
+- User accounts, custom slugs
+- Rate limiting, analytics dashboard
+- Multi-tenancy or auth
+
+## Success Criteria
+
 - [ ] All three endpoints respond correctly with documented contracts.
 - [ ] `POST /shorten` returns the same code for an identical URL within 24h (idempotency).
 - [ ] Click counts increment exactly once per redirect under concurrent load (10 req/sec).
 
-**Tech Stack:**
+## Tech Stack Summary
+
 - Backend: Fastify 5.x (Node.js 22 LTS)
 - Database: PostgreSQL 16
 - ORM: Drizzle 0.36+
 - Validation: Zod 4
 - Test: Vitest 2 + supertest
 
-**Constraints:**
+(Full rationale in ARCHITECTURE.md and DECISIONS.md.)
+
+## Constraints
+
 - TypeScript strict mode, no `any`.
 - All routes Zod-validated at boundary.
 - All DB writes through Drizzle (no raw SQL except migrations).
 
-## 2. Architecture
+## Target Users / Use Cases
+
+- Internal team needing a quick shortener for analytics-friendly campaign links.
+- No public signup — single-tenant, owner-administered.
+
+---
+
+# ARCHITECTURE.md
+
+**Last updated:** 2026-04-25
+
+## Component Diagram
 
 ```mermaid
 graph TD
@@ -42,14 +76,30 @@ graph TD
     Counter --> DB
 ```
 
-**Key Design Decisions:**
-| Decision | Choice | Rationale |
-|---|---|---|
-| Code generation | nanoid(8) | URL-safe, low collision at expected scale, no DB lookup for uniqueness check on first attempt |
-| Click counter | `UPDATE ... RETURNING` | Avoids read-modify-write race under concurrent redirects |
-| Persistence | PostgreSQL `urls` table with unique index on URL hash | Idempotent shortening without exposing the hash |
+## System Boundaries
 
-## 3. Target Files
+- **External interfaces:** HTTP requests to `/shorten`, `/:code`, `/:code/stats`.
+- **Internal interfaces:** Service layer → Drizzle client → Postgres.
+- **Trust boundary:** Zod-validated request body / params at the route layer. Nothing else is trusted to be well-formed.
+
+## Data Flow
+
+1. `POST /shorten` receives `{url}`. Zod validates string + length cap.
+2. Service computes `url_hash`, attempts `INSERT ... ON CONFLICT (url_hash) DO NOTHING RETURNING code`. Returns existing or new code.
+3. `GET /:code` runs single-statement `UPDATE urls SET click_count = click_count + 1 WHERE code = $1 RETURNING original_url`. On hit, redirects with 302. On miss, 404.
+4. `GET /:code/stats` reads `click_count + created_at` for the code; 200 with body or 404.
+
+## Key Design Decisions
+
+| # | Decision | Choice | Rationale |
+|---|---|---|---|
+| 1 | Code generation | nanoid(8) | URL-safe, low collision at expected scale, no DB lookup needed for uniqueness on first attempt |
+| 2 | Click counter | `UPDATE … RETURNING` | Avoids read-modify-write race under concurrent redirects |
+| 3 | Persistence | PostgreSQL `urls` table with unique index on URL hash | Idempotent shortening without exposing the hash |
+
+(Full chronological decision history with supersession lives in DECISIONS.md.)
+
+## Target Files
 
 Files to be **created**:
 - `src/server.ts` — Fastify bootstrap
@@ -69,7 +119,84 @@ Files to be **modified**:
 
 Files to **NOT touch**: N/A (greenfield).
 
-## 4. Milestones
+---
+
+# ASSUMPTIONS.md
+
+Non-obvious truths about this project's reality that wouldn't be evident from reading the code.
+
+## Current
+
+- [2026-04-25] **No users yet** — we can break URL-format compatibility freely through M2; lock in by deploy.
+- [2026-04-25] **Single-tenant only.** Multi-tenant would require schema rework (a `tenant_id` column on every table); deliberately out of scope.
+- [2026-04-25] **The shortener domain is internally-owned.** No public-facing risk of someone shortening malicious URLs via the API at this stage.
+- [2026-04-25] **PostgreSQL is fine for the projected scale.** Estimated ≤10K shorten ops/day, ≤100K redirects/day. No need to plan around eventual sharding.
+- [2026-04-25] **Drizzle 0.36 is current.** If Drizzle ships breaking changes before deploy, we pin to 0.36.x and revisit at the first scheduled upgrade.
+
+## Invalidated
+
+(none yet — file starts empty under "Invalidated" until something actually changes)
+
+---
+
+# DECISIONS.md
+
+Chronological architecture and tooling decisions. Append new entries; never delete. Sequence numbers (`0001`, `0002`, …) are the cross-reference for supersession.
+
+## 0001 — 2026-04-25 — Fastify over Express
+
+**Status:** Active
+
+**Context:** HTTP server with first-class TypeScript types and good async handling. Team has Express experience but no strong attachment.
+
+**Decision:** Fastify 5.x. Native TS types, faster routing, schema-based validation hook composes with our Zod-everywhere pattern.
+
+**Consequences:** Team learns Fastify lifecycle (1-2 days). Accept smaller plugin ecosystem vs. Express. Migration cost ~minimal at current size.
+
+---
+
+## 0002 — 2026-04-25 — PostgreSQL over MongoDB for primary store
+
+**Status:** Active
+
+**Context:** URL shortener data is relational (urls table, click counter). Idempotency requires unique constraints on URL hash.
+
+**Decision:** PostgreSQL 16 with Drizzle 0.36 ORM. Atomic UPDATE...RETURNING for click counter; INSERT...ON CONFLICT for idempotent shortening.
+
+**Consequences:** Single-node Postgres sufficient for projected scale. Operational story: managed Postgres on Supabase/Neon when we deploy.
+
+---
+
+## 0003 — 2026-04-25 — nanoid(8) for code generation
+
+**Status:** Active
+
+**Context:** Need URL-safe codes with low collision probability at expected scale (≤10K shorten ops/day). Options: nanoid, hashids, sequential base62, random alphanumeric.
+
+**Decision:** nanoid(8). 218 trillion possible codes; collision becomes meaningful only past ~10⁹ rows.
+
+**Consequences:** No DB lookup needed for uniqueness on first attempt. Catch unique-violation on insert and retry once with a new code (rare event).
+
+---
+
+## 0004 — 2026-04-25 — Atomic UPDATE for click counter (race-safe by design)
+
+**Status:** Active
+
+**Context:** Risk-assessor flagged anti-pattern #9 (Fallback Trap): a SELECT-then-UPDATE pattern under concurrent redirects loses click increments silently.
+
+**Decision:** Single-statement `UPDATE urls SET click_count = click_count + 1 WHERE code = $1 RETURNING original_url`. Atomic at the SQL level; no application-level retry loop.
+
+**Consequences:** Concurrency test in S7 verifies exactly count=100 under 100 concurrent redirects. Mocks not used for this test — real Postgres only.
+
+---
+
+# PLAN.md
+
+**Generated:** 2026-04-25
+**Status:** APPROVED (example artifact — not a real project)
+
+## Milestones
 
 | # | Milestone | Goal | Key Artifacts | Est. Complexity |
 |---|---|---|---|---|
@@ -78,7 +205,7 @@ Files to **NOT touch**: N/A (greenfield).
 | M3 | Concurrency hardening | Idempotency + click-count race fix | Updated service + tests | 6/10 |
 | M4 | Deploy | Dockerfile + smoke tests | Dockerfile, CI | 3/10 |
 
-## 5. Implementation Steps
+## Implementation Steps
 
 ### Phase 1: Scaffold (Milestone M1)
 
@@ -198,7 +325,7 @@ Files to **NOT touch**: N/A (greenfield).
   - **Rollback:** `git rm .github/workflows/ci.yml`
   - **Test Strategy:** Mutation test — comment out the click-counter UPDATE statement, push to a feature branch, confirm CI catches it
 
-## 6. Checkpoints
+## Checkpoints
 
 ### Checkpoint 1: After Phase 1 (M1)
 - **Gate:** S1, S2, S3 must be [VERIFIED]
@@ -211,7 +338,7 @@ Files to **NOT touch**: N/A (greenfield).
 - **Validation:** Full vitest suite passes; manual `curl POST /shorten` + `curl GET /:code` round-trip
 - **Rollback:** Revert S4–S6 commits; DB rollback via `npx drizzle-kit drop && drizzle-kit migrate`
 - **Human Review:** Confirm response shapes match documented contracts before deploy work starts
-- **Context Action:** Commit, then `/rad-planner:checkpoint` to dump state. Recommend `/clear` before starting M3 — concurrency reasoning needs a clean window.
+- **Context Action:** Commit, then `/rad-planner:checkpoint` to dump planner state. Run `/rad-session:wrapup` if you also want a session-level handoff. Recommend `/clear` before starting M3 — concurrency reasoning needs a clean window.
 
 ### Checkpoint 3: After Phase 3 (M3)
 - **Gate:** S7, S8 [VERIFIED]
@@ -219,9 +346,10 @@ Files to **NOT touch**: N/A (greenfield).
 - **Rollback:** Revert to end-of-M2; M3 changes are isolated to one file
 - **Human Review:** Spot-check the SQL — atomic UPDATE and ON CONFLICT clauses are easy to subtly break
 
-## 7. Risks and Considerations
+## Risks and Considerations
 
 ### Technical Risks
+
 | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|
 | nanoid collision at higher scale than expected | Low | Medium | Catch unique-violation on insert, retry once with new code; add scale alerting |
@@ -229,16 +357,19 @@ Files to **NOT touch**: N/A (greenfield).
 | Drizzle 0.36 breaking change between plan and execution | Medium | Low | Pin to ~0.36.x; revisit if the project lives long enough to upgrade |
 
 ### Edge Cases to Handle
+
 - Empty body POST → 400 with explicit message (not 500)
 - URL longer than 2048 chars → 413
 - URL with spaces / fragments / unicode → preserve as-is (no eager canonicalization)
 - Lookup of a code that was never created → 404 (not 500)
 
 ### Anti-Pattern Warnings
-- This plan avoids #9 (Fallback Trap) — concurrency fixes use atomic SQL, not silent retry loops.
-- This plan avoids #11 (Stale APIs) — Drizzle 0.36 syntax verified against current docs (2026-04).
+
+- Avoids #9 (Fallback Trap) — concurrency fixes use atomic SQL, not silent retry loops (see DECISIONS 0004).
+- Avoids #11 (Stale APIs) — Drizzle 0.36 syntax verified against current docs (2026-04).
 - S10 CI mutation test enforces #14 (Shoot and Forget) at the org boundary.
 
 ### Context Management Notes
+
 - Plan estimated to fit in a single Claude Code session at execution time, with one mandatory clear after M2 (concurrency work benefits from a fresh context window).
-- Reference files needed in execution session: this plan + the project README. CLAUDE.md is generated by `/rad-planner:generate-project-config` once approved.
+- Reference files needed in execution session: PLAN.md (this file), ARCHITECTURE.md, ASSUMPTIONS.md. CLAUDE.md is generated by rad-session `/init` from the `CLAUDE-FRAGMENT.md` that `/plan` emitted alongside these docs.

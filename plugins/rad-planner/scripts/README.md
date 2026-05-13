@@ -47,7 +47,7 @@ python3 scripts/validate-json.py <schema> agent-output.md --extract-from-markdow
 python3 scripts/validate-json.py <schema> output.json --json
 ```
 
-The dispatching skills (`plan-project`, `review-plan`, `evaluate-stack`) use this to verify subagent JSON output against the documented contract before consuming it. On failure they re-prompt once with the validation errors before falling back to markdown parsing.
+The dispatching skills (`plan`, `review-plan`, `evaluate-stack`) use this to verify subagent JSON output against the documented contract before consuming it. On failure they re-prompt once with the validation errors before falling back to markdown parsing.
 
 **Exit codes:** `0` valid, `1` invalid, `2` script error.
 
@@ -56,7 +56,7 @@ The dispatching skills (`plan-project`, `review-plan`, `evaluate-stack`) use thi
 | Caller | Script | When |
 |---|---|---|
 | `review-plan` skill | `plan-lint.py --mode all` | Step 2 (before / alongside risk-assessor dispatch) |
-| `plan-project` skill | `plan-lint.py --mode all` | After Phase 3 (plan drafted, before risk-assessor) and after Phase 5 (post-approval) |
+| `plan` skill | `plan-lint.py --mode all` | After Phase 3 (plan drafted, before risk-assessor) and after Phase 5 (post-approval) |
 | `risk-assessor` agent | `plan-lint.py --mode all --json` | Pass 2 / Pass 3 — to skip mechanical re-checks the script already covered, focus LLM judgment on Pass 1 anti-patterns and Pass 6 architecture |
 | `status` skill | `plan-lint.py --mode status` | Whenever invoked |
 | `evaluate-stack` skill | `validate-json.py stack-eval.schema.json` | After stack-advisor returns |

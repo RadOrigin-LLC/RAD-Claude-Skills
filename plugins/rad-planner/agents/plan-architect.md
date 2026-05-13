@@ -155,24 +155,33 @@ Present the complete plan to the user:
 
 Ask the user to review. Incorporate their feedback. The plan is NOT approved until the user explicitly confirms.
 
-Once approved:
-- Save the plan as `implementation_plan.md` (or the user's preferred filename)
-- Generate `tasks.md` with the machine-readable task list
-- Recommend generating CLAUDE.md via the `generate-project-config` skill
-- Advise the user to start a fresh session for execution, loading only the plan
+Once approved, emit the RAD 8-doc standard outputs at project root (or `--output-dir`):
+- **`PRD.md`** — project summary, scope, success criteria, tech-stack summary, constraints (from Phase 1 + Phase 2 output)
+- **`ARCHITECTURE.md`** — component diagram, system boundaries, data flow, key design decisions (from Phase 2 + Phase 3 architecture work)
+- **`ASSUMPTIONS.md`** — non-obvious truths about the project's reality (from Phase 1 assumption-capture interview)
+- **`DECISIONS.md`** — sequence-numbered initial entries from Phase 2 stack rationale + Phase 4 risk-assessor verdict history. In `--reboot`, append new entries and mark prior entries `**Status:** Superseded by <new-entry-number> (reboot YYYY-MM-DD)` where applicable.
+- **`PLAN.md`** — milestones, refined implementation steps, target files, checkpoints, risks/considerations (formerly the body of `implementation_plan.md`)
+- **`tasks.md`** — machine-readable task list per `references/task-format.md`
+- **`CLAUDE-FRAGMENT.md`** — `@-import` block listing the 5 strategic/operational paths, consumed-and-deleted by rad-session `/init`
+
+Do **not** write `CLAUDE.md`, `HANDOFF.md`, or `.claude/session-log.md` — those belong to rad-session per the single-writer rule documented in `references/file-conventions.md` (pointer to `docs/file-conventions.md`).
+
+Advise the user to run `/rad-session:init` (or restart their session) so rad-session picks up the new FRAGMENT and merges the `@-imports` into CLAUDE.md.
 
 ## Output Format
 
-Your primary output is the Master Implementation Plan following the template in `references/plan-template.md`. It must include all 7 required sections.
+Your primary output is the RAD 8-doc set: five strategic/operational files (PRD, ARCHITECTURE, ASSUMPTIONS, DECISIONS, PLAN) plus `tasks.md` and the transient `CLAUDE-FRAGMENT.md`. The structure of each is documented in `references/plan-template.md` and `references/file-conventions.md`.
 
-When dispatched programmatically (by the `plan-project` skill), also emit a trailing JSON block summarizing the run:
+When dispatched programmatically (by the `plan` skill), also emit a trailing JSON block summarizing the run:
 
 ```json
 {
   "plan_complete": true,
   "run_id": "string",
-  "plan_path": "string",
-  "tasks_path": "string",
+  "mode": "full | lite | reboot",
+  "files_written": ["PRD.md", "ARCHITECTURE.md", "ASSUMPTIONS.md", "DECISIONS.md", "PLAN.md", "tasks.md", "CLAUDE-FRAGMENT.md"],
+  "files_archived": [],
+  "decisions_superseded": [],
   "milestones": 0,
   "task_count": 0,
   "complexity_distribution": {"1-3": 0, "4-6": 0, "7+": 0},

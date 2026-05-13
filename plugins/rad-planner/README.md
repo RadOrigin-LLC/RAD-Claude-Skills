@@ -26,14 +26,15 @@ rad-planner produces project-level planning artifacts per the [RAD 8-doc standar
 
 | Skill | Trigger | What it produces |
 |---|---|---|
-| `/rad-planner:plan-project` | "plan my project", "create implementation plan" | Full 6-phase workflow → `implementation_plan.md` + `tasks.md` + `EXECUTION-PROMPT.md`. Supports `--lite` for small work. |
-| `/rad-planner:evaluate-stack` | "what stack should I use", "recommend a stack" | Stack recommendation table with live version verification. Standalone or as Phase 2 of plan-project. |
-| `/rad-planner:review-plan` | "review my plan", "audit this plan" | Quality audit combining mechanical lint + judgment review. |
+| `/rad-planner:plan` | "plan my project", "create implementation plan" | Full 6-phase workflow → 5-file split (PRD / ARCHITECTURE / ASSUMPTIONS / DECISIONS / PLAN) + `tasks.md` + transient `CLAUDE-FRAGMENT.md`. Supports `--lite`, `--reboot`, `--validate`. Legacy 2.x trigger `plan-project` still works. |
+| `/rad-planner:evaluate-stack` | "what stack should I use", "recommend a stack" | Stack recommendation table with live version verification. Standalone or as Phase 2 of `/plan`. |
+| `/rad-planner:review-plan` | "review my plan", "audit this plan" | Deep quality audit combining mechanical lint + risk-assessor judgment. For a cheap "do the docs exist + does lint pass" gap-check, use `/plan --validate` instead. |
 | `/rad-planner:status` | "plan status", "what's next", "where am I in the plan" | Quick read of an in-flight plan: % complete, blocked tasks, next eligible. |
-| `/rad-planner:generate-project-config` | "generate CLAUDE.md", "setup project files" | Generates CLAUDE.md + ARCHITECTURE.md from an approved plan. |
-| `/rad-planner:checkpoint` | "checkpoint", "save progress", "document and clear" | Writes HANDOFF.md + `.planner/state/<run-id>.json`. User runs `/clear` separately. |
+| `/rad-planner:checkpoint` | "checkpoint", "save progress", "document and clear" | Writes `.planner/state/<run-id>.json` and updates plan task states. **Does NOT write HANDOFF.md in 3.0+** — that's rad-session `/wrapup`'s job (single-writer rule). |
 
-Honest note: `evaluate-stack` and `review-plan` are also exposed as standalone skills, but they re-use the same agents (`stack-advisor`, `risk-assessor`) that `plan-project` invokes during its phases. Treat them as direct entry points for those phases, not separate functionality.
+Honest note: `evaluate-stack` and `review-plan` are also exposed as standalone skills, but they re-use the same agents (`stack-advisor`, `risk-assessor`) that `/plan` invokes during its phases. Treat them as direct entry points for those phases, not separate functionality.
+
+**Removed in 3.0:** `generate-project-config` is gone. Its v2.x role (derive `CLAUDE.md` + `ARCHITECTURE.md` from an approved plan) is fully absorbed by `/plan`'s Phase 6, which now emits `ARCHITECTURE.md` directly and produces `CLAUDE-FRAGMENT.md` for rad-session `/init` to merge into `CLAUDE.md`. Run `/plan` for greenfield, `/plan --reboot` for projects without a plan.
 
 ## Agents
 
@@ -77,7 +78,7 @@ Claude Code ships with [Plan Mode](https://docs.claude.com/en/docs/claude-code/)
 - **Plan Mode** handles read-only enforcement at the runtime level (no Edit/Write/Bash).
 - **rad-planner** adds structured artifacts on top: a 7-section plan template, a DAG, a risk audit, an executor handoff manifest, and a checkpoint schema.
 
-You can run `/rad-planner:plan-project` inside Plan Mode for runtime-level read-only guarantees — the skill will still produce all its planning artifacts via the Write tool (which is required to save the plan).
+You can run `/rad-planner:plan` inside Plan Mode for runtime-level read-only guarantees — the skill will still produce all its planning artifacts via the Write tool (which is required to save the plan).
 
 ## Pipeline with rad-brainstormer
 
@@ -87,10 +88,10 @@ You can run `/rad-planner:plan-project` inside Plan Mode for runtime-level read-
 |---|---|---|---|
 | **Ideation** (divergent) | `rad-brainstormer` | Exploring the problem, generating options, stress-testing assumptions | A decided idea + rough direction |
 | **Design** (post-ideation) | `rad-brainstormer:design-sprint` | Architecture, components, data flow, API design, error handling, testing strategy | A reviewable design spec |
-| **Planning** (pre-code) | `rad-planner:plan-project` | Dependency-aware task graph, complexity scoring, risk audit, failure states | An ordered implementation plan |
+| **Planning** (pre-code) | `rad-planner:plan` | Dependency-aware task graph, complexity scoring, risk audit, failure states | An ordered implementation plan |
 | **Code** | your tools of choice | Implementation | Working software |
 
-If you come in with a clear idea, start with `/rad-planner:plan-project`. If the idea is fuzzy, start with `/rad-brainstormer:brainstorm-session` first.
+If you come in with a clear idea, start with `/rad-planner:plan`. If the idea is fuzzy, start with `/rad-brainstormer:brainstorm-session` first.
 
 ## Reference Files
 
@@ -100,11 +101,11 @@ The `references/` directory contains the knowledge base agents and skills load o
 |---|---|
 | `golden-path-matrix.md` | AI-native proficiency tiers + project-type stack recommendations (date-stamped, opinionated) |
 | `anti-patterns.md` | 14 documented "Do Not Do" constraints (some are opinions with thresholds — clearly marked) |
-| `plan-template.md` | Master Implementation Plan structure (7 sections) with a "what enforces what" table |
+| `plan-template.md` | Template structure for the 5-file split (PRD / ARCHITECTURE / ASSUMPTIONS / DECISIONS / PLAN) with shared rules and a "what enforces what" table |
+| `file-conventions.md` | Pointer to canonical `docs/file-conventions.md` (RAD 8-doc standard, single-writer rule) |
 | `task-format.md` | DAG-based task syntax, states, dependency rules, complexity scoring |
 | `failure-state-template.md` | Triple-component validation (Action → Validation → Rollback) |
 | `tdd-constraints.md` | Red-Green-Refactor + mutation testing requirements |
-| `claude-md-template.md` | WHY/WHAT/HOW template for CLAUDE.md generation |
 | `context-management.md` | Document & Clear triggers, handoff protocol, shared checkpoint schema |
 | `subagent-prompts/stack-eval.md` + `.schema.json` | Stack-advisor dispatch template + JSON Schema |
 | `subagent-prompts/risk-assessment.md` + `.schema.json` | Risk-assessor dispatch template + JSON Schema |
@@ -112,9 +113,22 @@ The `references/` directory contains the knowledge base agents and skills load o
 ## Examples
 
 `examples/example-plan.md` and `examples/example-tasks.md` are a complete (small) plan that passes the validators. Use them to:
-- See what `plan-project` actually produces (not just templates).
+- See what `/plan` actually produces (not just templates) — `example-plan.md` shows all five strategic/operational docs concatenated for readability.
 - Run the validators against a real artifact: `python3 scripts/plan-lint.py --mode all examples/example-tasks.md`.
 - Test the validator failure modes by introducing a cycle or stripping a field.
+
+## What's New in 3.0
+
+- **Document standardization — the RAD 8-doc standard.** `/plan` now emits five strategic/operational files (PRD.md, ARCHITECTURE.md, ASSUMPTIONS.md, DECISIONS.md, PLAN.md) at project root instead of a single 7-section `implementation_plan.md`. Each file has a single canonical purpose and one plugin owner. Canonical spec at `docs/file-conventions.md` (shared with rad-session 4.0).
+- **`plan-project` renamed to `plan`.** Same skill, shorter name. Legacy trigger phrases (`plan-project`, "plan my project") still work.
+- **`CLAUDE-FRAGMENT.md` handoff to rad-session.** `/plan` Phase 6 emits a transient `@-import` block listing the 5 strategic paths. rad-session `/init` merges it into CLAUDE.md and deletes the FRAGMENT. Single-writer rule: `/plan` never touches CLAUDE.md directly.
+- **`/plan --reboot` mode.** For projects past their original plan: audits existing code (Phase 0.5), archives prior strategic docs to `*.pre-reboot`, regenerates anchored to current reality, marks superseded DECISIONS entries with sequence-number references (`Superseded by 0042 (reboot YYYY-MM-DD)`). ADR-layout conversion at the ~500-line threshold is prompted independently, not automatic.
+- **`/plan --validate` mode.** Cheap 8-doc gap-check: do the files exist? Does `tasks.md` lint clean? No agents dispatched, no writes. Cheaper than `/review-plan` (which dispatches the risk-assessor for deep judgment audits).
+- **`/checkpoint` no longer writes HANDOFF.md.** That file is owned exclusively by rad-session `/wrapup` in the 4.0/3.0 era. `/checkpoint` now writes only `.planner/state/<run-id>.json` and updates plan task states. Run `/rad-session:wrapup` before clearing if you want a session-level handoff.
+- **`generate-project-config` removed.** Its v2.x role is fully absorbed by `/plan`'s Phase 6 (ARCHITECTURE.md) and `/init`'s FRAGMENT merge (CLAUDE.md). One source of truth, not two.
+- **`EXECUTION-PROMPT.md` dropped.** rad-session `/startup` briefing covers the same role: it reads HANDOFF.md + session-log + CLAUDE.md and orients you for the next chunk of work. A separate kickoff artifact was redundant.
+- **`ASSUMPTIONS.md` is a new file type.** Phase 1 Discovery explicitly captures non-obvious truths about the project's reality ("no users yet", "single-tenant only", "sensitive data — no real values in repo"). Invalidated assumptions use strikethrough, not deletion — audit trail matters.
+- **`DECISIONS.md` is sequence-numbered and append-only.** Stack rationale + risk-assessor verdicts seed the initial entries. `/wrapup` Phase 3.5 (rad-session 4.0) prompts to append tagged decisions from a work session.
 
 ## What's New in 2.1
 
@@ -146,12 +160,12 @@ Platform-level optimization pass for Opus 4.7 (Sonnet 4.6 and Haiku 4.5 fully su
 ## Quick Start
 
 1. Start a new Claude Code session.
-2. Run `/rad-planner:plan-project` with your project description (add `--lite` for small work).
-3. Answer the strategic discovery questions.
+2. Run `/rad-planner:plan` with your project description (add `--lite` for small work, `--reboot` for an existing project that needs replanning).
+3. Answer the strategic discovery questions (including the assumption-capture interview new in 3.0).
 4. Review the generated plan and approve.
-5. Start a fresh session for execution — load `EXECUTION-PROMPT.md`.
+5. Run `/rad-session:init` (or restart your session) so rad-session merges `CLAUDE-FRAGMENT.md` into `CLAUDE.md`. Then start a fresh execution session — `/rad-session:startup` briefs you for the first task.
 
-For an existing plan: `/rad-planner:review-plan path/to/plan.md` for a quality audit, or `/rad-planner:status path/to/tasks.md` for a quick progress read.
+For an existing plan: `/rad-planner:plan --validate path/to/project` for a cheap 8-doc gap-check, `/rad-planner:review-plan path/to/plan.md` for a deep quality audit, or `/rad-planner:status path/to/tasks.md` for a quick progress read.
 
 ## The Planning Workflow
 
@@ -160,26 +174,42 @@ For an existing plan: `/rad-planner:review-plan path/to/plan.md` for a quality a
 │ Discovery │→ │ Stack Eval │→ │  Plan   │→ │  Risk   │→ │   Review   │
 └───────────┘  └────────────┘  └─────────┘  └─────────┘  └────────────┘
                                                               ↓
-                                              ┌──────────────────────────┐
-                                              │ Export: plan + tasks +   │
-                                              │ EXECUTION-PROMPT (with   │
-                                              │ plan-lint validation)    │
-                                              └──────────────────────────┘
+                                              ┌──────────────────────────────────┐
+                                              │ Export: PRD + ARCHITECTURE +     │
+                                              │ ASSUMPTIONS + DECISIONS + PLAN + │
+                                              │ tasks + CLAUDE-FRAGMENT (with    │
+                                              │ plan-lint validation)            │
+                                              └──────────────────────────────────┘
 ```
 
-`--lite` collapses Stack Eval and Risk into a single Plan→Lint→Review pass.
+`--lite` collapses Stack Eval and Risk into a single Plan→Lint→Review pass. `--reboot` adds a Phase 0.5 audit before Discovery. `--validate` short-circuits the workflow to a cheap gap-check + lint pass.
 
 ## What Gets Generated
 
-After the planning workflow completes:
+After the planning workflow completes, at project root (or `--output-dir`):
 
-- `implementation_plan.md` — Master plan with 7 sections
-- `tasks.md` — Machine-readable task list with dependency graph
-- `EXECUTION-PROMPT.md` — Copy-pasteable kickoff for the next session
-- `CLAUDE.md` — Project configuration (via `/rad-planner:generate-project-config`)
-- `ARCHITECTURE.md` — Component diagram and design decisions (via `generate-project-config`)
-- `HANDOFF.md` — Session state for context management (via `/rad-planner:checkpoint`)
-- `.planner/state/<run-id>.json` — Resumable run state (via `--resume`)
+**Strategic tier (set at project genesis, rarely change):**
+- `PRD.md` — project summary, scope, success criteria, tech-stack summary, constraints
+- `ARCHITECTURE.md` — component diagram, system boundaries, data flow, design decisions
+- `ASSUMPTIONS.md` — non-obvious truths about the project's reality
+
+**Operational tier (evolve with the work):**
+- `DECISIONS.md` — sequence-numbered append-only architecture decisions (stack rationale + risk-assessor verdicts seed it)
+- `PLAN.md` — milestones, implementation steps, target files, checkpoints, risks/considerations
+
+**Machine-readable:**
+- `tasks.md` — task list with dependency graph, validated by `plan-lint.py`
+- `.planner/state/<run-id>.json` — resumable run state (via `--resume`)
+
+**Transient handoff:**
+- `CLAUDE-FRAGMENT.md` — `@-import` block consumed and deleted by `/rad-session:init`
+
+**Not written by `/plan` (single-writer rule):**
+- `CLAUDE.md` — owned by rad-session `/init`, `/wrapup`, `/add-resource`
+- `HANDOFF.md` — owned by rad-session `/wrapup`
+- `.claude/session-log.md` — owned by rad-session `/wrapup`
+
+See `docs/file-conventions.md` (canonical) for the full ownership matrix and update/pruning rules.
 
 ## Requirements
 

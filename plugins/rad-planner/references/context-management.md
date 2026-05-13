@@ -14,7 +14,7 @@ Before clearing, instruct the AI to write a handoff document capturing:
 
 Save to: `HANDOFF.md`, `activeContext.md`, or `SCRATCHPAD.md`.
 
-For active skill runs, also save to `.planner/state/<run-id>.json` per the shared checkpoint schema below. This enables `--resume <run-id>` on `plan-project`, `review-plan`, and `evaluate-stack`.
+For active skill runs, also save to `.planner/state/<run-id>.json` per the shared checkpoint schema below. This enables `--resume <run-id>` on `plan`, `review-plan`, and `evaluate-stack`.
 
 ### Step 2: Wipe
 Run `/clear` to completely reset the session. This erases all conversational context.
@@ -22,7 +22,7 @@ Run `/clear` to completely reset the session. This erases all conversational con
 ### Step 3: Rehydration
 Start a fresh session. Point the AI to:
 1. The saved handoff document
-2. The master plan (`PLAN.md` or `implementation_plan.md`)
+2. The master plan (`PLAN.md` in RAD 3.0+, or `implementation_plan.md` in v2.x legacy projects)
 3. Any committed changes in the Git branch
 4. The project's CLAUDE.md for conventions
 
@@ -32,12 +32,12 @@ The AI now operates with a pristine context window, focused only on the next pha
 
 ## Shared Checkpoint Schema
 
-All three multi-phase skills (`plan-project`, `review-plan`, `evaluate-stack`) share a single state file format at `.planner/state/<run-id>.json`:
+All three multi-phase skills (`plan`, `review-plan`, `evaluate-stack`) share a single state file format at `.planner/state/<run-id>.json`:
 
 ```json
 {
   "run_id": "string",
-  "skill": "plan-project | review-plan | evaluate-stack",
+  "skill": "plan | review-plan | evaluate-stack",
   "phase": "string — skill-specific phase identifier",
   "started_at": "ISO-8601",
   "last_saved": "ISO-8601",

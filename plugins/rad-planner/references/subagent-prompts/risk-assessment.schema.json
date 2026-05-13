@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "rad-planner/risk-assessment.schema.json",
   "title": "rad-planner risk-assessor output contract",
-  "description": "JSON contract emitted by the risk-assessor agent. Validated by scripts/validate-json.py before the dispatching skill (plan-project / review-plan) consumes it.",
+  "description": "JSON contract emitted by the risk-assessor agent. Validated by scripts/validate-json.py before the dispatching skill (plan / review-plan) consumes it.",
   "type": "object",
   "required": ["assessment_complete", "iteration", "verdict", "summary", "blocking_issues", "advisory_issues", "escalation_required"],
   "properties": {

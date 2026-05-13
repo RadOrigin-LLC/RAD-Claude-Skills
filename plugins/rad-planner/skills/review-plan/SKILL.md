@@ -5,8 +5,8 @@ description: >
   "check my implementation plan", "is this plan complete", "what's missing from my plan",
   "validate my plan", "plan review", "check plan quality", "risk review", "check
   dependencies", "are there any risks in my plan", or has an existing implementation
-  plan (plan.md, implementation_plan.md, tasks.md) that needs quality assessment
-  before execution begins.
+  plan (PLAN.md, plan.md, implementation_plan.md, tasks.md) that needs quality
+  assessment before execution begins.
 argument-hint: "[path to plan file] [--strict] [--non-interactive] [--resume <run-id>]"
 user-invocable: true
 allowed-tools: Read Glob Grep Agent Write Bash
@@ -42,12 +42,14 @@ Works across Opus 4.7, Sonnet 4.6, and Haiku 4.5. Opus/Sonnet batch the plan-fil
 ### 1. Locate the Plan
 
 If a path was provided, read it directly. Otherwise, Glob for candidates in parallel:
-- `implementation_plan.md`
-- `PLAN.md`
+- `PLAN.md` (RAD 3.0+ standard)
+- `implementation_plan.md` (v2.x legacy)
 - `plan.md`
 - `tasks.md`
 - `active-plan.md`
 - Any `.md` file in `docs/plans/` or `plans/`
+
+If a 3.0+ project is detected, also Glob for `PRD.md`, `ARCHITECTURE.md`, `ASSUMPTIONS.md`, `DECISIONS.md` and read them in the same batch — the risk-assessor benefits from the full strategic context. (For the cheap "does the 8-doc set exist" gap-check without dispatching the risk-assessor, use `/rad-planner:plan --validate` instead.)
 
 Read the plan file(s) completely. If multiple files exist (plan + tasks), read all of them in a single parallel batch.
 
@@ -69,7 +71,7 @@ Exit code 1 = issues found, 0 = clean. Either way, parse the JSON for the issue 
 
 Use the Agent tool to delegate to the `risk-assessor` agent with the substituted template from `references/subagent-prompts/risk-assessment.md`. Pass:
 - The plan content
-- `iteration_number: 1`, `max_iterations: 1` (review-plan runs a single pass; the iterative loop is owned by `plan-project`)
+- `iteration_number: 1`, `max_iterations: 1` (review-plan runs a single pass; the iterative loop is owned by `/rad-planner:plan`)
 - A note that mechanical lint has already run, so the agent should focus on judgment-required passes (anti-patterns 1, 11, 13; architecture; TDD strategy quality) rather than re-doing field-presence and DAG checks
 
 **Validate the agent's JSON output:**
