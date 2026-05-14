@@ -117,7 +117,7 @@
     {
       "name": "rad-session",
       "source": "./plugins/rad-session",
-      "description": "Session lifecycle for Claude Code — /init bootstraps once (stack detection + FRAGMENT merge from rad-planner), /startup orients each session (8-doc gap-check + cross-machine sync), /wrapup captures each session (HANDOFF.md + session-log + optional DECISIONS append) and auto-commits.",
+      "description": "Make Claude Code sessions remember each other — even across machines. /init bootstraps once with stack detection and CLAUDE.md scaffold. /startup orients each session, fetching origin and prompting to pull before reading any handoff file. /wrapup captures state with structured 'what NOT to do' traps, optional DECISIONS append, and auto-commits + prompts to push. PreCompact safety net included. Pairs with rad-planner via the RAD 8-doc standard.",
       "category": "productivity",
       "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-session",
       "license": "Apache-2.0"
@@ -133,7 +133,7 @@
     {
       "name": "rad-planner",
       "source": "./plugins/rad-planner",
-      "description": "Structured project planning — dependency-aware implementation plans with DAG task graphs, stack evaluation via Golden Path matrix, risk assessment (14 anti-patterns), TDD integration, context management. Emits the RAD 8-doc standard (PRD / ARCHITECTURE / ASSUMPTIONS / DECISIONS / PLAN + tasks.md + CLAUDE-FRAGMENT.md). /plan --reboot regenerates after pivots; /plan --validate gap-checks the 8-doc set.",
+      "description": "Plan a project before you write any code — or replan after a pivot. /plan walks you through strategic discovery, stack evaluation, task breakdown with explicit dependency graph, complexity scoring, and risk review — then captures the result as a structured set of documents (PRD, ARCHITECTURE, ASSUMPTIONS, DECISIONS, PLAN, tasks.md) that a fresh AI session can execute cold. Python validators back DAG integrity and field-presence checks. --reboot regenerates after pivots; --validate gap-checks the doc set. Pairs with rad-session for the full lifecycle.",
       "category": "productivity",
       "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-planner",
       "license": "Apache-2.0"
