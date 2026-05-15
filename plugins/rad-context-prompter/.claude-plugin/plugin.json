@@ -1,7 +1,7 @@
 {
   "name": "rad-context-prompter",
-  "version": "3.0.0",
-  "description": "Reverse-engineer and migrate AI prompts. The prompt-decompiler skill routes between six modes — anatomize, translate, compress, decompose, forensics, diagnose — on prompts you paste in. The prompt-engineering skill covers writing patterns and platform-specific shape (Claude, GPT, Gemini, image generators, agentic tools). Plus an autonomous prompt-debugger agent for prompt-output failure analysis.",
+  "version": "3.1.0",
+  "description": "Reverse-engineer and migrate AI prompts. The prompt-decompiler skill routes between six modes — anatomize, translate, compress, decompose, forensics, diagnose — on prompts you paste in. The prompt-engineering skill covers writing patterns and platform-specific shape (Claude, GPT, Gemini, image generators, agentic tools). Plus an autonomous prompt-debugger agent for prompt-output failure analysis.\n\n**v3.1 adds** `scripts/lint-prompt.py` — pure-stdlib Python that mechanically detects common prompt-engineering issues: missing role/system frame, vague instructions (\"make it better\", \"be helpful\"), unbounded length adjectives (\"concise\" with no limit), subjective quality claims, conflicting output formats (JSON + markdown), missing examples after few-shot intent (\"for example\" with no example block), excessive YOU MUST / ALWAYS / NEVER emphasis, superhuman-role framing (\"world-class expert\"), and imperative collisions (same verb both demanded and forbidden). Reads prompts from file or stdin; emits JSON or human-readable findings.",
   "author": {
     "name": "RAD",
     "url": "https://github.com/radesjardins"
