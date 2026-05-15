@@ -1,6 +1,9 @@
 # RAD Writer — Claude.ai Skill
 
-Domain-smart writing, AI pattern avoidance, voice profiling, and editorial review across 9 content types. Adapted from the [rad-writer plugin](../../plugins/rad-writer/) for Claude.ai.
+Domain-smart writing, AI pattern avoidance, voice profiling, and editorial review across 9 content types — email, blog, web copy, business reports, research, presentations, prose, technical docs, social media.
+
+> **Two distributions, two audiences.**
+> This Claude.ai skill is the multi-genre home for rad-writer. For engineer-writing in Claude Code (READMEs, CHANGELOGs, commits, PRs, ADRs, technical docs, runbooks), see the [rad-writer plugin](../../plugins/rad-writer/) instead. The plugin's engineer-focused pivot is in progress; multi-genre coverage migrates here as it completes.
 
 ## What's Included
 

@@ -46,7 +46,7 @@ Functionally everything `/init` did is still here; just one less command surface
 
 - `--auto-pull` — Skip the Phase 0 prompt; fast-forward silently when behind. For autonomous loops or when you've already decided to always sync.
 - `--no-pull` — Skip the sync check entirely; read local files as-is. Briefing leads with a stale warning if origin has unpulled commits. For offline work.
-- `--bootstrap` — Force Phase 0.5 bootstrap to re-run even if all artifacts are present. Use after migrations, or to refresh the plugin-bloat audit / stack summary. Idempotent.
+- `--bootstrap` — Force Phase 0.5 bootstrap to re-run even if all artifacts are present. Use to refresh the plugin-bloat audit / stack summary or after manual changes to `.rad/profile`. Idempotent.
 - `--no-bootstrap` — Skip Phase 0.5 even if artifacts are missing. Read-only fallback for diagnostics.
 - `--agents <scope>` — Set agent scope without prompting during bootstrap (`claude_only` | `codex_only` | `claude_and_codex`). Only relevant if bootstrap fires.
 - `--non-interactive` — Skip all user-confirmation prompts in the bootstrap path. Defaults apply. Pairs naturally with autonomous loops.
@@ -72,7 +72,6 @@ Phase 0 (sync from origin) **must run first** because it can update the very fil
 - Read `docs/planning/current.md` (Phase 1.4)
 - Read `docs/vision.md`, `docs/architecture.md` (Phase 1.5 file-existence checks)
 - Glob `docs/decisions/*.md` (Phase 1.5)
-- Glob root for legacy v3.0 strategic docs: `PRD.md`, `ARCHITECTURE.md`, `ASSUMPTIONS.md`, `DECISIONS.md`, `PLAN.md` (Phase 1.5 legacy detection)
 - Read `.mcp.json`, `.claude/settings.json`, `.env.example`, `package.json`, `pyproject.toml` (Phase 2.5)
 - Glob for stack marker files (Phase 2.5.2)
 - Bash: combined `git status --short && git log --oneline -5 && git rev-parse --abbrev-ref HEAD && git rev-list --left-right --count HEAD...@{upstream}` (Phase 2.2)
@@ -239,13 +238,8 @@ Mechanical read-only inspection of the project directory. Compute a feature vect
 | `has_status` | `docs/status.md` exists with non-trivial content |
 | `has_decisions` | `docs/decisions/` directory exists with at least `README.md` |
 | `has_rad_profile` | `.rad/profile` exists |
-| `has_v3_strategic_docs` | any of `PRD.md`, `ARCHITECTURE.md`, `ASSUMPTIONS.md`, `DECISIONS.md`, `PLAN.md` exists at project root (legacy detection) |
 
 **Note on `external_*_init_residue` fields:** these detect output from *external* init tools (Claude Code's built-in `/init` skill, Codex's `/init` command). They are NOT residue from a prior rad-session run. Rad-session's bootstrap path can safely enrich files showing this pattern.
-
-If `has_v3_strategic_docs == true`, surface to the user:
-
-> "⚠ v3.0-style strategic docs detected at project root (PRD.md / ARCHITECTURE.md / etc.). rad-planner 4.0's canonical structure is at `docs/`. Consider running `/rad-planner:plan --pivot` to migrate, or keep the v3.0 layout for now — rad-session reads what's there. The v4.0 doc set is the canonical structure going forward."
 
 Save the full feature vector for use in subsequent steps.
 
@@ -275,8 +269,6 @@ Existing rad-session state (v4.0 canonical):
   docs/status.md:           [present | missing]
   docs/decisions/:          [present (N ADRs) | missing]
   .rad/profile:             [present | missing]
-
-⚠ Legacy v3.0 state (if detected): [PRD.md, etc. — listed; user advised on migration]
 ```
 
 #### Step 5: Recommend rad-* plugins for the detected stack
@@ -293,7 +285,6 @@ Match detected stack to currently-shipping rad-* plugins. **Be honest about whic
 | Project planning needed | `rad-planner` | Plan-first workflow, four entry points, four mechanical validators (4.0) |
 | Brainstorming / design needed | `rad-brainstormer` | Pre-planning ideation + design specs |
 | Writing / content work | `rad-writer` | Domain-aware writing assistance |
-| Multi-platform agentic company work | `rad-agentic-company-builder` | Workspace scaffolding + opt-in business-function agents |
 
 For each recommendation, surface what's installed vs. not.
 
@@ -679,12 +670,6 @@ Soft gap-check for the v4.0 canonical strategic docs. The reads already happened
   ```
   ⚠ Missing strategic docs: <comma-separated list> — run /rad-planner:plan to create. (Soft warning; session continues.)
   ```
-
-**Legacy v3.0 detection:** Glob root for `PRD.md`, `ARCHITECTURE.md`, `ASSUMPTIONS.md`, `DECISIONS.md`, `PLAN.md`. If any present, surface separately:
-
-```
-⚠ v3.0 strategic docs detected at project root (PRD.md / etc.). v4.0 canonical structure is at docs/. Run /rad-planner:plan --pivot to migrate, or rad-session reads what's there in mixed-layout mode.
-```
 
 **Why soft.** Many sessions are pure execution against an existing plan; some are exploratory; some projects are too small for the full set. The warning informs without blocking — session continues regardless.
 

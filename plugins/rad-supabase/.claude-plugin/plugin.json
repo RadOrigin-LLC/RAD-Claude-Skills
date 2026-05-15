@@ -1,7 +1,7 @@
 {
   "name": "rad-supabase",
   "version": "2.0.0",
-  "description": "Supabase development and operations — projects, database, migrations, edge functions, auth, storage, realtime, branching, security, troubleshooting. Covers Supabase CLI v2.95+ and Supabase MCP server v0.7+ (31 tools). Ships 3 static validators (audit-rls.py, check-secret-leaks.py, audit-edge-functions.py) that mirror Splinter lint codes 0002/0003/0008/0011/0013/0015 and catch secret leaks before they ship.",
+  "description": "Static pre-deploy audit for Supabase migration SQL — runs before deploy, no live database needed. Three pure-stdlib Python validators: `audit-rls.py` (mirrors Splinter lint codes 0002 auth_users_exposed, 0003 auth_rls_initplan, 0008 rls_enabled_no_policy, 0011 function_search_path_mutable, 0013 rls_disabled_in_public, 0015 rls_references_user_metadata; plus structural checks for `using(true)` with no `with check` and `FOR ALL` policies), `check-secret-leaks.py`, `audit-edge-functions.py`. Knowledge skills cover migrations, edge functions, auth, storage, realtime, branching, security, and troubleshooting; these overlap with the official Supabase plugin — pair the two for full coverage. Compatible with Supabase CLI v2.95+ and Supabase MCP server v0.7+.",
   "author": {
     "name": "RAD",
     "url": "https://github.com/radesjardins"

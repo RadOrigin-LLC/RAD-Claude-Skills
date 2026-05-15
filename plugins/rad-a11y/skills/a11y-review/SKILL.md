@@ -19,7 +19,7 @@ Perform a structured **static analysis pass** over the specified component, page
 
 ## What this skill is — and what it isn't
 
-This skill performs **pattern-based static analysis** over `.tsx` / `.jsx` / `.astro` / `.html` / `.css` source. It is **not** a WCAG audit, does **not** run axe-core, does **not** test runtime focus behavior, does **not** measure real contrast ratios, and does **not** test with screen readers.
+This skill performs **pattern-based static analysis** over `.tsx` / `.jsx` / `.astro` / `.html` / `.css` source. It is **not** a WCAG audit, does **not** run axe-core, does **not** test runtime focus behavior, and does **not** test with screen readers. It does compute WCAG sRGB contrast ratios for Tailwind class pairs co-occurring on the same element (the `check-tailwind-contrast.py` validator), but it cannot see DOM-inherited backgrounds without runtime.
 
 **What this skill catches well (high confidence):**
 - Missing `alt` on `<img>`, missing `<label>` association, missing accessible name on icon buttons
@@ -29,9 +29,11 @@ This skill performs **pattern-based static analysis** over `.tsx` / `.jsx` / `.a
 - `<div onClick>` / `<span onClick>` without role + keyboard handlers
 - Skipped heading levels, missing landmarks
 - React-specific focus drift (modal close handlers without focus restoration)
+- **Color contrast for Tailwind class pairs on the same element** — `check-tailwind-contrast.py` computes real WCAG 2.x sRGB ratios from the Tailwind v3 default palette plus custom colors parsed from `tailwind.config.{js,ts,cjs,mjs}`. Flags AA failures (4.5:1 body / 3:1 large or UI) and surfaces the actual computed ratio. Function-based palettes (colors imported from another file) are skipped with a warning.
 
 **What this skill flags but cannot confirm (medium confidence):**
-- Color contrast — flags suspect Tailwind class combinations by name; real sRGB → WCAG ratio math and Tailwind palette parsing is not yet implemented
+- Color contrast where the background comes from a DOM ancestor — the validator can't resolve inherited backgrounds across the rendered tree without a browser
+- Color contrast involving alpha-blended (translucent) backgrounds — not handled by the validator
 - ARIA state synchronization beyond the simplest cases
 - Whether a `<fieldset>` correctly wraps a logical group
 

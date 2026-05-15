@@ -20,7 +20,6 @@ RAD-Claude-Skills/
 │   └── coolify-mcp/                   # @radoriginllc/coolify-mcp — MCP server for Coolify API
 ├── plugins/                           # Claude Code CLI & Desktop plugins (multi-skill bundles)
 │   ├── rad-a11y/                      # WCAG 2.2 AA accessibility toolkit
-│   ├── rad-agentic-company-builder/   # Workspace scaffolding + opt-in business-function agents (where MCPs exist)
 │   ├── rad-brainstormer/              # Ideation methodologies & creative tools
 │   ├── rad-chrome-extension/          # MV3 Chrome extension development
 │   ├── rad-code-review/               # Diff-aware adversarial code review
@@ -167,12 +166,6 @@ Each plugin stands alone — the pipeline is a suggestion, not a requirement. Th
 | Plugin | Skills | Agents | What It Does | Works with |
 |--------|--------|--------|-------------|-----------|
 | [rad-gws-core](plugins/rad-gws-core/) | 14 | 0 | Google Workspace essentials — Gmail send/read/reply/triage, Docs write, Sheets read/append, Slides, Drive, Calendar. Requires `gws` CLI. The wider 93-skill `rad-google-workspace` was archived in April 2026 (see [archive/](archive/)). | CLI, Desktop |
-
-### Agentic Systems
-
-| Plugin | Skills | Agents | What It Does | Works with |
-|--------|--------|--------|-------------|-----------|
-| [rad-agentic-company-builder](plugins/rad-agentic-company-builder/) | 8 | 1 | Claude Code workspace scaffolding + opt-in business-function agents for verified write-capable MCPs (Stripe, HubSpot, QuickBooks, Intercom, Vanta, DocuSign, etc.). Ships Python validators (`audit-structure`, `validate-hooks`, `check-mcp-config`) that catch fictional hook events, hardcoded secrets, structural gaps. Honest about what AI agents can/can't do in 2026. | CLI, Desktop |
 
 ---
 

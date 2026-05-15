@@ -1,6 +1,11 @@
 # rad-writer
 
-Domain-aware writing assistance for Claude Code, claude.ai, and Claude Desktop. Nine writing genres, four skills, two agents, two Python scripts that actually measure what the skills describe.
+Writing assistance in Claude Code, transitioning to an engineer-writing focus (technical docs, READMEs, CHANGELOGs, commits, PRs, ADRs, runbooks, technical posts). Four skills, two agents, two Python scripts that actually measure what the skills describe.
+
+> **Two distributions, two audiences.**
+>
+> - **This plugin (`plugins/rad-writer/`)** — engineer-writing focus in Claude Code. The orchestrators currently also handle the broader genre set; that coverage migrates out as the pivot completes.
+> - **Claude.ai skill (`skills/rad-writer/`)** — multi-genre writing (email, blog, web copy, reports, presentations, prose, social media). Import the ZIP via **Settings > Customize > Skills** for those use cases.
 
 ## Read this first: what this plugin will NOT do
 

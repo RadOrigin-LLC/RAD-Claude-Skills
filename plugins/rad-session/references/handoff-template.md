@@ -15,10 +15,6 @@ v4.0's `HANDOFF.md` was session-scoped (overwritten each wrapup) and synthesis-b
 1. **Session-scoped state is fragile** — a single bad wrapup wiped the previous handoff. `docs/status.md` is project-scoped: it persists across milestones and accumulates evidence.
 2. **Synthesis is unreliable** — what the LLM remembers from a 200-turn conversation isn't the same as what actually changed. v5.0 `/wrapup` writes `docs/status.md` from **evidence** (git diff, test output, plan-task state) — not chat synthesis.
 
-## Migrating a v3/v4 project
+## If your project still has HANDOFF.md
 
-Run `scripts/migrate-to-v5.py` from the rad-session plugin directory. It archives the old `HANDOFF.md` to `.rad-archive/<UTC-timestamp>/` and prompts whether to seed the new `docs/status.md` from the archived content.
-
-## If you're following an old link
-
-The v4.0 `HANDOFF.md` template (status / what NOT to do / open work / key insights structure) is preserved in the `.rad-archive/<UTC-timestamp>/` folder of any project that ran the v5.0 migration. The structural lesson — capture failed approaches explicitly — is preserved in v5.0's `docs/status.md` "Decisions made during execution" and "Known issues or blockers" sections.
+It's no longer read or written by rad-session. You can archive or delete it. The structural lesson — capture failed approaches explicitly — lives on in v5.0's `docs/status.md` "Decisions made during execution" and "Known issues or blockers" sections.

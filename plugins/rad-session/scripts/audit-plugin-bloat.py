@@ -151,7 +151,6 @@ PLUGIN_RULES: dict[str, dict] = {
     # ---- Productivity: default disable for code projects ----
     "rad-gws-core@rad-claude-skills": {"category": "productivity"},
     "rad-para-second-brain@rad-claude-skills": {"category": "productivity"},
-    "rad-agentic-company-builder@rad-claude-skills": {"category": "productivity"},
 
     # ---- Meta-authoring: keep only in plugin-authoring repos ----
     "plugin-dev@claude-plugins-official": {

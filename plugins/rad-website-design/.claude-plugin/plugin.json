@@ -1,7 +1,7 @@
 {
   "name": "rad-website-design",
   "version": "0.2.0",
-  "description": "Vision-implementer for 2026 web design — translates a user's vision into code that meets modern standards, and proposes concrete fixes for existing sites. Nine skills: knowledge layer (must-do baseline, should-do recommendations, severity-tiered anti-patterns with damage cited from real research, aesthetic direction with Calm UX default, agentic UX patterns, AEO/llms.txt with adoption caveats), action layer (implement = vision-to-code execution discipline; improve = identify issues + propose fixes for source paths or live URLs; review = pure static-analysis report). **One autonomous reviewer agent** scans HTML/CSS/JSX source. **Three pure-stdlib Python validators** (viewport-meta, pure-bw, tap-targets) run before LLM judgment. **Honest scope:** does NOT brainstorm or plan (use rad-brainstormer / rad-planner upstream), does NOT run Lighthouse, does NOT run axe-core at runtime, does NOT measure real Core Web Vitals, does NOT take screenshots, does NOT render JS-heavy SPAs. Findings tagged [STATIC] / [HEURISTIC] / [NEEDS-MANUAL]; no Pass/Fail verdict. Pair with chrome-devtools-mcp for runtime/visual layer, Lighthouse for perf measurement, rad-a11y for deeper accessibility.",
+  "description": "Static-analysis design review and concrete fix proposals for existing HTML/CSS/JSX/Astro source. Three pure-stdlib Python validators (viewport-meta presence + `user-scalable=no` detection, pure black/white eye-strain scan, sub-44px tap-target detection) run before LLM judgment. One autonomous reviewer agent. Knowledge skills cover must-do baseline, should-do recommendations, severity-tiered anti-patterns with damage cited from research, Calm UX aesthetic direction, agentic UX patterns, and AEO/llms.txt with adoption caveats. Honest scope: does NOT run Lighthouse, does NOT run axe-core at runtime, does NOT measure Core Web Vitals, does NOT take screenshots, does NOT render JS-heavy SPAs. Findings tagged [STATIC] / [HEURISTIC] / [NEEDS-MANUAL]; no Pass/Fail verdict. For new design generation, pair with `frontend-design`. For runtime/visual verification, pair with chrome-devtools-mcp + Lighthouse. For deeper accessibility, pair with rad-a11y.",
   "author": {
     "name": "RAD",
     "url": "https://github.com/radesjardins"
@@ -14,7 +14,6 @@
     "ui",
     "ux",
     "frontend",
-    "2026",
     "static-analysis",
     "design-review",
     "anti-patterns",

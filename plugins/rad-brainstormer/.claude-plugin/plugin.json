@@ -1,7 +1,7 @@
 {
   "name": "rad-brainstormer",
   "version": "2.0.0",
-  "description": "RAD Brainstormer — collaborative ideation using proven methodologies (SCAMPER, Six Hats, Reverse Brainstorming, TRIZ, etc.), domain research, structured divergent/convergent phases, creative unblocking, and idea evaluation. Any topic: software, business, product, content, research.",
+  "description": "Brainstorming in Claude Code with an optional local visual companion. Mockups, diagrams, and side-by-side comparisons render in a browser tab when the next question benefits from them — entirely local (no npm deps; Node stdlib only), terminal-vs-browser routing decided per question. Methodology skills cover SCAMPER, Six Hats, 5 Whys, How Might We, reverse brainstorming, creative unblock, idea generation, idea evaluation, and a design-sprint flow. Three agents handle domain research, idea challenging, and spec review.",
   "author": {
     "name": "RAD",
     "url": "https://github.com/radesjardins"

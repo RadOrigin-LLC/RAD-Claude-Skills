@@ -188,37 +188,6 @@ No project-level migration needed. v5.1 keeps the same artifacts (`.rad/profile`
 - Bootstrap logic moved to `/startup` Phase 0.5 — fires automatically on first run for a project; skipped on every subsequent run.
 - If you typed `/rad-session:init` before, type `/rad-session:startup` now. It detects whether bootstrap is needed.
 
-### From rad-session 3.x / 4.x
-
-Run the bundled migration helper **before** installing rad-session 5.0+:
-
-```bash
-# Preview the changes (writes nothing)
-python3 ${rad-claude-skills}/plugins/rad-session/scripts/migrate-to-v5.py /path/to/your/project --dry-run
-
-# Apply (interactive — confirms each transformation)
-python3 ${rad-claude-skills}/plugins/rad-session/scripts/migrate-to-v5.py /path/to/your/project
-
-# Or apply non-interactively (safe transforms only)
-python3 ${rad-claude-skills}/plugins/rad-session/scripts/migrate-to-v5.py /path/to/your/project --non-interactive
-```
-
-**What gets transformed:**
-
-| v3.x / v4.x artifact | v5.0+ outcome |
-|---|---|
-| `HANDOFF.md` at project root | Archived; `docs/status.md` replaces it. User prompted to seed status.md from archived content. |
-| `.claude/session-log.md` | Archived; `docs/planning/archive/` replaces it (per-milestone, not per-session). |
-| v4.0 8-doc files at project root (`PRD.md`, `ARCHITECTURE.md`, `PLAN.md`, `DECISIONS.md`, `ASSUMPTIONS.md`) | Moved to `docs/` per canonical structure. DECISIONS.md splits into sequence-numbered ADRs. |
-| `CLAUDE-FRAGMENT.md` (v4.0 transient) | Archived. Role replaced by rad-planner `/plan` M6 writing Constitution sections directly. |
-| Existing operating manual | Preserved. User opts in to adding Operational scaffold (`## Commands`, etc.). |
-
-All originals archive to `.rad-archive/<UTC-timestamp>/` (gitignored). The archive's `manifest.json` records every action.
-
-**Re-run safety:** the migration script is a no-op on projects already on the v5.0+ layout.
-
-> See `scripts/README.md` for the full `migrate-to-v5.py` contract.
-
 ## How this compares to alternatives
 
 |  | **rad-session 5.1** | claude-plugins-official/remember | claude-mem | thepushkarp/handoff |

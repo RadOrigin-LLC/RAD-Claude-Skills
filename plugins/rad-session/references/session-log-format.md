@@ -15,10 +15,6 @@ v4.0's session-log.md was a flat append-only file capped at 20 entries. Two stru
 
 `planning/archive/` solves both: one file per **shipped milestone** (the right granularity), unlimited count (one file per archive entry), and the filename's date+milestone-number prefix sorts chronologically without scanning content.
 
-## Migrating a v3/v4 project
+## If your project still has .claude/session-log.md
 
-Run `scripts/migrate-to-v5.py` from the rad-session plugin directory. It archives the old `.claude/session-log.md` to `.rad-archive/<UTC-timestamp>/` for reference. The historical entries are preserved but not migrated into the new archive structure (per-session entries don't map 1:1 to milestones).
-
-## If you're following an old link
-
-The v4.0 session-log format (newest-first, structured per-entry blocks) is preserved in `.rad-archive/<UTC-timestamp>/` of any project that ran the v5.0 migration.
+It's no longer read or written by rad-session. You can archive or delete it. Per-session granularity didn't map cleanly to milestones; the v5.0 `docs/planning/archive/` structure (one file per shipped milestone) replaces it for retrospective signal.

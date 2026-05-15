@@ -1,6 +1,6 @@
 # rad-coolify-orchestrator scripts
 
-Mechanical validators that turn the coolify-reviewer agent's checklist from "I'll look at your Dockerfile" into "Python ran four scanners and found these specific issues." Same pattern as rad-planner's `plan-lint.py` and rad-agentic-company-builder's `audit-structure.py`.
+Mechanical validators that turn the coolify-reviewer agent's checklist from "I'll look at your Dockerfile" into "Python ran four scanners and found these specific issues." Same pattern as rad-planner's `plan-lint.py` and rad-supabase's `audit-rls.py`.
 
 All scripts are pure Python 3.8+ stdlib. No `pip install` required (`lint-compose.py` will use PyYAML if it's installed for fuller YAML coverage, but the built-in fallback parser handles the subset docker-compose actually uses).
 

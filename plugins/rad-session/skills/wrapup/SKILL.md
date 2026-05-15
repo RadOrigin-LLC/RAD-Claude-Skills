@@ -729,7 +729,7 @@ Each line conditional on its own anomaly. Do not mix success-path lines into the
 
 **Plugin internals:**
 
-- `scripts/README.md` — full script documentation (v5.0; includes `migrate-to-v5.py` contract)
+- `scripts/README.md` — full script documentation
 
 ## Mode flags (recap)
 
