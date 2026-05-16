@@ -189,7 +189,7 @@ Inside Claude Code, run `/plugin` and enable each. Or edit `C:\Users\RAD\.claude
 
 **From `claude-plugins-official`:** `frontend-design`, `skill-creator`, `claude-code-setup`, `plugin-dev`, `microsoft-docs`, `remember`, `mcp-server-dev`
 
-**From `rad-claude-skills`:** `rad-a11y`, `rad-1password`, `rad-brainstormer`, `rad-chrome-extension`, `rad-code-review`, `rad-context-prompter`, `rad-coolify-orchestrator`, `rad-gws-core`, `rad-para-second-brain`, `rad-planner`, `rad-seo-optimizer`, `rad-session`, `rad-supabase`, `rad-writer`
+**From `rad-claude-skills`:** `rad-a11y`, `rad-1password`, `rad-brainstormer`, `rad-chrome-extension`, `rad-code-review`, `rad-context-prompter`, `rad-coolify-orchestrator`, `rad-explain`, `rad-gws-core`, `rad-para-second-brain`, `rad-planner`, `rad-seo-optimizer`, `rad-session`, `rad-supabase`
 
 > Archived plugins (`rad-astro`, `rad-fastify`, `rad-google-workspace`, `rad-nextjs`, `rad-react`, `rad-stack-guide`, `rad-stripe-fastify-webhooks`, `rad-typescript`, `rad-zod`) are preserved under [`archive/`](../archive/) but are no longer in the marketplace. Remove them from your laptop's `enabledPlugins` if they were there from a prior install.
 

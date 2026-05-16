@@ -33,7 +33,7 @@ Load the `web-design-improve` skill via the Skill tool. It performs issue identi
 
 - Runtime perf and screenshots → `chrome-devtools-mcp` plugin
 - Accessibility depth → `rad-a11y` plugin
-- AI-slop copy detection → `rad-writer:ai-audit`
+- AI-slop copy detection → human read
 - SEO depth → `rad-seo-optimizer`
 
 If `$ARGUMENTS` is empty, ask once for the path or URL. Do not guess.

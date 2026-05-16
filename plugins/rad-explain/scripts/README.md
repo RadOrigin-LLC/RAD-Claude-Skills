@@ -81,7 +81,7 @@ python3 scripts/check-overpromise.py <file.md> --strict   # tighter
 | `/rad-explain` skills | Final-pass validation before surfacing output to user. Both validators run; findings included in the surfaced summary. |
 | User direct | Standalone via `python3 plugins/rad-explain/scripts/<validator>.py <file>` |
 | CI / pre-commit hook | Same, with `--json` |
-| Other rad-* plugins | Available for external invocation (e.g., rad-writer's `review-readme` skill could run `check-overpromise.py` on the file under review) |
+| Other rad-* plugins | Available for external invocation — any plugin can shell out to these validators on a Markdown file |
 
 ## Together — the rad-explain principle
 

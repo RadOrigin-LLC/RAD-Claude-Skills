@@ -29,7 +29,7 @@ Load the `web-design-implement` skill via the Skill tool. It contains the execut
    - Component CSS / Tailwind classes
    - Honest scope note ("starter scaffold; you'll need to wire data, finalize copy, etc.")
 
-If the user asks for something this skill can't do (full production code, brand strategy, image generation), say so explicitly and recommend the right plugin (rad-brainstormer, rad-writer, etc.).
+If the user asks for something this skill can't do (full production code, brand strategy, image generation), say so explicitly and recommend the right plugin (rad-brainstormer, rad-explain, etc.).
 
 For upstream brainstorming and planning, recommend `rad-brainstormer` and `rad-planner`.
 For post-implementation review, recommend `/rad-website-design:review` or `/rad-website-design:improve`.

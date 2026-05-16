@@ -87,7 +87,7 @@ PLUGIN_RULES: dict[str, dict] = {
     "rad-planner@rad-claude-skills": {"category": "core"},
     "rad-brainstormer@rad-claude-skills": {"category": "core"},
     "rad-context-prompter@rad-claude-skills": {"category": "core"},
-    "rad-writer@rad-claude-skills": {"category": "core"},
+    "rad-explain@rad-claude-skills": {"category": "core"},
     "context7@claude-plugins-official": {"category": "core"},
 
     # ---- Stack-conditional: keep iff signals present ----

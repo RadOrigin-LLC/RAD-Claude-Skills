@@ -48,7 +48,7 @@ These rules are non-negotiable. If a skill's draft fails either validator, the s
 
 - **Not a truth-checker.** The grounding validator is heuristic — token absence is suggestive, not definitive. The validator's job is mechanical: did the substantive content of a claim leave ANY trace in the source?
 - **Not a fact-extractor.** rad-explain doesn't read code to derive facts; it reads what's already written (in code, docs, manifests) and synthesizes audience-appropriate prose.
-- **Not a tone tool.** Voice / style polish isn't the focus; the focus is honesty + grounding. For voice-aware writing assistance, see rad-writer (genre-aware engineer-writing focus, post Track C).
+- **Not a tone tool.** Voice / style polish isn't the focus; the focus is honesty + grounding.
 - **Subject to false positives.** Both validators surface candidates; the user is the final judge. Backing language nearby a flagged phrase ("verified", "measured", "see [doc]") triggers a one-level severity downgrade in `check-overpromise.py`; pass `--strict` to disable.
 
 ## Example usage

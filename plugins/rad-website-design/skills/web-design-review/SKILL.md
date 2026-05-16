@@ -41,7 +41,7 @@ This skill performs **pattern-based static analysis** over `.tsx`/`.jsx`/`.astro
 - Real LCP / INP / CLS values — pair with Lighthouse / WebPageTest / RUM
 - Computed contrast ratios — pair with axe-core / Stark / DevTools
 - Sycophantic AI tone — needs human read
-- AI-slop copywriting tics — needs human read or `rad-writer`'s ai-audit
+- AI-slop copywriting tics — needs human read
 - Information scent failures / nav confusion — needs real users
 - Dark patterns embedded in copy — needs human judgment
 
@@ -123,7 +123,7 @@ These are `[HEURISTIC]` findings — flag with rationale, never as `[STATIC]`.
 ### Phase 7 — Anti-pattern NEEDS-MANUAL list
 
 Surface the categories that static analysis cannot defensibly verify, with a one-line guide for each:
-- AI-slop copywriting → use `rad-writer:ai-audit`
+- AI-slop copywriting → human read
 - Real Core Web Vitals → run Lighthouse
 - Real contrast ratios → use axe-core or Stark
 - Dark patterns in copy → human read
@@ -150,7 +150,7 @@ Surface the categories that static analysis cannot defensibly verify, with a one
 ...
 
 ## NEEDS-MANUAL follow-ups
-- AI-slop copy check → run `rad-writer:ai-audit`
+- AI-slop copy check → human read
 - Core Web Vitals → Lighthouse
 - ...
 ```

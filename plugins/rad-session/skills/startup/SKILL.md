@@ -284,7 +284,7 @@ Match detected stack to currently-shipping rad-* plugins. **Be honest about whic
 | Coding project of any kind | `rad-code-review` | Diff-aware adversarial code review |
 | Project planning needed | `rad-planner` | Plan-first workflow, four entry points, four mechanical validators (4.0) |
 | Brainstorming / design needed | `rad-brainstormer` | Pre-planning ideation + design specs |
-| Writing / content work | `rad-writer` | Domain-aware writing assistance |
+| Project explanation / pitch / grounded README work | `rad-explain` | Narrate / pitch / explain documents / ground READMEs against actual code |
 
 For each recommendation, surface what's installed vs. not.
 

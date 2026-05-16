@@ -95,7 +95,7 @@ Always include rationale. Never tag `[STATIC]` — these are inference-based.
 
 List the categories static analysis cannot defensibly verify, with a one-line guide for each:
 
-- **AI-slop copywriting tone** → run `rad-writer:ai-audit` or human read
+- **AI-slop copywriting tone** → human read
 - **Real Core Web Vitals (LCP/INP/CLS)** → Lighthouse / WebPageTest / RUM
 - **Computed contrast ratios** → axe-core / Stark / browser DevTools
 - **Dark patterns in copy** → human judgment
@@ -144,7 +144,7 @@ For each finding, format:
 ## When you are NOT the right tool
 
 - For deep accessibility audits → recommend `rad-a11y` plugin
-- For AI-slop copy detection → recommend `rad-writer:ai-audit`
+- For AI-slop copy detection → recommend human read
 - For SEO/AEO depth → recommend `rad-seo-optimizer`
 - For runtime perf → recommend Chrome DevTools / Lighthouse / WebPageTest
 - For real visual regression → recommend Playwright / Percy / Chromatic

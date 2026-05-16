@@ -25,24 +25,24 @@ RAD-Claude-Skills/
 │   ├── rad-code-review/               # Diff-aware adversarial code review
 │   ├── rad-context-prompter/          # Prompt engineering for 30+ AI platforms
 │   ├── rad-coolify-orchestrator/      # Coolify self-hosted PaaS management (MCP-backed)
+│   ├── rad-explain/                   # Honest project explanation — 5 skills + 2 grounding/overpromise validators
 │   ├── rad-gws-core/                  # Google Workspace core (14 essential skills)
 │   ├── rad-para-second-brain/         # PARA second brain — organize, review, distill
 │   ├── rad-planner/                   # Structured project planning + Python DAG validators
 │   ├── rad-seo-optimizer/             # Complete SEO & AEO toolkit
 │   ├── rad-session/                   # Session lifecycle: /startup (with first-run bootstrap) + /wrapup + /add-resource
-│   ├── rad-supabase/                  # Full-stack Supabase development (MCP-backed)
-│   └── rad-writer/                    # Domain-aware writing (9 domains) + Python validators for measured AI patterns
+│   └── rad-supabase/                  # Full-stack Supabase development (MCP-backed)
 └── skills/                            # Claude.ai skills (ZIP upload / Project Knowledge)
     ├── rad-brainstormer/              # Ideation — Claude.ai adaptation of rad-brainstormer
     ├── rad-seo-aeo-reviewer/          # SEO/AEO — Claude.ai adaptation of rad-seo-optimizer
-    └── rad-writer/                    # Writing — Claude.ai adaptation of rad-writer
+    └── rad-writer/                    # Writing — Claude.ai-only distribution (no longer a plugin)
 ```
 
 ---
 
 ## Plugins vs Skills — Two Formats, Two Environments
 
-You'll notice that some names appear in both `plugins/` and `skills/` (rad-writer, rad-brainstormer). They cover the same knowledge, but they're built for different environments:
+You'll notice some names appear in both `plugins/` and `skills/` (`rad-brainstormer`, plus `rad-seo-optimizer` ↔ `rad-seo-aeo-reviewer`), and that `rad-writer` lives only under `skills/`. They cover the same knowledge but are built for different environments:
 
 **`plugins/` — Claude Code CLI & Claude Desktop**
 Full plugin bundles with multiple skills, autonomous agents, reference files, and automatic routing. They activate when you're working in a Claude Code session — they can read your filesystem, spawn subagents, and chain tools together. Install with `claude plugins add`.
@@ -50,7 +50,7 @@ Full plugin bundles with multiple skills, autonomous agents, reference files, an
 **`skills/` — Claude.ai (the web app)**
 Single-file skills designed for [claude.ai](https://claude.ai). They work as uploadable ZIP files via **Settings > Customize > Skills**, as Project Knowledge, or as conversation attachments. They consolidate plugin knowledge into one skill, use web search and URL fetching instead of filesystem tools, and output deliverables as artifacts. No CLI needed.
 
-Three plugins have Claude.ai counterparts: `rad-writer`, `rad-brainstormer`, and `rad-seo-optimizer` (as `rad-seo-aeo-reviewer`). The table column **Works with** shows which environments each plugin supports.
+Two plugins have Claude.ai counterparts: `rad-brainstormer` and `rad-seo-optimizer` (as `rad-seo-aeo-reviewer`). A third Claude.ai skill, `rad-writer`, is distributed standalone — the matching plugin was retired in v1.11.0 (its project-narrative role moved to `rad-explain` and `rad-planner`'s `/project-story`). The table column **Works with** shows which environments each plugin supports.
 
 ---
 
@@ -113,7 +113,7 @@ Not sure which plugins to install first? These four deliver the most value acros
 | [rad-session](plugins/rad-session/) | **4.0** — Three-phase workflow lifecycle with cross-machine continuity. `/init` bootstraps (deterministic stack detection, plugin recommendations, CLAUDE.md scaffold; merges `CLAUDE-FRAGMENT.md` if present from rad-planner ≤3.0, else auto-generates `@-imports` from detected strategic docs), `/startup` orients each session (verifies sync with origin before reading any handoff file, gap-checks strategic docs), `/wrapup` captures state (prompts to append tagged decisions to `DECISIONS.md`, prune protection, auto-commits + prompts to push). PreCompact safety net included. **Note:** rad-planner 4.0 writes the operating manual directly without a FRAGMENT — rad-session 4.0 still works but the FRAGMENT-merge path is unused; rad-session 5.0 (upcoming) picks up rad-planner 4.0's contract. | CLI, Desktop |
 | [rad-code-review](plugins/rad-code-review/) | Catches bugs, AI anti-patterns, and security issues in your current diff — regardless of language or framework | CLI, Desktop |
 | [rad-planner](plugins/rad-planner/) | **4.0** — Plan-first project planning with four entry points (`--full` / `--improve` / `--drift` / `--pivot`). Five-phase conversation produces the plan; M6 writes the approved doc set per the canonical structure aligned with published research at [`docs/doc-conventions.md`](docs/doc-conventions.md). Four mechanical validators (`plan-lint.py`, `status-validator.py`, `doc-redundancy.py`, `doc-contradiction.py`) back the workflow. Always-teaches in `/plan`; mentor vs dev mode in `.rad/profile` gates `/wrapup` teaching depth. | CLI, Desktop |
-| [rad-writer](plugins/rad-writer/) | Domain-aware writing across 9 content types with measured AI-pattern auditing (Python validators), honest about what detection can/can't claim in 2026 | CLI, Desktop, Claude.ai |
+| [rad-explain](plugins/rad-explain/) | **0.1.0** — Honest project explanation for any repo. Five skills (`narrate-project`, `elevator-pitch`, `draft-pitch`, `explain-document`, `ground-readme`) generate audience-targeted external communications from internal artifacts. Two pure-stdlib Python validators (`check-grounding`, `check-overpromise`) run on every output — claims must trace to repo source; superlatives, vague-quantity, marketing fluff, and production-readiness assertions get flagged. No rad-planner dependency; works on any repo. | CLI, Desktop |
 
 After installing rad-session, run `/rad-session:startup` in your project — on first run, it bootstraps the project (stack detection, agent scope, operating manual scaffold, status.md scaffold, profile creation) and recommends which other rad-* plugins fit (no auto-install, just informed recommendations). Subsequent runs are a quick read-only briefing.
 
@@ -150,7 +150,7 @@ Each plugin stands alone — the pipeline is a suggestion, not a requirement. Th
 |--------|--------|--------|-------------|-----------|
 | [rad-seo-optimizer](plugins/rad-seo-optimizer/) | 12 | 3 | Full SEO toolkit — site audits, AEO/AI visibility, keyword research, competitor analysis, link building, schema, technical SEO | CLI, Desktop, Claude.ai |
 | [rad-brainstormer](plugins/rad-brainstormer/) | 10 | 3 | Structured ideation — SCAMPER, Six Hats, Five Whys, reverse brainstorming, design sprints, pre-mortem analysis | CLI, Desktop, Claude.ai |
-| [rad-writer](plugins/rad-writer/) | 4 | 2 | Domain-aware writing across 9 content types — email, blog, web copy, reports, technical docs, social media. Python validators (`text-stats.py` for burstiness/em-dash/hedging/transitions, `check-blocklist.py` for word-list scans). AI patterns reorganized by durability tier. Honest about detection (impossible) and voice cloning (informal-genre limits). 2.0 honesty pass. | CLI, Desktop, Claude.ai |
+| [rad-explain](plugins/rad-explain/) | 5 | 0 | **0.1.0** — Honest project explanation. Five skills (`narrate-project`, `elevator-pitch`, `draft-pitch`, `explain-document`, `ground-readme`) generate audience-targeted external communications from a project's internal artifacts. Two pure-stdlib Python validators (`check-grounding`, `check-overpromise`) gate every output — claims must trace to repo source, superlatives + vague-quantity + marketing fluff + unsupported production-readiness get flagged. Works on any repo; reads canonical `docs/` if present, falls back to README + manifest + source structure. Pairs with `/rad-planner:project-story` for canonical-doc-set projects. | CLI, Desktop |
 | [rad-para-second-brain](plugins/rad-para-second-brain/) | 5 | 2 | PARA second brain — organize notes, run weekly reviews, progressive summarization, session handoffs, 12 favorite problems | CLI, Desktop |
 | [rad-context-prompter](plugins/rad-context-prompter/) | 2 | 1 | Prompt engineering — write, debug, and optimize prompts for 30+ AI platforms. Includes decompiler for reverse-engineering existing prompts | CLI, Desktop |
 

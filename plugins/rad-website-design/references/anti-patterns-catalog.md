@@ -86,7 +86,7 @@ Tagged for severity:
 - Users in 2026 are highly sensitive to synthetic content; immediate bounce when detected.
 - Strongest negative signal for engagement metrics in 2026.
 
-**Fix:** Edit aggressively. Lead with specifics: real numbers, named people, dated events. Use `rad-writer:ai-audit` to detect patterns programmatically.
+**Fix:** Edit aggressively. Lead with specifics: real numbers, named people, dated events. Detect via human read of the content.
 
 ---
 

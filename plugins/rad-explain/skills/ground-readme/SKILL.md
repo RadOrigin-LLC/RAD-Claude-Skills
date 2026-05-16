@@ -224,5 +224,4 @@ in check.
 - For a longer project narrative (much more than a README), use `narrate-project` in this plugin or `/rad-planner:project-story` for canonical-doc projects.
 - For pitches (different shape — persuasive vs informational), use `elevator-pitch` or `draft-pitch`.
 - For interpreting a specific file (not generating one), use `explain-document`.
-- For rad-writer's engineer-writing-pivot version (after Track C lands), `review-readme` will pair with `check-readme-quality.py` for a different angle (placeholder content, broken examples, format compliance) — orthogonal to this skill's overpromise/grounding focus.
 - Both validators live in this plugin's `scripts/` dir.

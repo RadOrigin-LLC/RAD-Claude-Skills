@@ -127,7 +127,7 @@ What this skill cannot do, but the user should:
 - **Visual regression** → Playwright + Percy/Chromatic
 - **Screenshot review** → `chrome-devtools-mcp` plugin
 - **JS-heavy SPA content** → render with `chrome-devtools-mcp` first, then re-run improve
-- **AI-slop tone evaluation** → human read or `rad-writer:ai-audit`
+- **AI-slop tone evaluation** → human read
 - **Information scent / nav UX** → real user testing
 - **Conversion impact** → A/B testing
 
@@ -165,7 +165,7 @@ What this skill cannot do, but the user should:
 - For pure findings without proposals → `web-design-review`
 - For new design from scratch → `web-design-implement`
 - For accessibility deep-dive → `rad-a11y` plugin
-- For copy / AI-slop tone → `rad-writer:ai-audit`
+- For copy / AI-slop tone → human read
 - For SEO depth beyond AEO basics → `rad-seo-optimizer`
 - For runtime / visual layer → `chrome-devtools-mcp` plugin
 

@@ -54,7 +54,7 @@ When reviewing a site or codebase, scan for these in order. AVOID-AT-ALL-COSTS f
 
 - **Pattern:** Unedited LLM-generated copy with telltale tics: "not only... but also," "Conclusion:" headers, em-dash overuse, confident hallucinations.
 - **Damage:** Creates a "semantic void" — destroys brand authority. Users in 2026 detect synthetic content immediately and bounce.
-- **Fix:** Edit aggressively. Lead with specifics: real numbers, named people, dated events. Pair with `rad-writer` for AI-pattern detection.
+- **Fix:** Edit aggressively. Lead with specifics: real numbers, named people, dated events. Detect via human read of the content.
 
 ### 7. Hidden Desktop Hamburger Menu
 

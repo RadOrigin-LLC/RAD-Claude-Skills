@@ -28,7 +28,7 @@ It contains:
 - Run axe-core at runtime — pair with `rad-a11y`
 - Do visual regression — pair with Playwright / Percy / Chromatic
 - Verify computed contrast ratios — pair with axe / Stark / browser DevTools
-- Detect AI-slop copywriting tone — pair with `rad-writer:ai-audit`
+- Detect AI-slop copywriting tone — needs human read
 
 Findings are tagged **[STATIC]** / **[HEURISTIC]** / **[NEEDS-MANUAL]** by detection confidence. **No Pass/Fail verdict** is issued because static analysis cannot defensibly produce one.
 
@@ -140,13 +140,13 @@ This plugin is **execution discipline + static analysis + change proposal**. It 
 - Guarantee conversion (that requires user testing + iteration)
 - Catch real-world INP/LCP/CLS values (need RUM or Lighthouse)
 - Verify actual computed contrast (needs DOM inspection or runtime tools)
-- Detect AI-slop copywriting tone (needs human read or `rad-writer:ai-audit`)
+- Detect AI-slop copywriting tone (needs human read)
 - Catch information-scent failures (needs real users)
 - Detect dark patterns embedded in copy (needs human judgment)
 - Catch browser-specific rendering bugs (needs actual browsers)
 - Render JS-heavy SPAs when fetching live URLs (use `chrome-devtools-mcp`)
 
-Use this plugin as the **execution layer** — pair with the right runtime tools (`chrome-devtools-mcp`, Lighthouse, `rad-a11y`) and the right upstream tools (`rad-brainstormer`, `rad-planner`, `rad-writer`) for a complete workflow.
+Use this plugin as the **execution layer** — pair with the right runtime tools (`chrome-devtools-mcp`, Lighthouse, `rad-a11y`) and the right upstream tools (`rad-brainstormer`, `rad-planner`, `rad-explain`) for a complete workflow.
 
 ## Source attribution
 

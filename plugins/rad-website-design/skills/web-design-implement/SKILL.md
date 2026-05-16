@@ -27,7 +27,7 @@ This skill **directs Claude's design generation.** It is **not** a brainstorming
 For upstream work:
 - Ideation / "what should I build?" → `rad-brainstormer`
 - Architecture planning / multi-week project plans → `rad-planner`
-- Brand strategy / writing voice → `rad-writer`
+- Brand strategy / writing voice → `rad-explain` (narrative + pitch; not a voice tool)
 
 ## When to engage this skill
 
