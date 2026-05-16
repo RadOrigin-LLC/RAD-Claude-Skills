@@ -1,0 +1,13 @@
+{
+  "name": "rad-explain",
+  "version": "0.1.0",
+  "description": "Honest project explanation for any repo. Five skills produce audience-targeted external communications from a project's internal artifacts (code, docs, planning files): `narrate-project` (plain-English description, audience-adaptive — non-dev / investor / future-self / new-collaborator); `elevator-pitch` (~150 words / ~30 seconds spoken); `draft-pitch` (one-pager / executive summary / deck-equivalent for funding, grants, partnerships); `explain-document` (interpret a specific repo file — \"what does this commit me to?\", \"what does this assume?\", \"where could this go wrong?\"); `ground-readme` (generate or audit a README / marketplace listing so it doesn't overpromise). Two pure-stdlib Python validators run on every output: `check-grounding.py` (every substantive claim must trace to repo source — flag unbacked claims) and `check-overpromise.py` (flag superlatives, vague-quantity claims without enumeration, marketing fluff, hype words). Works on any repo with no rad-planner dependency — reads `docs/` if present (vision.md, decisions/, planning/current.md, status.md, roadmap.md), falls back to README + package.json + source structure when absent. Pairs with rad-planner's `/project-story` for canonical-doc-set narratives. The principle: every claim should be checkable against source; the alternative is marketing-shaped content that strangers can't verify. Eats own dog food on the marketplace's \"no sensational copy\" guardrail.",
+  "author": {
+    "name": "RAD",
+    "url": "https://github.com/radesjardins"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-explain",
+  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "keywords": ["explain", "narrate", "pitch", "elevator-pitch", "readme", "documentation", "honest-marketing", "grounded", "project-story", "synthesis", "source-traceable", "anti-overpromise"]
+}
