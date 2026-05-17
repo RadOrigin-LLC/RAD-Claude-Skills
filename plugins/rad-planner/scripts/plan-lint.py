@@ -45,12 +45,16 @@ import sys
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
-# Canonical from docs/doc-conventions.md planning/current.md template
+# Canonical from docs/doc-conventions.md planning/current.md template.
+# Guardrails + User-visible behavior added in v4.6 (build-readiness gate
+# milestone schema extension — questions 6 and 7 of the framework).
 REQUIRED_SECTIONS = (
     "Objective",
     "Current milestone",
     "Acceptance criteria",
     "Validation commands",
+    "Guardrails",
+    "User-visible behavior",
     "Stop conditions",
     "Notes for the next session",
 )

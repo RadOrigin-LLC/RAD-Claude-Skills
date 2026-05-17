@@ -91,6 +91,7 @@ Not every project needs every file. The planner recommends a doc set based on pr
 | File | Owner | Created at |
 |---|---|---|
 | `docs/decisions/NNNN-*.md` | Human (prompted by both plugins) | as decisions occur |
+| `docs/planning/parked.md` | Human (rad-planner appends when user parks an idea during M2) | first park action |
 | `.claude/rules/*.md` | Human (planner recommends) | post-plan |
 | `.claude/skills/<name>/SKILL.md` | Human (planner recommends) | post-plan |
 | `.agents/skills/<name>/SKILL.md` | Human (planner recommends) | post-plan |
@@ -212,20 +213,24 @@ CLAUDE.md shim additions when both agents in scope:
 
 **Purpose:** Current execution plan. Self-contained — a future agent should be able to restart from this file without chat history.
 
-**Template sections** (research-canonical):
+**Template sections** (research-canonical; **Guardrails** and **User-visible behavior** added in rad-planner v4.6 as build-readiness gate questions 6 and 7):
 - Objective
-- Why this matters
-- Non-goals
+- Why this matters (recommended)
+- Non-goals (recommended)
 - Current milestone
 - Acceptance criteria
 - Validation commands
-- Planned changes
-- Open questions
-- Risks
+- **Guardrails** — what the agent must NOT change while executing this milestone. Required. Bulleted list of files, contracts, modules, and behaviors that stay out of scope (e.g., "do not touch `lib/auth/`", "do not change migration history", "do not add packages outside the `lib/constraints/` cone").
+- **User-visible behavior** — what an end user can observe after this milestone ships. Required. Short scenario or numbered flow describing the observable outcome at the UI / API / CLI surface. Concrete enough that a fresh agent could walk through it.
+- Planned changes (recommended)
+- Open questions (recommended)
+- Risks (recommended)
 - Stop conditions
 - Notes for the next session
 
 **Target length:** 100–400 lines.
+
+**Required vs recommended:** `plan-lint.py` enforces all 8 required sections (Objective, Current milestone, Acceptance criteria, Validation commands, Guardrails, User-visible behavior, Stop conditions, Notes for the next session). Empty or placeholder-only required sections fail the lint. Recommended sections flag at LOW severity if missing — useful for non-trivial plans, optional for very small ones.
 
 **Update triggers:** task state change, milestone boundary, scope adjustment, new task added, open question surfaced or resolved.
 
@@ -242,6 +247,34 @@ CLAUDE.md shim additions when both agents in scope:
 **Update triggers:** rad-session `/wrapup` moves current.md here when the user confirms a milestone is shipped.
 
 **Pruning:** never automated. Archive is the historical record. Manual cleanup if it becomes unmanageable.
+
+### `docs/planning/parked.md`
+
+**Purpose:** First-class home for captured-but-not-committed ideas (rad-planner v4.6+). The third option alongside "in scope" and "non-goal" — for ideas that surface during planning but aren't ready to commit to and aren't worth foreclosing.
+
+**Distinct from `vision.md` non-goals:** non-goals are foreclosure ("we are NOT building this"). Parked items are open ("worth thinking about, not now").
+
+**Distinct from `roadmap.md` Later/Parked:** roadmap.md implies sequencing intent. parked.md is the holding pen with no implicit ordering or commitment.
+
+**Update triggers:** during `/plan` M2 conversation when the user opts to park an idea that doesn't fit must-be-TRUE / must-EXIST / CRITICAL / non-goal. `--auto` does NOT park (single-pass mode skips the conversation branch). Manual promotion to a milestone or to a non-goal is user-initiated; no automatic decay or pruning.
+
+**Owner:** Human-owned. rad-planner appends when the user explicitly opts to park during M2. Neither plugin auto-prunes or auto-promotes.
+
+**Entry format** (research-canonical):
+
+```markdown
+## YYYY-MM-DD — Short title
+
+**Why parked:** one-line reason (e.g., "interesting but post-v1", "needs user research first", "depends on retired feature returning")
+**Source:** which M2 conversation / which milestone surfaced it / who raised it
+**Promote when:** condition under which this should be revisited (optional)
+
+Brief description of the idea, no more than a paragraph. Specific enough that future-you remembers what it was without re-deriving the context.
+```
+
+**Target length:** unbounded. Parking is unbounded by design — the cost of a stale parked item is low; the cost of foreclosing a good idea or polluting the roadmap is high.
+
+**Pruning:** never automated. User decides whether to promote, drop, or leave.
 
 ### `docs/decisions/`
 

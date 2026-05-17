@@ -109,7 +109,7 @@ Without `--auto`, all M1–M5 phases require explicit user response before the c
 
 2. **No conversation.** `--assessment` skips M1–M5 entirely. M0 mechanical discovery still runs, then the assessor pass executes, then the report is emitted. M0.5 scope confirmation is also skipped because there is no substantive work whose scope needs confirming — the only output is a report.
 
-3. **Report structure.** The output is a single markdown report covering: (a) project facts (directory, agent scope, git state, source file count, last commit date), (b) canonical-doc coverage (which of `docs/vision.md`, `docs/architecture.md`, `docs/planning/current.md`, `docs/status.md`, `docs/roadmap.md`, `docs/decisions/` exist; staleness in days; whether `plan-lint` / `status-validator` / `doc-redundancy` / `doc-contradiction` pass), (c) detected drift signals (`current.md` ACs marked complete but no matching commits; ADRs referenced from `current.md` that don't exist; vision non-goals contradicted by current.md ACs), (d) inferred next-step suggestion (one of: run `--full`, run `--improve`, run `--drift`, run `--pivot`, or "current state is healthy, no planner action needed") with one sentence of rationale.
+3. **Report structure.** The output is a single markdown report covering: (a) project facts (directory, agent scope, git state, source file count, last commit date), (b) canonical-doc coverage (which of `docs/vision.md`, `docs/architecture.md`, `docs/planning/current.md`, `docs/status.md`, `docs/roadmap.md`, `docs/decisions/` exist; staleness in days; whether `plan-lint` / `status-validator` / `doc-redundancy` / `doc-contradiction` pass), (c) detected drift signals (`current.md` ACs marked complete but no matching commits; ADRs referenced from `current.md` that don't exist; vision non-goals contradicted by current.md ACs), (d) **planning velocity signals** (NEW in v4.6 — from `scripts/assess-planning-velocity.py`): `current_md_edits_since_last_code_commit`, `ac_rewrite_count_per_ac`, `planning_doc_growth_ratio`, `time_since_last_code_commit`. Each signal includes its measured value, the threshold, and a flag marker (⚠) when over threshold. The defaults are 5 edits / 3 AC rewrites / 2.0× growth ratio / 14 days stale; per-project overrides via `--threshold-edits`, `--threshold-rewrites`, `--threshold-growth`, `--threshold-stale-days`, `--window-days`. (e) inferred next-step suggestion (one of: run `--full`, run `--improve`, run `--drift`, run `--pivot`, or "current state is healthy, no planner action needed") with one sentence of rationale. Velocity signals feed the suggestion: when `time_since_last_code_commit` and `current_md_edits_since_last_code_commit` both flag, recommend executing the current plan rather than further refinement.
 
 `--assessment` is the right flag when the user asks "where does this project stand?" or "what's the state of planning here?" without yet committing to a specific entry point.
 
@@ -592,6 +592,30 @@ Examples: "not building a mobile app for v1", "no support for languages other th
 
 *Why this matters:* Non-goals are as load-bearing as goals. Without them, scope expands silently. Land in vision.md's "Non-goals" section AND inform hard boundaries in the operating manual.
 
+#### 2e-park — Parking lot (third option for ambiguous ideas)
+
+> **New in v4.6.** Parking is a *third option* alongside in-scope and non-goal. Offer it when an idea surfaces during 2a–2e that doesn't cleanly fit either.
+
+If during 2a–2e the user raises an idea that isn't a clear must-be-TRUE / must-EXIST / CRITICAL **and** isn't a clean non-goal — surface a third option explicitly:
+
+> "That doesn't sound like it fits this milestone, but I don't think you want to foreclose it either. Three choices:
+> 1. **Include in scope** — add to must-be-TRUE / must-EXIST / CRITICAL
+> 2. **Mark as non-goal** — explicitly NOT building this (forecloses it)
+> 3. **Park** — capture in `docs/planning/parked.md` for later; not a commitment, not a foreclosure"
+
+When the user picks park, capture:
+- One-line title
+- Why parked (one line — "interesting but post-v1", "needs user research first", etc.)
+- Source (which M2 sub-step / what surfaced it)
+- Optional: "promote when" condition (what would make this worth revisiting)
+- Brief description (one paragraph)
+
+Append to `discovery_state.parked_drafts` array. Written to `docs/planning/parked.md` at M6 (file created if it doesn't exist; appended in reverse-chronological order otherwise).
+
+**`--auto` does NOT offer parking.** Single-pass auto mode keeps the binary in-scope-or-non-goal cut; if the user wants nuance, they run `/plan --improve` without `--auto`.
+
+*Why this matters:* Without a parking lot, ambiguous ideas pollute either non-goals (over-foreclosing) or roadmap.md (implying sequencing intent). Parking captures the idea without committing the project to it or against it. Question 3 of the build-readiness gate ("what is explicitly out of scope?") gets cleaner answers because non-goals stay reserved for true foreclosures.
+
 #### 2f — Save scope draft
 
 Save to `discovery_state.scope_draft`:
@@ -606,7 +630,16 @@ Save to `discovery_state.scope_draft`:
     "nice_to_have": ["..."],
     "hardest_unknown": "<text>",
     "derailment_risks": [{"risk": "...", "mitigation": "..."}],
-    "non_goals": ["..."]
+    "non_goals": ["..."],
+    "parked_drafts": [
+      {
+        "title": "...",
+        "why_parked": "...",
+        "source": "M2 sub-step <x>",
+        "promote_when": "...",
+        "description": "..."
+      }
+    ]
   }
 }
 ```
@@ -772,7 +805,37 @@ Examples:
 
 *Why this matters:* Validation commands are how the agent verifies "done" vs. assuming. Mechanical checks beat self-assessment. These land in planning/current.md's "Validation commands" section and feed status.md's "Latest validation results" at /wrapup.
 
-#### 4c — Stop conditions (per milestone)
+#### 4c — Guardrails (per milestone)
+
+For each milestone, ask: "What must the agent NOT change while executing this milestone? Files, modules, contracts, behaviors that stay strictly out of scope."
+
+Examples:
+
+- "Do not touch `lib/auth/` — auth is M5, this milestone is M3"
+- "Do not modify migration history — only add new migrations, never rebase existing ones"
+- "Do not introduce packages outside the `lib/constraints/` dependency cone"
+- "Do not change pricing or tier-gating logic"
+- "Do not refactor the weather adapter contract — M1 callers depend on it as-is"
+
+If the user struggles to name guardrails, prompt with examples in the project: large existing modules that should stay frozen, contracts other code depends on, anything sensitive (auth, billing, schema history).
+
+*Why this matters:* Guardrails are the milestone-level "do not touch" contract. They convert implicit user assumptions ("obviously the agent won't rewrite auth this milestone") into a written constraint the agent inherits. This is question 6 of the build-readiness gate; without it, scope creep is one bad inference away. Lands in planning/current.md's "Guardrails" section.
+
+#### 4d — User-visible behavior (per milestone)
+
+For each milestone, ask: "What can an end user observe after this milestone ships? Walk through the surface — UI, API, CLI, whatever — as concretely as if explaining it to someone using the product."
+
+Examples:
+
+- "User opens /signup, fills the form with email + password, gets a verification email within 30s, and after clicking the link is logged in and redirected to /dashboard"
+- "API caller hits `POST /api/v1/quotes` with a valid body and gets a `201` with the quote ID; an invalid body returns `422` with field-level errors"
+- "CLI user runs `mytool process file.csv` and sees row-by-row progress, then a summary line; exit 0 on success, exit 1 with a clear error on failure"
+
+A short scenario or numbered flow is fine — the test is "a fresh agent could walk through this without asking what 'works' means."
+
+*Why this matters:* User-visible behavior is question 7 of the build-readiness gate. Acceptance criteria describe what's true; user-visible behavior describes what's observable. Without it, the agent can satisfy ACs while building something the user can't actually use. Lands in planning/current.md's "User-visible behavior" section.
+
+#### 4e — Stop conditions (per milestone)
 
 For each milestone, ask: "When should the agent stop and ask for approval rather than proceeding?"
 
@@ -787,7 +850,7 @@ User can add milestone-specific stops on top of the defaults.
 
 *Why this matters:* Stop conditions are the milestone-level version of M1's escalation triggers. They tell the agent when to break out of execution mode and surface a decision rather than proceed unilaterally.
 
-#### 4d — Project-wide Definition of Done
+#### 4f — Project-wide Definition of Done
 
 Ask: "Beyond per-milestone acceptance criteria, what's the project-wide 'done' bar? What must always be true before a change is considered complete?"
 
@@ -802,7 +865,7 @@ User adds project-specific DoD items on top.
 
 *Why this matters:* The project-wide DoD lives in the operating manual and applies to every change, regardless of milestone. This is the bar the agent uses to decide "ready to commit?" vs. "still working."
 
-#### 4e — Notes for next session (per milestone)
+#### 4g — Notes for next session (per milestone)
 
 For each milestone, ask: "What should the next session know about this milestone? Most likely next step, files likely to change, what must remain true."
 
@@ -812,7 +875,7 @@ Example:
 
 *Why this matters:* "Notes for next session" is how planning/current.md communicates across context boundaries. Without it, the next session starts cold even with the plan in place. This field is load-bearing for rad-session's /startup.
 
-#### 4f — Save quality gates draft
+#### 4h — Save quality gates draft
 
 Save to `discovery_state.quality_gates_draft`:
 
@@ -824,6 +887,8 @@ Save to `discovery_state.quality_gates_draft`:
         "milestone_id": "M1",
         "acceptance_criteria": ["..."],
         "validation_commands": ["..."],
+        "guardrails": ["..."],
+        "user_visible_behavior": "...",
         "stop_conditions": ["..."],
         "notes_for_next_session": "..."
       }
@@ -1091,7 +1156,8 @@ For each entry in `doc_set_draft.approved_docs`, write per the canonical templat
 - **`docs/vision.md`** — from M2 (`goal_statement` → Product statement; `must_be_true` and `must_exist` → success signals; product principles synthesized from M1 principles where relevant; `non_goals` → Non-goals)
 - **`docs/architecture.md`** — **SCAFFOLD only.** The planner emits the template structure (Current stack / Repository map / System boundaries / Core invariants / Canonical patterns / Commands agents should know / Secrets and environment / Known sharp edges / Change notes) with placeholders. **Surface to user explicitly: "architecture.md is a scaffold — fill in the per-section content as you go; M4 quality gates and rad-session /wrapup surface when sections drift from reality."**
 - **`docs/roadmap.md`** (if approved) — from M3 (multi-milestone view → Now / Next / Later / Parked + Rules for proposing roadmap changes)
-- **`docs/planning/current.md`** — from M3 + M4 (`current_milestone` + per-milestone `acceptance_criteria` + `validation_commands` + `stop_conditions` + `notes_for_next_session` + `risks` from M2 `derailment_risks`)
+- **`docs/planning/current.md`** — from M3 + M4 (`current_milestone` + per-milestone `acceptance_criteria` + `validation_commands` + `guardrails` + `user_visible_behavior` + `stop_conditions` + `notes_for_next_session` + `risks` from M2 `derailment_risks`). All 8 required sections per `docs/doc-conventions.md` must be populated; `plan-lint.py` fails the milestone otherwise.
+- **`docs/planning/parked.md`** — only if `discovery_state.scope_draft.parked_drafts` is non-empty. Use the format from `references/parked-template.md`. Append to the file if it already exists (reverse-chronological — newest entries at the top), or create with the file header otherwise. Skipped entirely under `--auto`.
 - **`docs/status.md` scaffold** — empty 8-section template (see `docs/status-md-schema.md`) with explicit "No data yet — populated by rad-session /wrapup from evidence" markers per section
 
 **ADR handling — branches on `--auto`:**

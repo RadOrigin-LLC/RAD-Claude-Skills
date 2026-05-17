@@ -32,6 +32,28 @@ M2: Activity-constraint engine + per-constraint go/no-go evaluation
 - `bun run typecheck` — strict type-checking passes
 - `bun run lint` — biome lint passes
 
+## Guardrails
+
+Things the agent must NOT change while executing M2:
+
+- The `lib/weather/` adapter contract — M1 callers depend on it as-is
+- The Drizzle migration history (no rebase of `lib/db/migrations/0001-*.sql` or `0002-*.sql`)
+- The `users` and `forecast_cache` tables — M2 adds `constraint_sets` only
+- Anything under `app/(auth)/` — auth flow stays untouched
+- Any package in `package.json` outside the `lib/constraints/` and `app/constraints/` dependency cone
+- Pricing / tier-gating logic (none belongs at this milestone; flag if encountered)
+
+## User-visible behavior
+
+After M2 ships, a user on the running app can:
+
+1. Open `/constraints/new` and create a named constraint set with at least 5 constraint types filled in
+2. Save the set; see it listed at `/constraints`
+3. Pick a saved set on `/evaluate`, select a location, and see a 7-day grid showing go/no-go per day plus which specific constraints failed by how much
+4. Hit Visual Crossing's rate limit and still see results — graceful degradation with cached data plus a visible "using cached data" notice rather than an error page
+
+The flow must work without a page refresh between create → list → evaluate.
+
 ## Planned changes
 
 - [x] `lib/constraints/types.ts` — constraint type definitions

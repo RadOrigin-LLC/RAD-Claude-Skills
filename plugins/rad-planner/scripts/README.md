@@ -20,7 +20,7 @@ python3 scripts/plan-lint.py --mode all docs/planning/current.md --json  # machi
 
 **What `sections` catches:**
 
-- Missing required sections (Objective, Current milestone, Acceptance criteria, Validation commands, Stop conditions, Notes for the next session)
+- Missing required sections (Objective, Current milestone, Acceptance criteria, Validation commands, **Guardrails**, **User-visible behavior**, Stop conditions, Notes for the next session — Guardrails + User-visible behavior added in v4.6 per build-readiness gate questions 6 and 7)
 - Empty required sections (or sections containing only template-placeholder content like `[Single clear outcome]`)
 - Missing recommended sections (Why this matters, Non-goals, Planned changes, Open questions, Risks) — surfaced as LOW
 
@@ -184,6 +184,32 @@ python3 scripts/scope-creep-detector.py /path/to/project --json
 **Severity:** HIGH on active creep; MEDIUM on dropped-only; LOW on weak match.
 
 **Exit codes:** `0` clean, `1` HIGH/MEDIUM issues, `2` script error.
+
+## assess-planning-velocity.py (v4.6)
+
+Surfaces overplanning signals from git history. Built for the `/plan --assessment` flow but usable standalone. Catches the planning-as-avoidance pattern (rewriting plans without shipping code).
+
+```bash
+python3 scripts/assess-planning-velocity.py <project-dir>
+python3 scripts/assess-planning-velocity.py <project-dir> --json
+python3 scripts/assess-planning-velocity.py <project-dir> \
+  --threshold-edits 8 --threshold-rewrites 5 \
+  --threshold-growth 3.0 --threshold-stale-days 21 \
+  --window-days 30
+```
+
+**Four signals:**
+
+1. `current_md_edits_since_last_code_commit` — commits to `docs/planning/current.md` since the last commit touching non-docs files. Default threshold: 5.
+2. `ac_rewrite_count_per_ac` — how many times the Acceptance criteria section was rewritten across git history (via `git log -L`). Default threshold: 3.
+3. `planning_doc_growth_ratio` — ratio of docs/ line-change volume to source line-change volume over the last N days. Default threshold: 2.0× (planning outpacing shipping).
+4. `time_since_last_code_commit` — days since last non-docs commit. Flagged only when current.md is also fresh (< 7 days). Default threshold: 14 days.
+
+**Graceful skip:** if the project directory is not a git repository, the validator emits a "git not initialized" note and exits 0 — signals are unavailable but the validator does not fail.
+
+**Exit codes:** `0` no signals flagged or git unavailable; `1` at least one signal flagged; `2` script error.
+
+**Threshold tuning:** the defaults are heuristics, not laws. Marketplace meta-repos (like rad-claude-skills itself) have unusual planning-doc activity by nature. Per-project overrides via `--threshold-*` flags. Document the chosen thresholds in `docs/planning/current.md` if they differ from defaults.
 
 ## validate-json.py
 

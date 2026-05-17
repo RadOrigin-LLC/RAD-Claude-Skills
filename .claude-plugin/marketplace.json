@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Curated marketplace of Claude Code plugins for developer frameworks, productivity, accessibility, SEO, and DevOps. Each plugin is built for a specific job — code review, project planning, accessibility audits, secret management, Coolify ops, Supabase audits, and so on — with explicit honesty about what each does and doesn't do. Pair them where it makes sense; use them standalone where it doesn't. Version history lives in CHANGELOG.md.",
-    "version": "1.12.0",
+    "version": "1.13.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -109,7 +109,7 @@
     {
       "name": "rad-planner",
       "source": "./plugins/rad-planner",
-      "description": "Plan a project before you write code — or replan after a pivot, deepen an existing plan, or check for drift between plan and reality. rad-planner walks you through a five-phase planning conversation (Constitution → Scope → Sequence → Quality Gates → Doc-Set Recommendation), then writes the approved doc set as the plan's first executed milestone. The plan is the deliverable; the docs follow it.\n\nFour entry points cover the lifecycle: full plan (greenfield), improvement (deepen what's there), drift (compare reality to plan), and pivot (substantial re-plan). A read-only `--assessment` mode answers \"where does this project stand?\" without writing anything. Two project-story skills (`/project-story`, `/refresh-story`) turn the canonical doc set into plain-English narrative for non-developers, collaborators, or your future self. Four mechanical validators (plan-lint, status, doc-redundancy, doc-contradiction) back the workflow. Pairs with rad-session for the full lifecycle; works standalone.",
+      "description": "Plan a project before you write code — or replan after a pivot, deepen an existing plan, or check for drift between plan and reality. rad-planner walks you through a five-phase planning conversation (Constitution → Scope → Sequence → Quality Gates → Doc-Set Recommendation), then writes the approved doc set as the plan's first executed milestone. The plan is the deliverable; the docs follow it.\n\nFour entry points cover the lifecycle: full plan (greenfield), improvement (deepen what's there), drift (compare reality to plan), and pivot (substantial re-plan). A read-only `--assessment` mode answers \"where does this project stand?\" without writing anything — and (v4.6) now surfaces planning-velocity signals to catch the planning-as-avoidance pattern. Two project-story skills (`/project-story`, `/refresh-story`) turn the canonical doc set into plain-English narrative for non-developers, collaborators, or your future self.\n\n**v4.6 — build-readiness gate alignment.** `docs/planning/current.md` gains two required sections (Guardrails + User-visible behavior) enforced by `plan-lint.py`. `docs/planning/parked.md` is first-class — M2 offers parking as a third option alongside in-scope and non-goal for ambiguous ideas. `/plan --assessment` surfaces four overplanning signals (edits-since-last-code-commit, AC-rewrite-count, planning-doc-growth-ratio, time-since-last-code-commit) with per-project threshold overrides.\n\nFive mechanical validators back the workflow: plan-lint, status, doc-redundancy, doc-contradiction, and assess-planning-velocity. Pairs with rad-session for the full lifecycle; works standalone.",
       "category": "productivity",
       "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-planner",
       "license": "Apache-2.0"
