@@ -21,7 +21,7 @@ The matrix itself reflects the maintainer's opinion plus dated observations of m
 
 ## Cross-model note
 
-This skill works identically across Opus 4.7, Sonnet 4.6, and Haiku 4.5. Parallel batching of WebSearch verification calls is handled inside the `stack-advisor` agent. The agent's JSON contract is identical regardless of model.
+This skill is model-agnostic. Parallel batching of WebSearch verification calls is handled inside the `stack-advisor` agent. The agent's JSON contract is identical regardless of which model tier the session runs in.
 
 ## Mode Flags
 

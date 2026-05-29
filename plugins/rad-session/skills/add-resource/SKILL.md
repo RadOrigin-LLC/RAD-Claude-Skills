@@ -20,7 +20,7 @@ Append a user-supplied resource to `CLAUDE.md`'s canonical `## Resources` sectio
 
 **This skill only writes to CLAUDE.md at the project root. It never touches other files.**
 
-**Cross-model note.** Works identically across Opus 4.7, Sonnet 4.6, and Haiku 4.5. Always use targeted `Edit` operations to insert single lines rather than `Write` to rewrite the whole file — whole-file rewrites churn trailing whitespace and line endings on Windows, inflate diffs, and risk clobbering manual edits the user made between sessions.
+**Cross-model note.** Model-agnostic. Always use targeted `Edit` operations to insert single lines rather than `Write` to rewrite the whole file — whole-file rewrites churn trailing whitespace and line endings on Windows, inflate diffs, and risk clobbering manual edits the user made between sessions.
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: wrapup
 description: >
-  End-of-session skill for v5.0 — writes docs/status.md from EVIDENCE (not chat
+  End-of-session skill — writes docs/status.md from EVIDENCE (not chat
   synthesis), surfaces candidate decisions for ADR recording, runs cross-doc
   redundancy + contradiction checks via rad-planner validators, prunes the
   operating manual's Operational sections (sectioned-writer rule), archives
@@ -19,13 +19,13 @@ allowed-tools:
   - Bash
 ---
 
-# Session Wrapup (v5.0)
+# Session Wrapup
 
 Close the store: write `docs/status.md` from observed evidence, surface candidate decisions the user may want to record as ADRs, run cross-doc maintenance checks, prune the operating manual's Operational sections, archive shipped milestones, sync session files to git. Predictable and deliberate — wrapup is bounded; tomorrow's open should be fast.
 
 **Janitor model:** clean up, ensure everything's in its place, move quickly when nothing's blocking, take time when something genuinely needs synthesis. No churn for ceremony.
 
-> **Status:** rad-session 5.0 — released. plugin.json is at 5.0.0; the marketplace ships this workflow.
+> **Status:** Released — the marketplace ships this workflow. The current plugin version lives in `plugin.json` (don't hard-code it here — it only goes stale). Feature additions are marked inline with the version they landed in.
 
 ## What changed from v4.0
 
@@ -52,7 +52,9 @@ Close the store: write `docs/status.md` from observed evidence, surface candidat
 
 ## Cross-model note
 
-The phase logic uses explicit evidence-extraction patterns so output is comparable across Opus 4.7, Sonnet 4.6, and Haiku 4.5. Don't assume Opus-level latent reflection — evidence is the contract.
+The phase logic uses explicit evidence-extraction patterns so output is reproducible from evidence regardless of which model tier the session runs in. The status.md content must be derivable from git diff, test output, and plan-task state — not from chat memory or model recall. Evidence is the contract.
+
+**Python launcher.** Code blocks below invoke `python3` for brevity. Use whichever launcher exists — `python3`, else `python`, else the Windows `py` launcher; the validator scripts are launcher-agnostic pure-stdlib. Each Bash call is independent (shell state does not persist between calls), so resolve the launcher in the block that uses it. If none exists, the validator steps degrade gracefully (Phase 4 emits a "validators unavailable" note).
 
 **Announce at start:** "Wrapping up — gathering evidence, writing status.md, surfacing candidate decisions, running cross-doc checks, pruning operating manual Operational sections, archiving milestone if shipped, syncing to git..."
 

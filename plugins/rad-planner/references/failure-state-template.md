@@ -1,10 +1,10 @@
 # Failure State Mapping: Triple-Component Instructions
 
-AI models suffer from "happy path" bias -- they assume every tool call, API response, and environment configuration will succeed perfectly. The planner must counter this by defining explicit failure states for every planned phase.
+AI models suffer from "happy path" bias -- they assume every tool call, API response, and environment configuration will succeed perfectly. The planner must counter this by defining explicit failure states for every milestone or risky change. In a v4.x plan these map onto `docs/planning/current.md`'s **Validation commands** (the check), **Stop conditions** (when to escalate rather than push on), and **Guardrails** (what must not change).
 
 ## The Triple-Component Model
 
-Every major task or checkpoint requires three components:
+Every milestone or risky change requires three components:
 
 ### 1. Execution Action
 The precise technical operation to be performed.
@@ -26,10 +26,10 @@ Pre-determined reversal steps to revert to the last stable state.
 - Include data recovery steps if destructive operations are involved
 - Specify what constitutes a "clean rollback" vs. "partial recovery"
 
-## Template Per Task
+## Template (per milestone or risky change)
 
 ```markdown
-#### Task S3: Implement user authentication middleware
+#### Example: user authentication middleware
 
 **Execution Action:**
 Create JWT validation middleware in `src/middleware/auth.ts` that:
@@ -95,10 +95,9 @@ npm run dev
 
 Insert validation checkpoints:
 - After every milestone completion
-- After any task that modifies database schema
-- After any task that changes authentication/authorization
-- After any task that integrates with external services
-- After any task with complexity >= 6
+- After any change that modifies database schema
+- After any change to authentication / authorization
+- After any change that integrates with external services
 - Before any destructive or irreversible operation
 
 ## Escalation Protocol
@@ -106,6 +105,6 @@ Insert validation checkpoints:
 If a validation check fails:
 1. **First attempt:** Review error output, identify root cause, fix and re-validate
 2. **Second attempt:** If same failure, check anti-patterns list -- the approach may be fundamentally wrong
-3. **Third attempt:** STOP. Do not retry. Execute rollback procedure. Flag the task as [BLOCKED] with a clear description of what failed and why. Escalate to human review.
+3. **Third attempt:** STOP. Do not retry. Execute rollback procedure. Surface the failure to the user via the milestone's stop conditions, with a clear description of what failed and why. Escalate to human review.
 
 Never enter an endless correction loop. After 2 failures on the same task, the context is likely polluted. Clear and restart with a fresh approach.

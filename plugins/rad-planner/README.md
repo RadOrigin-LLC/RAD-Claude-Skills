@@ -2,6 +2,18 @@
 
 Plan-first project planning for Claude Code — **conversational by design**, with mechanical validators (pure-stdlib Python) backing the parts templates alone can't enforce.
 
+> **v4.11 — v3.0 debt retirement.** The legacy v3.0 agents, sibling skills, and reference files are realigned to the v4.x canonical doc structure. `plan-architect` is retired (the `/plan` skill is the orchestrator); `risk-assessor` now reviews `docs/planning/current.md`'s milestone structure instead of a v3.0 `tasks.md` DAG; `status` reports acceptance-criteria progress; `checkpoint` points at `docs/status.md` (HANDOFF.md / session-log retired in rad-session 5.0). Point-version model references removed plugin-wide; agents/skills are model-agnostic.
+>
+> **v4.10 — user-owned content visibility audit.** New `audit-user-content.py` validator surfaces stale user-owned operating-manual sections — orphan terminology (Title-Case phrases that appear nowhere else in the repo) and dead paths (links to files that don't exist) — without modifying them. Invoked by rad-session 5.6+ at `/wrapup` and `/startup`. Pairs with the sectioned-writer rule: refusal to modify ≠ refusal to flag staleness.
+>
+> **v4.9 — depth-of-planning heuristic at M0.5.** The scope gate recommends a planning depth (shallow / standard / deep) from the inferred decision class — architecture / cost / UX / trust / identity changes warrant deep; cosmetic fixes warrant shallow. `--depth` overrides. Shallow skips M1–M5; deep adds a mandatory `risk-assessor` pass at M4. The M0.5 hard gate fires regardless.
+>
+> **v4.8 — compact milestone contract in `current.md`.** M6 writes a `### Session contract` sub-section (the 7-field build-readiness block: current milestone / goal / in scope / out of scope / files likely touched / acceptance criteria / stop-and-ask-if) derived from the canonical sections. `plan-lint.py` validates all 7 fields; rad-session 5.5+ surfaces it at `/startup` before the first tool call.
+>
+> **v4.7 — Lanes section in the operating manual.** M6 writes a verbatim role-separation contract — what the human decides, what the agent may do during planning vs during coding, what it must never do. Agent-agnostic; owned by rad-planner per the sectioned-writer rule; rad-session 5.4+ treats it as never-prunable.
+>
+> **v4.6 — build-readiness gate alignment.** `docs/planning/current.md` gains required **Guardrails** and **User-visible behavior** sections (enforced by `plan-lint.py`); `docs/planning/parked.md` becomes a first-class third option for ambiguous ideas; `--assessment` surfaces planning-velocity signals to catch planning-as-avoidance.
+>
 > **v4.5 — `--assessment` flag exposed.** A read-only state-of-project diagnostic. Runs the internal assessor over whatever evidence exists (git, docs, source, validator results) and emits a structured report: project facts, canonical-doc coverage + staleness + validator pass/fail, detected drift signals, and an inferred next-step suggestion (full / improve / drift / pivot / "no planner action needed") with one-sentence rationale. Distinct from `--drift` (which requires an existing plan): `--assessment` works on any project state, produces no writes, skips M0.5 and M1–M5.
 >
 > **v4.4 — project-story synthesis skills.** Two new skills derive plain-language narrative views from the canonical doc set: `/project-story` generates a state-of-the-project narrative (one-line product test, who it's for in build order, what it's explicitly NOT, where we are, what's pending, bottom line) for non-developer stakeholders, new collaborators, future-self after time away, or funders. `/refresh-story` updates an existing story file in place via inline drift detection.
@@ -36,16 +48,15 @@ The skills are structured prompts that drive the conversation. The **scripts** i
 | `/rad-planner:refresh-story` | "refresh the story", "update PROJECT-STORY.md" | In-place refresh of an existing story file. Inline drift detection — regenerates only sections whose canonical source has changed; preserves the user's edits in fresh sections. |
 | `/rad-planner:evaluate-stack` | "what stack should I use", "recommend a stack" | Stack recommendation table with live version verification. Standalone, or invoked as part of `/plan`'s M2/M3 conversation. |
 | `/rad-planner:review-plan` | "review my plan", "audit this plan" | Deep quality audit combining mechanical lint + risk-assessor judgment. For a cheap "do the docs exist + does lint pass" gap-check, use `/plan --validate` instead. |
-| `/rad-planner:status` | "plan status", "what's next", "where am I in the plan" | Quick read of an in-flight plan: % complete, blocked tasks, next eligible. |
-| `/rad-planner:checkpoint` | "checkpoint", "save progress" | Writes `.planner/state/<run-id>.json` and updates plan task states. Does NOT write `docs/status.md` — that's owned by rad-session `/wrapup` (single-writer rule). |
+| `/rad-planner:status` | "plan status", "what's next", "where am I in the plan" | Quick read of an in-flight plan: acceptance-criteria progress (% complete, what's done, what's remaining). |
+| `/rad-planner:checkpoint` | "checkpoint", "save progress" | Writes `.planner/state/<run-id>.json` and reflects completed acceptance criteria in `current.md`. Does NOT write `docs/status.md` — that's owned by rad-session `/wrapup` (single-writer rule). |
 
 ## Agents
 
 | Agent | Role | Model |
 |---|---|---|
-| **plan-architect** | Lead orchestrator — read-only exploration, strategic questions, plan drafting | Opus 4.7 default, Sonnet 4.6 fallback |
-| **stack-advisor** | Tech stack evaluation, live version checks via Context7/WebSearch | Opus 4.7 default, Sonnet 4.6 fallback |
-| **risk-assessor** | Anti-pattern judgment, architecture concerns, TDD strategy quality. Calls `plan-lint.py` first to skip mechanical checks. | Opus 4.7 default, Sonnet 4.6 fallback |
+| **stack-advisor** | Tech stack evaluation, live version checks via Context7/WebSearch | Opus default, Sonnet fallback |
+| **risk-assessor** | Anti-pattern judgment, architecture concerns, TDD strategy quality. Calls `plan-lint.py` first to skip mechanical checks. | Opus default, Sonnet fallback |
 
 ## Mechanical validators (scripts/)
 
@@ -99,7 +110,6 @@ Per the [canonical doc structure](../../docs/doc-conventions.md):
 
 **Not written by `/plan` (single-writer rule):**
 - `docs/status.md` — owned by rad-session `/wrapup` (populates from evidence)
-- `.claude/session-log.md` — owned by rad-session `/wrapup`
 
 ## Pipeline with rad-brainstormer
 

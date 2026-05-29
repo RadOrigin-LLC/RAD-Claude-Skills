@@ -6,24 +6,24 @@ AI reasoning quality tends to degrade as context windows fill — observable in 
 
 ### Step 1: Status Checkpoint (Dump)
 
-There are two complementary state files in the RAD 8-doc standard (3.0+). Use both for a full handoff:
+There are two complementary state files. Use both for a full handoff:
 
 **Planner-side (this plugin's job — `/checkpoint`):** write `.planner/state/<run-id>.json` per the shared checkpoint schema below. This captures:
 - Which skill was in flight (`plan` / `review-plan` / `evaluate-stack`)
 - Current phase, run-id, model, codebase context, stack recommendation, risk-history
 - Whatever the skill needs to resume mid-flight via `--resume <run-id>`
 
-**Session-side (rad-session's job — `/rad-session:wrapup`):** generate `HANDOFF.md` and append to `.claude/session-log.md`. This captures:
-- What was tried and didn't work (TRIED / FAILED BECAUSE / CORRECT APPROACH traps)
-- Where you left off, modified files, open work, key decisions, key insights
-- The "what NOT to retry" record that the next `/rad-session:startup` reads
+**Session-side (rad-session's job — `/rad-session:wrapup`):** write `docs/status.md` from evidence (git diff, test output, plan-task state). This captures:
+- What actually changed this session, and the latest validation results
+- Where you left off, known issues / blockers, and the next recommended step
+- The evidence-based reality the next `/rad-session:startup` reads to orient
 
-Per the single-writer rule (see `docs/doc-conventions.md` → canonical at `docs/doc-conventions.md`), **rad-planner does NOT write HANDOFF.md.** Run `/rad-session:wrapup` *before or after* `/rad-planner:checkpoint` if you want both kinds of state captured.
+Per the single-writer rule (see `docs/cross-plugin-contracts.md`), **rad-planner does NOT write `docs/status.md`.** Run `/rad-session:wrapup` *before or after* `/rad-planner:checkpoint` if you want both kinds of state captured.
 
 The two-step idiom is:
 ```
 /rad-planner:checkpoint --run-id <id>    # saves .planner/state/<id>.json
-/rad-session:wrapup                      # writes HANDOFF.md + session-log
+/rad-session:wrapup                      # writes docs/status.md from evidence
 /clear
 ```
 
@@ -34,10 +34,10 @@ Run `/clear` to completely reset the session. This erases all conversational con
 
 ### Step 3: Rehydration
 Start a fresh session. Point the AI to:
-1. The saved handoff document
-2. The master plan (`PLAN.md` in RAD 3.0+, or `implementation_plan.md` in v2.x legacy projects)
+1. `docs/status.md` — the evidence-based reality from the last `/wrapup`
+2. The active plan (`docs/planning/current.md`) — the current milestone's intent
 3. Any committed changes in the Git branch
-4. The project's CLAUDE.md for conventions
+4. The operating manual (`CLAUDE.md` / `AGENTS.md`) for conventions
 
 If a `.planner/state/<run-id>.json` file exists for a skill that was in flight, use the skill's `--resume <run-id>` flag instead of re-orienting from scratch.
 
@@ -111,11 +111,10 @@ Skills may add skill-specific fields without breaking the shared contract — us
 - The task's validation criteria and rollback procedure
 
 ### What to Externalize
-- Completed work summaries (commit to git, reference in handoff)
-- Architecture decisions (store in `decisions.md`)
-- Stack/library choices (store in `CLAUDE.md`)
-- Test strategies (store in `TESTING.md`)
-- Full project plan (store in `PLAN.md`, load only current phase)
+- Completed work summaries (commit to git; surfaced in `docs/status.md` at `/wrapup`)
+- Architecture decisions (store in `docs/decisions/`)
+- Stack/library choices and conventions (store in the operating manual / `docs/architecture.md`)
+- Full project plan (store in `docs/planning/current.md`, load only the current milestone)
 
 ## Dynamic Context Loading
 
@@ -130,20 +129,20 @@ Instead of hardwiring everything into CLAUDE.md (burns tokens on every message),
 
 This "progressive disclosure" pattern keeps the active context lean while making deep knowledge available when needed.
 
-## Handoff Document Template
+## Handoff Document
 
-The canonical HANDOFF.md template is owned by rad-session, not rad-planner. See:
-- `plugins/rad-session/references/handoff-template.md` for the format
-- `docs/doc-conventions.md` for the per-section rules (length caps, "What NOT To Do" structure, etc.)
+The canonical session handoff is `docs/status.md`, owned by rad-session (not rad-planner). See:
+- `docs/status-md-schema.md` for the 8-section schema and per-field inference policy
+- `plugins/rad-session/skills/wrapup/SKILL.md` for how it's populated from evidence
 
 The `.planner/state/<run-id>.json` schema is documented above ("Shared Checkpoint Schema"). That's the only state file rad-planner writes directly.
 
 ## Integration with Plan Checkpoints
 
-The plan template includes checkpoints after every milestone. Each checkpoint should:
-1. Run all validation checks for completed tasks
+`docs/planning/current.md` is milestone-based, with a stop-and-checkpoint boundary at each milestone. Each checkpoint should:
+1. Run the milestone's validation commands and check acceptance criteria
 2. Commit all verified work to git
 3. Update `.planner/state/<run-id>.json` if a planner skill is in flight (rad-planner's responsibility)
-4. Run `/rad-session:wrapup` if you want a session-level HANDOFF.md (rad-session's responsibility — keeps the single-writer rule intact)
+4. Run `/rad-session:wrapup` to write `docs/status.md` from evidence (rad-session's responsibility — keeps the single-writer rule intact)
 5. Assess context usage — if approaching capacity, dump state, recommend `/clear`, provide rehydration instructions
-6. If context is low: continue to next phase
+6. If context is healthy: continue to the next milestone

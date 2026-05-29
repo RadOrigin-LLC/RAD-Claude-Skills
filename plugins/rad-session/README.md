@@ -1,5 +1,11 @@
 # rad-session — agent session lifecycle: startup (with first-run bootstrap), wrapup, add-resource, with cross-machine continuity for Claude + Codex.
 
+> **v5.6 — user-owned content visibility audit.** `/wrapup` Phase 4 and `/startup` Phase 1.5.3 invoke rad-planner 4.10's `audit-user-content.py` to surface stale terminology and dead paths in user-owned operating-manual sections — advisory only; neither plugin modifies the content. Findings auto-fade when you fix the underlying content (no state file).
+>
+> **v5.5 — compact milestone contract render at `/startup`.** When `docs/planning/current.md` has a `### Session contract` sub-section (rad-planner 4.8+), `/startup` renders it as the first user-visible block after the floor line — putting the 7-field build-readiness contract in context before the first tool call. Graceful skip when absent.
+>
+> **v5.4 — Lanes section recognized.** `/startup` and `/wrapup` recognize rad-planner v4.7+'s `Lanes` Constitution section (role-separation contract) and treat it as never-prunable.
+>
 > **v5.3 — floor of one line on `/startup`.** Silent completion violates the doorman model; even the cleanest routine open emits at least a single confirmation line with status freshness + plan progress + pointer to `docs/status.md`. Anomalies stack above the floor; the floor always appears.
 >
 > **v5.2 — permission-mode-safe.** Operations split by asymmetry of downside. `/startup` Phase 0.5 Case C guard rail (overwrite/append/skip on operating manual > 500 bytes) is **data-loss-protected** — prompts regardless of Auto / Bypass / `--non-interactive` because silent overwrite of user-authored content is hard to recover. Conversely, `/wrapup --auto` writes candidate-decision ADRs with a `DRAFT — auto-recorded` banner so the capture isn't lost; review surfaces automatically in the next `/startup` Phase 1.5.1 briefing.

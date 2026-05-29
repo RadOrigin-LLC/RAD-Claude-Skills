@@ -56,11 +56,11 @@ You are orchestrating a project planning workflow. The deliverable is **the plan
 - Does not write `docs/status.md` content beyond a scaffold — rad-session populates from evidence at /wrapup
 - Does not touch code — flags code paths for human cleanup during pivot disposition
 - Does not write files outside the M0-determined project directory — never writes to cwd without confirmation
-- Does not detect every anti-pattern; mechanical validators (`plan-lint.py`, `doc-redundancy.py`, `doc-contradiction.py`) catch field presence, DAG integrity, vague language, cross-doc duplication, and cross-doc disagreements. The risk-assessor agent handles judgment-required anti-patterns and architectural concerns.
+- Does not detect every anti-pattern; mechanical validators (`plan-lint.py`, `doc-redundancy.py`, `doc-contradiction.py`) catch field presence, vague language, cross-doc duplication, and cross-doc disagreements (milestone dependency cycles are caught separately by `dependency-cycle-detector.py`). The risk-assessor agent handles judgment-required anti-patterns and architectural concerns.
 
 ## Cross-model note
 
-This skill works across Opus 4.7, Sonnet 4.6, and Haiku 4.5. Opus/Sonnet handle parallel batching reliably; Haiku may follow phase order sequentially. The plan output, JSON contracts, and validator scripts are identical regardless of model.
+This skill is model-agnostic. Independent reads and validator calls are issued in parallel batches; the plan output, JSON contracts, and validator scripts are identical regardless of which model tier the session runs in.
 
 ## Mode flags
 
@@ -938,6 +938,19 @@ Save to `discovery_state.quality_gates_draft`:
 
 Save M4 checkpoint to `.planner/state/<run-id>.json`.
 
+#### 4i — Deep-mode risk assessment (conditional)
+
+**Fires only when planning depth is `deep`** (from the M0.5 depth-heuristic confirmation, or an explicit `--depth deep`). Standard and shallow depth skip this sub-step entirely. `--auto --depth deep` runs it too — the depth flag controls the risk pass independently of M1–M5 dialogue suppression.
+
+The canonical `docs/planning/current.md` isn't written until M6, so dispatch the risk-assessor against the **drafted** plan, not a file on disk:
+
+1. Render the assembled drafts (`milestone_draft` + `quality_gates_draft` + `scope_draft` risks/non-goals) as `current.md`-shaped markdown — the 8-section milestone structure the risk-assessor expects.
+2. Use the Agent tool to delegate to the `risk-assessor` agent with the substituted template from `references/subagent-prompts/risk-assessment.md`. Pass the rendered draft as the `{plan_path_or_content}` value (inline content), the M1/M2 constitution + scope drafts as `{supporting_docs_or_none}`, and `iteration_number: 1`, `max_iterations: 1`. **Note in the prompt that the mechanical Pass 0 validators run at M6 against the written file — at M4 the agent should focus on the judgment passes (anti-patterns, validation/failure-state quality, sequencing, TDD, context, stack/arch).**
+3. Validate the returned JSON against `references/subagent-prompts/risk-assessment.schema.json` via `scripts/validate-json.py`. Re-prompt once on schema failure, then fall back to markdown parsing per `agents/risk-assessor.md`.
+4. Surface the risk-assessor's `verdict`, `blocking_issues[]`, and `advisory_issues[]` to the user as input to the M5 decision. This pass is **advisory** — it informs the user's doc-set approval at M5; it does NOT replace the M5 `user_approval` hard gate. If the verdict is `RETHINK`, surface the escalation (re-enter via `/rad-brainstormer:design-sprint`) before proceeding to M5.
+
+Save the assessment (verdict + issue counts) to `discovery_state.deep_risk_assessment` in the M4 checkpoint.
+
 ### Exit criteria
 
 - Every milestone has ≥3 acceptance criteria (concrete, not subjective)
@@ -946,6 +959,7 @@ Save M4 checkpoint to `.planner/state/<run-id>.json`.
 - Project-wide Definition of Done captured (≥3 entries; defaults + project-specific)
 - Notes for next session captured (at least for the current milestone)
 - Quality gates draft saved to run state
+- If depth is `deep`: risk-assessor pass completed and findings surfaced for the M5 decision
 - User confirms before M5 begins
 
 ### Iteration
@@ -1348,10 +1362,9 @@ Per `docs/cross-plugin-contracts.md`:
 - `fixtures/README.md` — end-to-end test fixtures
 - `fixtures/standard-project/` — reference v4.0 project showing what good output looks like
 
-**Plugin internals — legacy v3.0 (retained for sibling skills not yet updated):**
+**Plugin internals — shared references (`plugins/rad-planner/`):**
 
-The v4.0 `/plan` workflow (M0–M6) does not consume the v3.0 reference files below. They remain for the sibling skills (`checkpoint`, `status`, `review-plan`, `evaluate-stack`) and subagents (`plan-architect`, `risk-assessor`, `stack-advisor`) that are pending a future v4.x update:
+These back the sibling skills (`checkpoint`, `status`, `review-plan`, `evaluate-stack`) and subagents (`risk-assessor`, `stack-advisor`). All are aligned to the v4.x canonical doc structure (`docs/planning/current.md` + the canonical doc set):
 
-- `references/plan-template.md`, `references/task-format.md`, `references/golden-path-matrix.md`, `references/anti-patterns.md`, `references/failure-state-template.md`, `references/tdd-constraints.md`, `references/context-management.md`
+- `references/golden-path-matrix.md`, `references/anti-patterns.md`, `references/failure-state-template.md`, `references/tdd-constraints.md`, `references/context-management.md`
 - `references/subagent-prompts/stack-eval.md`, `references/subagent-prompts/risk-assessment.md`
-- `examples/example-plan.md` + `examples/example-tasks.md` — v3.0 examples; v4.0 reference output lives in `fixtures/standard-project/`

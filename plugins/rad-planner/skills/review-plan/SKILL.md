@@ -5,7 +5,7 @@ description: >
   "check my implementation plan", "is this plan complete", "what's missing from my plan",
   "validate my plan", "plan review", "check plan quality", "risk review", "check
   dependencies", "are there any risks in my plan", or has an existing implementation
-  plan (PLAN.md, plan.md, implementation_plan.md, tasks.md) that needs quality
+  plan (`docs/planning/current.md`) that needs quality
   assessment before execution begins.
 argument-hint: "[path to plan file] [--strict] [--non-interactive] [--resume <run-id>]"
 user-invocable: true
@@ -23,7 +23,7 @@ This is the quality gate between planning and execution.
 
 ## Cross-model note
 
-Works across Opus 4.7, Sonnet 4.6, and Haiku 4.5. Opus/Sonnet batch the plan-file reads and risk-assessor reference loads in parallel. The risk-assessor JSON contract is identical regardless of model.
+Model-agnostic. Batch the plan-file reads and risk-assessor reference loads in parallel. The risk-assessor JSON contract is identical regardless of which model tier the session runs in.
 
 ## Execution: parallel-first
 
@@ -41,29 +41,26 @@ Works across Opus 4.7, Sonnet 4.6, and Haiku 4.5. Opus/Sonnet batch the plan-fil
 
 ### 1. Locate the Plan
 
-If a path was provided, read it directly. Otherwise, Glob for candidates in parallel:
-- `PLAN.md` (RAD 3.0+ standard)
-- `implementation_plan.md` (v2.x legacy)
-- `plan.md`
-- `tasks.md`
-- `active-plan.md`
-- Any `.md` file in `docs/plans/` or `plans/`
+If a path was provided, read it directly. Otherwise the canonical plan is `docs/planning/current.md`. Read it plus the supporting canonical docs in a single parallel batch — `docs/vision.md` (goal + non-goals), `docs/architecture.md` (invariants, stack), `docs/roadmap.md` (sequencing) — so the risk-assessor has full strategic context.
 
-If a 3.0+ project is detected, also Glob for `PRD.md`, `ARCHITECTURE.md`, `ASSUMPTIONS.md`, `DECISIONS.md` and read them in the same batch — the risk-assessor benefits from the full strategic context. (For the cheap "does the 8-doc set exist" gap-check without dispatching the risk-assessor, use `/rad-planner:plan --validate` instead.)
+If `docs/planning/current.md` doesn't exist, fall back to Glob for a legacy or non-canonical plan file (`PLAN.md`, `plan.md`, `implementation_plan.md`, any `.md` in `docs/plans/` or `plans/`) and note in the report that the project isn't on the canonical structure — recommend `/rad-planner:plan` to migrate. (For the cheap "do the canonical docs exist + does lint pass" gap-check without dispatching the risk-assessor, use `/rad-planner:plan --validate` instead.)
 
-Read the plan file(s) completely. If multiple files exist (plan + tasks), read all of them in a single parallel batch.
+Read the plan file(s) completely in a single parallel batch.
 
 Save Step 1 checkpoint to `.planner/state/<run-id>.json`.
 
 ### 2. Mechanical Lint (parallel with Step 3)
 
 ```bash
-python3 ${plugin_root}/scripts/plan-lint.py --mode all <tasks-or-plan-path> --json
+python3 ${plugin_root}/scripts/plan-lint.py --mode all docs/planning/current.md --json
+python3 ${plugin_root}/scripts/coverage-validator.py docs/planning/current.md --json
+python3 ${plugin_root}/scripts/dependency-cycle-detector.py docs/planning/ --json --include-archive   # scans current.md + archive/*.md; no-ops cleanly if no milestone dependencies are declared
 ```
 
-Capture the output. The script reports:
-- **DAG issues:** cycles, phantom dependencies, complexity > 7 without subtasks
-- **Checklist issues:** missing required fields (Validation, Rollback, Dependencies, Complexity), vague language ("verify it works", etc.)
+Capture the output. The scripts report:
+- **plan-lint:** missing required sections, acceptance-criteria checkbox format, vague language ("verify it works", etc.)
+- **coverage-validator:** acceptance criteria with no verification path in the validation commands
+- **dependency-cycle-detector:** cycles in the milestone dependency graph
 
 Exit code 1 = issues found, 0 = clean. Either way, parse the JSON for the issue list — these feed directly into Step 5's report and **bypass the risk-assessor entirely** (deterministic results don't need LLM judgment).
 
@@ -71,8 +68,9 @@ Exit code 1 = issues found, 0 = clean. Either way, parse the JSON for the issue 
 
 Use the Agent tool to delegate to the `risk-assessor` agent with the substituted template from `references/subagent-prompts/risk-assessment.md`. Pass:
 - The plan content
+- The supporting canonical docs read in Step 1 (vision / architecture / roadmap) as `{supporting_docs_or_none}`
 - `iteration_number: 1`, `max_iterations: 1` (review-plan runs a single pass; the iterative loop is owned by `/rad-planner:plan`)
-- A note that mechanical lint has already run, so the agent should focus on judgment-required passes (anti-patterns 1, 11, 13; architecture; TDD strategy quality) rather than re-doing field-presence and DAG checks
+- A note that the mechanical layer has already run, so the agent should focus on judgment-required passes (anti-patterns 1, 9, 13; architecture; TDD strategy quality) rather than re-doing the field-presence, coverage, and dependency-cycle checks the scripts already cover
 
 **Validate the agent's JSON output:**
 
@@ -109,8 +107,8 @@ After parsing the risk assessor's report, also verify:
 - Are edge cases called out specifically?
 
 **Formatting (lint covers most of this; this is for things lint can't see):**
-- Are checkpoint sections present per milestone?
-- Is the plan structured per the 7-section template (or `--lite`)?
+- Are stop-and-checkpoint boundaries present per milestone?
+- Is the plan structured per the `docs/planning/current.md` 8-section schema?
 
 ### 5. Present Results
 

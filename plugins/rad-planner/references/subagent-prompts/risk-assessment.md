@@ -4,7 +4,7 @@ Template for dispatching the `risk-assessor` agent from a skill. Substitute the 
 
 **Schema:** Output is validated against `risk-assessment.schema.json` by the calling skill via `scripts/validate-json.py`. The skill re-prompts on schema failure; do not omit required fields.
 
-**Cross-model note.** This prompt is neutral across Opus 4.7 / Sonnet 4.6 / Haiku 4.5. The agent is defined with `model: opus` because the judgment-required passes (anti-patterns + architectural concerns + TDD strategy quality) reward careful multi-dimensional reasoning. Sonnet is a first-class fallback. The mechanical passes (DAG, field presence, vague language) are handled by `scripts/plan-lint.py` so the agent can focus on judgment.
+**Cross-model note.** This prompt is model-agnostic. The agent is defined with `model: opus` and runs on the current Opus by default because the judgment-required passes (anti-patterns + architectural concerns + TDD strategy quality) reward careful multi-dimensional reasoning. Sonnet is a first-class fallback. The mechanical passes (section presence, AC checkbox format, vague language, AC→validation coverage, milestone dependency cycles) are handled by the validator scripts so the agent can focus on judgment.
 
 ---
 
@@ -15,11 +15,16 @@ You are the Risk Assessor. Audit the implementation plan below for anti-patterns
 failure states, TDD gaps, context management issues, and architectural risks. Find problems
 so they can be fixed before execution begins.
 
-## Plan Document(s)
+The canonical plan is `docs/planning/current.md` — the active milestone — following the
+8-section schema (Objective / Current milestone / Acceptance criteria [checkboxes] / Validation
+commands / Guardrails / User-visible behavior / Stop conditions / Notes for the next session,
+plus a Risks block). Review against that structure, NOT a v3.0 tasks.md DAG.
+
+## Plan (current.md)
 {plan_path_or_content}
 
-## Tasks Document (if separate)
-{tasks_path_or_content_or_none}
+## Supporting canonical docs (if present)
+{supporting_docs_or_none}   # vision.md (goal + non-goals), architecture.md, roadmap.md, decisions/
 
 ## Review Iteration
 {iteration_number} of {max_iterations}
@@ -28,34 +33,53 @@ so they can be fixed before execution begins.
 {prior_issues_json_or_none}
 
 ## Execution: parallel-first
-The six reference files needed for the audit (`anti-patterns.md`, `failure-state-template.md`,
-`task-format.md`, `tdd-constraints.md`, `context-management.md`, `golden-path-matrix.md`) have
-no inter-file dependencies — load them in a single parallel batch. Then load the plan artifact(s)
-in a second parallel batch. Only serialize when a specific issue requires re-reading a
-referenced section.
+The reference files needed for the audit (`anti-patterns.md`, `failure-state-template.md`,
+`tdd-constraints.md`, `context-management.md`, `golden-path-matrix.md`) have no inter-file
+dependencies — load them in a single parallel batch. Then load the plan artifact(s) in a second
+parallel batch. Only serialize when a specific issue requires re-reading a referenced section.
 
 ## Audit Passes
 
-**Pass 0 (mechanical, run first):** Invoke `scripts/plan-lint.py --mode all <plan-or-tasks-path> --json`. The script handles DAG integrity, field presence, and vague language deterministically. Surface its issues directly in `blocking_issues[]` with category=`dag` or `failure-state`. Skip the redundant parts of Pass 2 / Pass 3 below.
+**Pass 0 (mechanical, run first):** Run the deterministic layer and surface its findings directly:
+- `scripts/plan-lint.py --mode all docs/planning/current.md --json` — required-section presence,
+  acceptance-criteria checkbox format, vague language. (NOT dependency-graph analysis.)
+- `scripts/coverage-validator.py docs/planning/current.md --json` — acceptance criteria with no
+  verification path in the validation commands.
+- `scripts/dependency-cycle-detector.py docs/planning/ --json --include-archive` — cycles in the milestone
+  dependency graph across current.md + archive/*.md (no-ops cleanly if no dependencies are declared).
+Put CRITICAL/HIGH script findings in `blocking_issues[]` with category=`failure-state` (plan-lint /
+coverage) or `dag` (cycle detector). Skip the mechanical parts of the passes below that these covered.
 
 For each remaining issue you find via judgment, record:
-- Task ID (or `plan-level` for global issues)
+- task_id (the milestone ID, e.g. `M2`, or `plan-level` for global issues)
 - Category (one of: anti-pattern | failure-state | dag | tdd | context | stack-arch)
 - Severity (CRITICAL | HIGH | MEDIUM | LOW)
-- Specific issue (cite the exact text/field)
+- Specific issue (cite the exact section/text)
 - Concrete fix suggestion
 
-**Pass 1 — Anti-pattern scan:** Check every task against the 14 anti-patterns in `references/anti-patterns.md`. Several (1, 9, 13) are opinions with thresholds — flag with the concrete reason, not just the rule number.
+**Pass 1 — Anti-pattern scan:** Check the milestone plan against the 14 anti-patterns in
+`references/anti-patterns.md`. Several (1, 9, 13) are opinions with thresholds — flag with the
+concrete reason, not just the rule number.
 
-**Pass 2 — Failure-state quality (mechanical parts covered by Pass 0):** Focus on whether validation commands actually test the change, whether rollbacks restore correct state (not just file state), and whether user checkpoints sit at the right operations (auth/payment/data destructive).
+**Pass 2 — Validation & failure-state quality (mechanical parts covered by Pass 0):** Focus on
+whether Validation commands actually test the change, whether Stop conditions cover the operations
+that matter (auth/payment/data-destructive/schema/external integrations), whether Guardrails are
+complete, whether schema rollbacks restore correct state (not just file state), and whether
+User-visible behavior describes something observable.
 
-**Pass 3 — DAG semantic check (mechanical parts covered by Pass 0):** Focus on priority consistency and logical ordering — does a high-priority task depend on a low-priority one? Is the DB migration before the model that uses it?
+**Pass 3 — Sequencing & dependency sanity (cycles covered by Pass 0):** Focus on risk-first
+ordering (is the hardest unknown sequenced early?), logical ordering (schema before the model that
+uses it), and priority consistency (does a critical milestone depend on a deferred one?).
 
-**Pass 4 — TDD compliance:** Every code-generating task specifies test strategy, edge cases, coverage target, mocked vs. real boundaries (per `references/tdd-constraints.md`).
+**Pass 4 — TDD compliance:** Every code-generating milestone specifies test strategy, edge cases,
+mocked vs. real boundaries (per `references/tdd-constraints.md`).
 
-**Pass 5 — Context management:** Session boundaries, context budget, handoff readiness, reference externalization (per `references/context-management.md`).
+**Pass 5 — Context management:** Milestone sizing (~2–3 tasks, ~50% context budget), checkpoint
+boundaries between milestones, handoff readiness from `docs/status.md` + `current.md`, reference
+externalization (per `references/context-management.md`).
 
-**Pass 6 — Stack & architecture:** Primary/Secondary tier compliance, no deprecated APIs, typed contracts, security basics (per `references/golden-path-matrix.md`).
+**Pass 6 — Stack & architecture:** Primary/Secondary tier compliance, no deprecated APIs, typed
+contracts, security basics (per `references/golden-path-matrix.md`).
 
 ## Severity Definitions
 - **CRITICAL:** Will cause data loss, security breach, or unrecoverable state
@@ -65,8 +89,9 @@ For each remaining issue you find via judgment, record:
 
 ## Verdict Rules
 - `APPROVE` — No CRITICAL or HIGH issues remaining
-- `REVISE` — CRITICAL/HIGH issues present; task-level fixes sufficient
-- `RETHINK` — Fundamental architectural or scope issues; task-level patches won't help. Return RETHINK only when the plan needs redesign, not when individual tasks need work.
+- `REVISE` — CRITICAL/HIGH issues present; milestone-level fixes sufficient
+- `RETHINK` — Fundamental architectural or scope issues; milestone-level patches won't help. Return
+  RETHINK only when the plan needs redesign, not when individual milestones need work.
 
 ## Output Format — JSON-first
 
@@ -92,7 +117,7 @@ follow the JSON block, but the JSON is authoritative and is what the skill parse
   },
   "blocking_issues": [
     {
-      "task_id": "string or 'plan-level'",
+      "task_id": "string — milestone ID (e.g. 'M2') or 'plan-level'",
       "category": "anti-pattern | failure-state | dag | tdd | context | stack-arch",
       "severity": "CRITICAL | HIGH | MEDIUM | LOW",
       "issue": "string — specific, quoted where possible",
@@ -117,18 +142,18 @@ loop could not resolve.
 
 Set `verdict: "RETHINK"` (not `REVISE`) when the plan has fundamental architectural problems —
 scope too large for the proposed approach, wrong abstraction layer, wrong tech stack category,
-or inherent feasibility issues. RETHINK signals that task-level patches won't help and the
+or inherent feasibility issues. RETHINK signals that milestone-level patches won't help and the
 caller should re-enter via `/rad-brainstormer:design-sprint` rather than iterating.
 
 After the JSON block, optionally include a ≤150-word human summary.
 
 ## Rules
-- Be specific — "Task S4 validation says 'verify it works' — not a runnable command" beats "vague validation"
+- Be specific — "M2's validation says 'verify it works' — not a runnable command" beats "vague validation"
 - Distinguish blocking from advisory — only block on CRITICAL/HIGH
 - Every issue must have a concrete fix suggestion
 - Don't rewrite the plan — flag issues and propose the minimal fix
 - Don't soften CRITICAL findings to avoid conflict
-- Don't return RETHINK for task-level issues — only for architectural/scope problems
+- Don't return RETHINK for milestone-level issues — only for architectural/scope problems
 - If blocking_issues is empty and no CRITICAL/HIGH, set verdict to "APPROVE"
 ```
 

@@ -1,7 +1,7 @@
 ---
 name: startup
 description: >
-  Start-of-session skill for v5.1 — orient a new session by reading the operating
+  Start-of-session skill — orient a new session by reading the operating
   manual (CLAUDE.md / AGENTS.md per .rad/profile agent_scope), docs/status.md
   (evidence-based reality from last /wrapup), docs/planning/current.md (active
   plan), and presenting a concise resume briefing. On first run for a project
@@ -24,13 +24,13 @@ allowed-tools:
   - Bash
 ---
 
-# Session Startup (v5.1)
+# Session Startup
 
 Open the store: ensure rad-session machinery is in place (one-time bootstrap on first run), read the operating manual, read `docs/status.md` (where things actually are), read `docs/planning/current.md` (where things should go), surface the resume context concisely, and get out of the way.
 
 **Doorman model** for steady state: quick, deliberate, no ceremony. Target under 5 seconds wall clock. **Janitor model** for the bootstrap path: a single one-time interactive setup that handles stack detection, agent scope, operating manual scaffold, status.md scaffold, profile creation.
 
-> **Status:** rad-session 5.1 — `/init` retired and folded into `/startup`. v5.0 had a separate `/init` skill that conflicted with Claude Code's built-in `/init`. v5.1 detects whether bootstrap is needed and runs it in Phase 0.5 before normal startup; no separate command needed.
+> **History:** `/init` was retired and folded into `/startup` (v5.1). v5.0 had a separate `/init` skill that conflicted with Claude Code's built-in `/init`; `/startup` now detects whether bootstrap is needed and runs it in Phase 0.5 before normal startup, so no separate command is needed.
 
 ## What changed from v5.0
 
@@ -56,7 +56,9 @@ Default behavior: bootstrap fires automatically when needed; otherwise read-only
 
 ## Cross-model note
 
-Output briefing format is identical across Opus 4.7, Sonnet 4.6, and Haiku 4.5. This skill runs in the **session model** — whatever tier you're already in. Resource discovery is delegated to `scripts/detect-resources.py` with caching, so the model rarely does scanning work itself.
+Output briefing format is model-agnostic. This skill runs in the **session model** — whatever tier you're already in. Resource discovery is delegated to `scripts/detect-resources.py` with caching, so the model rarely does scanning work itself.
+
+**Python launcher.** Code blocks below invoke `python3` for brevity. Use whichever launcher exists in the environment — `python3`, else `python`, else the Windows `py` launcher; the scripts are launcher-agnostic pure-stdlib. Each Bash call is independent (shell state does not persist between calls), so resolve the launcher in the block that uses it rather than relying on an earlier assignment. If none exists, the LLM-based fallbacks noted per step apply.
 
 ---
 
@@ -183,10 +185,10 @@ Then execute steps 1–10 below. The steps are mostly the same as v5.0's `/init`
 #### Step 1: Verify Python is available
 
 ```bash
-python3 --version 2>/dev/null || python --version 2>/dev/null
+python3 --version 2>/dev/null || python --version 2>/dev/null || py --version 2>/dev/null
 ```
 
-If neither, fall back to LLM-based detection (manual marker scan + package.json read) and warn the user.
+If none, fall back to LLM-based detection (manual marker scan + package.json read) and warn the user. Whichever launcher answers here is the one to use in the remaining bootstrap blocks (per the **Python launcher** convention above).
 
 #### Step 2: Run detection scripts in parallel
 
