@@ -1,6 +1,6 @@
 # Failure State Mapping: Triple-Component Instructions
 
-AI models suffer from "happy path" bias -- they assume every tool call, API response, and environment configuration will succeed perfectly. The planner must counter this by defining explicit failure states for every milestone or risky change. In a v4.x plan these map onto `docs/planning/current.md`'s **Validation commands** (the check), **Stop conditions** (when to escalate rather than push on), and **Guardrails** (what must not change).
+AI models suffer from "happy path" bias -- they assume every tool call, API response, and environment configuration will succeed perfectly. The planner must counter this by defining explicit failure states for every task and milestone. In `plan.md` these map onto each task's **Validate** (the check) and **Rollback** (the reversal), the plan-level **Stop conditions** (when to escalate rather than push on), and the per-milestone **Checkpoints** (gate / validate / rollback boundaries).
 
 ## The Triple-Component Model
 

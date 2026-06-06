@@ -15,7 +15,7 @@
       "source": "./plugins/rad-code-review",
       "description": "3-role adversarial code review with diff-aware scoping and AI slop detection — blame-aware diff filtering, framework-specific IDOR heuristics, 14 AI slop patterns, performance profiling, WCAG 2.2 dynamic ARIA state detection, interactive findings management with accept/filter/fix workflow, and severity-ranked findings with optional fix application.",
       "category": "development",
-      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-code-review",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-code-review",
       "license": "Apache-2.0"
     },
     {
@@ -23,7 +23,7 @@
       "source": "./plugins/rad-chrome-extension",
       "description": "Comprehensive MV3 Chrome extension development standards — WXT framework architecture, MV3 security, permission minimization, typed messaging, storage patterns, service worker lifecycle, React UI, testing, and Chrome Web Store troubleshooting.",
       "category": "development",
-      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-chrome-extension",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-chrome-extension",
       "license": "Apache-2.0"
     },
     {
@@ -31,7 +31,7 @@
       "source": "./plugins/rad-a11y",
       "description": "Digital accessibility toolkit for WCAG 2.2 AA compliance — semantic HTML, ARIA authoring practices, keyboard navigation, focus management, color contrast, motion/animation, form accessibility, SVG accessibility, and automated testing with axe-core.",
       "category": "development",
-      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-a11y",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-a11y",
       "license": "Apache-2.0"
     },
     {
@@ -39,7 +39,7 @@
       "source": "./plugins/rad-supabase",
       "description": "End-to-end Supabase development and operations — projects, database, migrations, edge functions, auth, storage, realtime, branching, security, and troubleshooting. Covers both Supabase CLI and Supabase MCP tool usage.",
       "category": "development",
-      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-supabase",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-supabase",
       "license": "Apache-2.0"
     },
     {
@@ -47,7 +47,7 @@
       "source": "./plugins/rad-coolify-orchestrator",
       "description": "End-to-end Coolify self-hosted PaaS management — deployments, databases, security, CI/CD, troubleshooting, observability, and multi-server infrastructure. Coolify v4 self-hosted.",
       "category": "devops",
-      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-coolify-orchestrator",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-coolify-orchestrator",
       "license": "Apache-2.0"
     },
     {
@@ -55,7 +55,7 @@
       "source": "./plugins/rad-1password",
       "description": "End-to-end 1Password CLI (op) coverage — secret references (op://...), `op inject`/`op run`/`op read` for keeping secrets out of code and shell history, item CRUD with assignment statements and JSON templates, vault and user provisioning with granular permissions, SSH key generation and use, third-party CLI auth via `op plugin run`, and service-account / Connect-server patterns for CI/CD and headless servers. 1 router skill, 6 topical sub-skills, 4 slash commands. Cross-checked against op v2.34.0 --help.",
       "category": "devops",
-      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-1password",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-1password",
       "license": "Apache-2.0"
     },
     {
@@ -63,7 +63,7 @@
       "source": "./plugins/rad-brainstormer",
       "description": "Collaborative ideation using proven methodologies (SCAMPER, Six Hats, Reverse Brainstorming, 5 Whys, HMW), domain research, structured evaluation, and design sprints.",
       "category": "productivity",
-      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-brainstormer",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-brainstormer",
       "license": "Apache-2.0"
     },
     {
@@ -71,7 +71,7 @@
       "source": "./plugins/rad-seo-optimizer",
       "description": "Comprehensive SEO auditing, AEO/GEO optimization, competitor intelligence, keyword discovery, link building, content strategy, schema markup, and E-E-A-T optimization.",
       "category": "productivity",
-      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-seo-optimizer",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-seo-optimizer",
       "license": "Apache-2.0"
     },
     {
@@ -79,7 +79,7 @@
       "source": "./plugins/rad-context-prompter",
       "description": "Production-grade prompt engineering toolkit — systematic tool-specific routing across 30+ AI platforms, anti-pattern diagnostics, technique selection matrix, prompt decompilation, autonomous debugging, context engineering for agentic systems, and reusable templates.",
       "category": "productivity",
-      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-context-prompter",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-context-prompter",
       "license": "Apache-2.0"
     },
     {
@@ -87,7 +87,7 @@
       "source": "./plugins/rad-para-second-brain",
       "description": "Active PARA system management — weekly review automation, folder structure auditing, Progressive Summarization, Intermediate Packet assembly, Hemingway Bridge session handoffs, and 12 Favorite Problems workshop.",
       "category": "productivity",
-      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-para-second-brain",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-para-second-brain",
       "license": "Apache-2.0"
     },
     {
@@ -95,7 +95,7 @@
       "source": "./plugins/rad-session",
       "description": "Make AI coding sessions remember each other — across machines, across agents (Claude + Codex), across days. Three commands manage the lifecycle: `/startup` orients you in under five seconds, `/wrapup` writes status from evidence (git diff, test output, plan state) rather than chat memory, and `/add-resource` registers new tools as you discover them.\n\nBuilt around a canonical doc set — operating manual (CLAUDE.md and/or AGENTS.md per agent scope), `docs/status.md`, `docs/planning/current.md`, `docs/decisions/` — aligned with published OpenAI/Anthropic project-structure research. Auto-bootstraps on first run, auto-commits to keep PC ↔ GitHub ↔ laptop in sync, and refuses to overwrite user-authored work even under autonomous permission modes.\n\n**v5.6 — user-owned content visibility audit at `/wrapup` and `/startup`.** Invokes rad-planner 4.10's `audit-user-content.py` to surface stale terminology + dead paths in user-owned operating-manual sections. Advisory only — neither plugin modifies the content. New principle codified in `docs/cross-plugin-contracts.md`: refusal to modify ≠ refusal to be silent about staleness.\n\n**v5.5 — compact milestone contract render at `/startup`.** When `docs/planning/current.md` has a `### Session contract` sub-section (rad-planner 4.8+), `/startup` Phase 1.5.2 renders it as the first user-visible block after the v5.3 floor line — putting the 7-field build-readiness contract in the agent's context window before the first tool call. Graceful skip when absent.\n\n**v5.4** — recognizes the new `Lanes` Constitution section (rad-planner v4.7+ role-separation contract) and treats it as never-prunable; `/startup` Phase 1.5 reads it as part of the operating-manual orientation. Pairs with rad-planner; works standalone.",
       "category": "productivity",
-      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-session",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-session",
       "license": "Apache-2.0"
     },
     {
@@ -103,15 +103,15 @@
       "source": "./plugins/rad-gws-core",
       "description": "Google Workspace core integration — 14 essential skills covering Gmail (send, read, reply, triage), Docs (write), Sheets (read, append), Slides, Drive, and Calendar. Requires the gws CLI binary.",
       "category": "productivity",
-      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-gws-core",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-gws-core",
       "license": "Apache-2.0"
     },
     {
       "name": "rad-planner",
       "source": "./plugins/rad-planner",
-      "description": "Plan a project before you write code — or replan after a pivot, deepen an existing plan, or check for drift between plan and reality. rad-planner walks you through a five-phase planning conversation (Constitution → Scope → Sequence → Quality Gates → Doc-Set Recommendation), then writes the approved doc set as the plan's first executed milestone. The plan is the deliverable; the docs follow it.\n\nFour entry points cover the lifecycle: full plan (greenfield), improvement (deepen what's there), drift (compare reality to plan), and pivot (substantial re-plan). A read-only `--assessment` mode answers \"where does this project stand?\" without writing anything — and (v4.6) now surfaces planning-velocity signals to catch the planning-as-avoidance pattern. Two project-story skills (`/project-story`, `/refresh-story`) turn the canonical doc set into plain-English narrative for non-developers, collaborators, or your future self.\n\n**v4.10 — user-owned content visibility audit.** New `audit-user-content.py` validator surfaces stale terminology and dead paths in user-owned operating-manual sections without modifying them. Closes the gap between the sectioned-writer rule's safety (won't auto-edit) and silence (couldn't notice staleness). Two heuristics in v1: orphan Title-Case phrases (catches brand resets like Digital Diorama → Grounded Naturalist) and dead path references. Pure-stdlib, false-positive-tightened.\n\n**v4.9 — depth-of-planning heuristic at M0.5.** The M0.5 gate recommends shallow / standard / deep based on the inferred decision class (architecture / cost / UX flow / user trust / product identity warrant deep; cosmetic fixes warrant shallow). User confirms or overrides; new `--depth` flag preempts the heuristic. Shallow skips M1–M5; deep adds a mandatory risk-assessor pass. M0.5 hard gate still fires regardless. Pure-stdlib keyword/state pattern matching — no ML.\n\n**v4.8 — compact milestone contract embedded in `current.md`.** M6 writes a `### Session contract` sub-section with the 7-field build-readiness block (Current milestone / Goal / In scope / Out of scope / Files likely touched / Acceptance criteria / Stop and ask if). Derived from canonical sections; `plan-lint.py` enforces all 7 fields. rad-session 5.5+ renders it at `/startup` as the first user-visible block, putting the contract in the agent's context before the first tool call.\n\n**v4.7 — Lanes section in the operating manual.** M6 now writes a verbatim role-separation contract: what the human decides, what the agent may do during planning, what the agent may do during coding, what the agent must NOT do. Agent-agnostic template. rad-session 5.4+ recognizes it as Constitution-band and never prunes it. Idempotent on re-run.\n\n**v4.6 — build-readiness gate alignment.** `docs/planning/current.md` gains two required sections (Guardrails + User-visible behavior) enforced by `plan-lint.py`. `docs/planning/parked.md` is first-class — M2 offers parking as a third option alongside in-scope and non-goal for ambiguous ideas. `/plan --assessment` surfaces four overplanning signals (edits-since-last-code-commit, AC-rewrite-count, planning-doc-growth-ratio, time-since-last-code-commit) with per-project threshold overrides.\n\nFive mechanical validators back the workflow: plan-lint, status, doc-redundancy, doc-contradiction, and assess-planning-velocity. Pairs with rad-session for the full lifecycle; works standalone.",
+      "description": "Plan a project before you write code. rad-planner runs a rigorous planning conversation and produces one thing: a plan a fresh agent can execute. It is strictly a planner — it writes the plan and nothing else.\n\nThe method is risk-first, adversarially-reviewed, and mechanically-validated — more than single-pass planning. It surfaces non-obvious assumptions, evaluates the stack for code-generation accuracy (AI-native Golden Path matrix), decomposes goal-backward, sequences risk-first with size discipline, and specs every task to execution-readiness (objective, files, dependencies, done-when, validation, rollback). `plan-lint.py` mechanically validates the plan — required sections, per-task fields, dependency resolution + cycles, vague-language detection — and the `risk-assessor` agent adversarially reviews it against 14 documented anti-patterns with APPROVE / REVISE / RETHINK verdicts.\n\nOutput is a single file, `docs/planning/plan.md` (created fresh or updated in place). Everything folds into it; no strategic-doc tree. When the conversation surfaces something for a durable doc the planner does not own (a PRD, a decision log, an architecture reference), it writes a paste-ready `docs/planning/[date]-update-prompt.md` you run in Claude or Codex to apply the change — durable docs stay under your control.\n\nTwo skills: `/plan` (the planning conversation) and `/review-plan` (a two-layer quality audit of an existing plan). Two agents back them: `stack-advisor` and `risk-assessor`. Two pure-stdlib validators: `plan-lint.py`, `validate-json.py`.\n\n**v5.0 — reboot.** Stripped the v4.x canonical doc tree, scope gates, depth heuristics, and doc-org validators that had buried the planning method. Restored the v3.0 conversation's rigor, kept the good ideas (goal-backward decomposition, size discipline), reshaped the output to a single lean plan, and decoupled from rad-session. Works standalone.",
       "category": "productivity",
-      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-planner",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-planner",
       "license": "Apache-2.0"
     },
     {
@@ -119,7 +119,7 @@
       "source": "./plugins/rad-explain",
       "description": "Explain a project to humans, honestly — without overpromising or inventing features that aren't in the repo. Five skills generate audience-targeted communications from your project's actual artifacts: `narrate-project` (plain-English description, audience-adaptive), `elevator-pitch` (~150 words / ~30 seconds spoken), `draft-pitch` (one-pager for funding, grants, partnerships), `explain-document` (interpret a specific repo file — \"what does this commit me to?\", \"where could this go wrong?\"), and `ground-readme` (generate or audit a README so it stays grounded in source).\n\nTwo pure-stdlib Python validators check every output: `check-grounding.py` traces each substantive claim back to repo source, and `check-overpromise.py` flags superlatives, marketing fluff, and production-readiness assertions without evidence. Works on any repo — no rad-planner dependency. Reads `docs/` if present, falls back to README + project manifest + source structure when absent. Pairs with `/rad-planner:project-story` for canonical-doc projects. The plugin's own README passes its own validators.",
       "category": "productivity",
-      "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-explain",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-explain",
       "license": "Apache-2.0"
     }
   ]

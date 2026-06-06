@@ -1,0 +1,146 @@
+# Plan Output Template — single-file `plan.md`
+
+rad-planner emits **one** plan file: `docs/planning/plan.md` (created if absent; updated in place if a plan already exists there or at a detected legacy path). Everything the planning conversation produces — objective, scope, assumptions, stack, milestones, tasks, checkpoints, risks — folds into this one file as sections. No separate `tasks.md`, no strategic-doc tree.
+
+A second file, `docs/planning/[date]-update-prompt.md`, is written **only when** the conversation surfaces a change that belongs in a durable doc the planner does not own (PRD / product contract, decision log, architecture). See "Update-prompt template" below.
+
+`plan.md` is validated mechanically by `scripts/plan-lint.py` after every write.
+
+---
+
+## `plan.md` template
+
+```markdown
+# Plan: [Project Name]
+
+**Status:** [DRAFT | APPROVED | IN PROGRESS | COMPLETED]
+**Updated:** [YYYY-MM-DD]
+<!-- Add the next line ONLY when an update-prompt was written this session: -->
+**Pending durable-doc updates:** see `[YYYY-MM-DD]-update-prompt.md`
+
+## Objective
+
+[1–2 sentences: what this builds and why now. The "why now" separates a real
+project from a someday-maybe.]
+
+## Scope
+
+**In scope:**
+- [Capability the plan commits to]
+
+**Out of scope / non-goals:**
+- [Deliberate exclusion — not just unattended, explicitly NOT building this]
+
+## Key assumptions
+
+[Non-obvious truths about the project's reality that wouldn't be evident from the
+code. One-line entries. When an assumption invalidates, strike it through rather
+than deleting — the audit trail matters.]
+
+- [YYYY-MM-DD] [e.g. "No real users yet — backward-compat can break until M3."]
+
+## Stack
+
+[Only when a stack evaluation ran this session. Brief — language, framework, data
+store, key libraries. The full rationale is durable; if it warrants recording,
+surface it into the update-prompt, do not expand it here.]
+
+## Milestones
+
+| # | Milestone | Goal (what it ships) | Key artifacts |
+|---|---|---|---|
+| M1 | [theme] | [coherent shippable outcome] | [files / components] |
+
+[Risk-first ordering: the hardest unknown is solved first. Size discipline:
+aim for 2–3 tasks per milestone; a milestone over 5 tasks is a split candidate.]
+
+## Tasks
+
+### M1 — [theme]
+
+- **T1 — [title]**
+  - **Objective:** [1–2 sentences]
+  - **Files:** [files likely created / modified]
+  - **Depends on:** [none | T-x, T-y]
+  - **Done when:** [specific, measurable — not "works"]
+  - **Validate:** `[runnable command or verifiable condition]`
+  - **Rollback:** `[how to revert to last known-good]`
+
+[Repeat per task. Every task carries all six fields — plan-lint enforces it.]
+
+## Checkpoints
+
+### After M1
+
+- **Gate:** T1–Tn complete and validated
+- **Validate:** `[command that proves the milestone]`
+- **Rollback:** `[reset to pre-M1 known-good]`
+
+## Risks & mitigations
+
+| Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|
+| [risk] | [Low/Med/High] | [Low/Med/High] | [specific mitigation] |
+
+## Validation
+
+[The commands that prove the whole plan is done. Concrete, pass/fail.]
+
+## Stop conditions
+
+[When the executing agent must halt and ask rather than guess — e.g. requirement
+conflict, change touches auth/billing/data model, validation fails and the fix
+needs scope expansion.]
+
+## Next step
+
+[The single immediate next action. One sentence.]
+```
+
+---
+
+## Shared rules (enforced)
+
+Every task in `## Tasks` MUST carry all six fields: **Objective, Files, Depends on, Done when, Validate, Rollback**. `plan-lint.py` flags any task missing one.
+
+1. **Dependencies reference task IDs** (`T1`, `T2`) and must resolve to a task that exists in the file — no phantom dependencies, no cycles. Checked by `plan-lint.py`.
+2. **`Validate` and `Done when` must be runnable or verifiable** — vague language ("verify it works", "looks right", "tbd", "etc.") is flagged.
+3. **`Rollback` must restore a known-good state.** Judgment — `risk-assessor` checks quality.
+4. **A checkpoint follows every milestone**, with its own gate / validate / rollback (the failure-state triple from `references/failure-state-template.md`). Placement judged by `risk-assessor`.
+5. **Assumption invalidations use strikethrough**, never deletion.
+
+| Rule | Enforced by |
+|---|---|
+| Required sections present | `plan-lint.py` |
+| Per-task field presence | `plan-lint.py` |
+| Dependency resolution + no cycles | `plan-lint.py` |
+| Vague-language detection | `plan-lint.py` |
+| Rollback correctness, checkpoint placement, anti-pattern coverage | `risk-assessor` agent (judgment) |
+
+---
+
+## Update-prompt template
+
+Written to `docs/planning/[date]-update-prompt.md` **only** when the conversation surfaced a durable-doc change. `plan.md` gets a one-line `**Pending durable-doc updates:**` pointer (above). One source of truth: the surfaced items live here, not duplicated into `plan.md`.
+
+```markdown
+# [YYYY-MM-DD] — Doc update prompt
+
+Generated by rad-planner. Paste into Claude or Codex to reconcile durable docs
+with decisions made during this planning session. Delete once the updates land.
+
+---
+
+During planning on [YYYY-MM-DD] we made changes that affect durable docs the
+planner does not own. Please:
+
+1. **[path, e.g. docs/prd.md]** — [what to record, and why; mark any superseded
+   wording].
+2. **[path, e.g. docs/reference/decision-log.md]** — [active decision to add;
+   note whether a detailed ADR is warranted].
+3. **[path, e.g. docs/architecture.md]** — [implication to capture].
+
+After updating, confirm each file changed and delete this prompt.
+```
+
+**Agent-agnostic.** The prompt names files and changes in plain language — it runs in Claude, Codex, or any agent. The planner never writes these durable docs itself; it only writes this prompt and the `plan.md` pointer.
