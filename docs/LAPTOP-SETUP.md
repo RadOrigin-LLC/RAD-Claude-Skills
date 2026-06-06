@@ -117,7 +117,7 @@ New-Item -ItemType Directory -Force -Path C:\Dev
 Set-Location C:\Dev
 
 # rad-skills-repo (plugins — needed for Coolify MCP path)
-gh repo clone radesjardins/RAD-Claude-Skills rad-skills-repo
+gh repo clone RadOrigin-LLC/RAD-Claude-Skills rad-skills-repo
 
 # RadOrigin projects
 New-Item -ItemType Directory -Force -Path `
@@ -180,7 +180,7 @@ claude login       # web auth — use the same Anthropic account as desktop
 claude
 # inside the Claude Code TUI:
 /plugin marketplace add anthropics/claude-plugins-official
-/plugin marketplace add radesjardins/RAD-Claude-Skills
+/plugin marketplace add RadOrigin-LLC/RAD-Claude-Skills
 ```
 
 ### Enable plugins (matches your desktop enabled list)

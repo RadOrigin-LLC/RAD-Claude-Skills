@@ -4,10 +4,10 @@
   "description": "Expert Zod v4 guidance for TypeScript projects — schema design, validation patterns, security, error handling, and framework integrations.",
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-zod",
-  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-zod",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
   "keywords": ["zod", "validation", "typescript", "schema", "runtime-types", "react-hook-form", "fastify", "nextjs"]
 }

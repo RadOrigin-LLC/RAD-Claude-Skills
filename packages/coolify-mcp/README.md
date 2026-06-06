@@ -101,7 +101,7 @@ COOLIFY_URL=https://coolify.example.com COOLIFY_API_TOKEN=your-token npx @radori
 
 ## Companion Plugin
 
-For Coolify deployment patterns, troubleshooting guides, and an AI reviewer agent, install [rad-coolify-orchestrator](https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-coolify-orchestrator) — it pairs with this MCP server to give Claude deep Coolify knowledge alongside the operational tools.
+For Coolify deployment patterns, troubleshooting guides, and an AI reviewer agent, install [rad-coolify-orchestrator](https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-coolify-orchestrator) — it pairs with this MCP server to give Claude deep Coolify knowledge alongside the operational tools.
 
 ## Requirements
 

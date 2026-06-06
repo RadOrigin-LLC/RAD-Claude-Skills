@@ -4,10 +4,10 @@
   "description": "MV3 Chrome extension development standards (WXT, React, TypeScript) with two pure-stdlib Python validators that catch what LLM eyeballing misses. Skills cover architecture, MV3 security (CSP, remote code ban, content script isolation), permission minimization and CWS compliance, typed messaging, storage selection, service worker lifecycle, React UI patterns, testing, and Chrome Web Store troubleshooting.\n\nThe chrome-ext-reviewer agent runs two validators before LLM judgment: `audit-manifest.py` (manifest.json audit for MV3 compliance, permission overreach, weak CSP, web_accessible_resources scoping, MV2 leftovers, CWS-rejection causes; auto-discovers WXT `.output/` build manifests) and `scan-mv3-violations.py` (greps source for CSP-banned `eval` / `new Function` / `setTimeout('string')`, remote `<script src=\"http\">` and dynamic imports of remote URLs, MV2-only `chrome.tabs.executeScript` / `chrome.browserAction` / `chrome.extension.getBackgroundPage`, blocking webRequest listeners, optional DOM-risk `innerHTML` / `document.write`). Both emit findings with severity and specific fix recommendations. Pure stdlib Python 3.8+.",
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-chrome-extension",
-  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-chrome-extension",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
   "keywords": ["chrome-extension", "manifest-v3", "wxt", "react", "typescript", "service-worker", "content-script", "chrome-web-store", "browser-extension", "mv3"]
 }

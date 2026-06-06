@@ -6,7 +6,7 @@ Thanks for your interest in contributing! Whether it's a bug report, new skill, 
 
 ### Reporting Bugs
 
-1. Check [existing issues](https://github.com/radesjardins/RAD-Claude-Skills/issues) to avoid duplicates
+1. Check [existing issues](https://github.com/RadOrigin-LLC/RAD-Claude-Skills/issues) to avoid duplicates
 2. Use the **Bug Report** issue template
 3. Include: what you expected, what happened, and steps to reproduce
 4. Mention which skill/plugin is affected and your Claude Code version
@@ -76,7 +76,7 @@ This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.
 
 ## Questions?
 
-Open a [discussion](https://github.com/radesjardins/RAD-Claude-Skills/discussions) or an issue — happy to help.
+Open a [discussion](https://github.com/RadOrigin-LLC/RAD-Claude-Skills/discussions) or an issue — happy to help.
 
 ## License
 

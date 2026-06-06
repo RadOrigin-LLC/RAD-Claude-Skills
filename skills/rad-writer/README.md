@@ -2,7 +2,7 @@
 
 Domain-smart writing, AI pattern avoidance, voice profiling, and editorial review across 9 content types — email, blog, web copy, business reports, research, presentations, prose, technical docs, social media.
 
-> **Claude.ai-only distribution.** This is the standalone Claude.ai skill version. The matching Claude Code plugin was retired in marketplace v1.11.0 — its project-narrative use case is now covered by [rad-explain](https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-explain) (`narrate-project`, `ground-readme`) for any repo, and [rad-planner](https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-planner)'s `/project-story` for canonical-doc projects. This skill remains the multi-genre writing home for Claude.ai users.
+> **Claude.ai-only distribution.** This is the standalone Claude.ai skill version. The matching Claude Code plugin was retired in marketplace v1.11.0 — its project-narrative use case is now covered by [rad-explain](https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-explain) (`narrate-project`, `ground-readme`) for any repo, and [rad-planner](https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-planner)'s `/project-story` for canonical-doc projects. This skill remains the multi-genre writing home for Claude.ai users.
 
 ## What's Included
 
@@ -66,4 +66,4 @@ Read these before expecting capabilities this skill cannot honestly deliver:
 | Long-document chunked processing | Manual sectioning |
 | Operates on filesystem | ✗ (paste / artifact only — Claude.ai sandbox has no filesystem) |
 
-For engineer-writing in a Claude Code session (READMEs, changelogs, ADRs, commits) with grounding and overpromise checks, use [`rad-explain`](https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-explain) — its `ground-readme` skill audits or generates README-style copy against the repo source.
+For engineer-writing in a Claude Code session (READMEs, changelogs, ADRs, commits) with grounding and overpromise checks, use [`rad-explain`](https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-explain) — its `ground-readme` skill audits or generates README-style copy against the repo source.

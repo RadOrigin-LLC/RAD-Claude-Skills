@@ -4,10 +4,10 @@
   "description": "RAD Fastify — comprehensive Fastify framework coding standards, architectural guidance, and anti-pattern enforcement. Covers the encapsulation model and plugin DAG, hook lifecycle, JSON Schema validation with Ajv, response serialization with fast-json-stringify, Pino logging, TypeScript type providers, in-process testing with .inject(), production hardening (reverse proxy, graceful shutdown, security headers), and common mistake prevention.",
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-fastify",
-  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-fastify",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
   "keywords": ["fastify", "nodejs", "api", "rest", "json-schema", "ajv", "pino", "typescript", "hooks", "encapsulation"]
 }

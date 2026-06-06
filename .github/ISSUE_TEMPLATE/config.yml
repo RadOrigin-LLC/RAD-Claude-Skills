@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Questions & Discussion
-    url: https://github.com/radesjardins/RAD-Claude-Skills/discussions
+    url: https://github.com/RadOrigin-LLC/RAD-Claude-Skills/discussions
     about: Ask questions, share ideas, or show what you've built with RAD skills
   - name: Security Vulnerability
-    url: https://github.com/radesjardins/RAD-Claude-Skills/security/advisories/new
+    url: https://github.com/RadOrigin-LLC/RAD-Claude-Skills/security/advisories/new
     about: Report security vulnerabilities privately (do NOT open a public issue)

@@ -30,7 +30,7 @@ Loaded automatically when relevant.
 ## Install
 
 ```
-/plugin marketplace add radesjardins/RAD-Claude-Skills
+/plugin marketplace add RadOrigin-LLC/RAD-Claude-Skills
 /plugin install rad-1password@rad-claude-skills
 ```
 

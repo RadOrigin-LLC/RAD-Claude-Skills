@@ -4,10 +4,10 @@
   "description": "Active PARA system management. Five skills cover folder organization, weekly review automation, Progressive Summarization, Hemingway Bridge session handoffs (integrates with rad-session), and the 12 Favorite Problems workshop. Two autonomous agents: para-auditor (structure validation) and para-weekly-reviewer (review briefings). One pure-stdlib Python validator (`audit-para-structure.py`) that mechanically enforces the four-canonical-folder rule (Projects/Areas/Resources/Archive), detects false projects (topic-shaped names instead of project-shaped), flags non-PARA anti-pattern folders (Inbox/Notes/Misc/etc.), counts active projects (warn >10, info >20, PARA recommends 5-10), and finds orphaned root files. Based on Tiago Forte's Building a Second Brain methodology.",
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-para-second-brain",
-  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-para-second-brain",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
   "keywords": ["para", "second-brain", "knowledge-management", "productivity", "progressive-summarization", "pkm", "tiago-forte"]
 }

@@ -8,7 +8,7 @@ If you discover a security vulnerability in this project, please report it respo
 
 ### Preferred: GitHub Private Vulnerability Reporting
 
-1. Go to the [Security tab](https://github.com/radesjardins/RAD-Claude-Skills/security) of this repository
+1. Go to the [Security tab](https://github.com/RadOrigin-LLC/RAD-Claude-Skills/security) of this repository
 2. Click **"Report a vulnerability"**
 3. Fill out the form with details about the vulnerability
 
@@ -16,7 +16,7 @@ This creates a private advisory where we can discuss the issue and develop a fix
 
 ### Alternative: Email
 
-If you prefer email, contact the maintainer directly at the email address listed on the [GitHub profile](https://github.com/radesjardins).
+If you prefer email, contact the maintainer directly at the email address listed on the [GitHub profile](https://github.com/RadOrigin-LLC).
 
 ## What to Include
 

@@ -4,10 +4,10 @@
   "description": "Modern React best practices — functional components, hooks, JSX, props, state, routing, forms, data fetching, server/client boundaries, accessibility, security, TypeScript, testing, performance optimization, and code organization. Includes React 19 patterns (useActionState, useFormStatus, useOptimistic), security (XSS, IDOR, Server Actions auth), useEffect anti-patterns, and AI coding assistant mistake detection. Current practices only, no class components.",
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-react",
-  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-react",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
   "keywords": ["react", "hooks", "typescript", "accessibility", "performance", "testing", "jsx", "server-components", "security", "react-19", "useeffect", "anti-patterns"]
 }

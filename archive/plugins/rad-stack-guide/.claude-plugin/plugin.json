@@ -4,10 +4,10 @@
   "description": "Auto-detects your tech stack, recommends and configures the right plugins, injects stack-aware guidance into CLAUDE.md, generates team settings, and orchestrates pre-ship reviews with specialist reviewers + rad-code-review as final gate. The entry point for the rad development stack.",
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-stack-guide",
-  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-stack-guide",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
   "keywords": ["stack-detection", "orchestration", "code-review", "claude-md", "team-settings", "plugin-management"]
 }

@@ -4,10 +4,10 @@
   "description": "Codebase-scoped SEO tooling for Claude Code with three pure-stdlib Python validators that turn the plugin's static-analysis claims into deterministic checks: `validate-jsonld.py` (extracts JSON-LD blocks from HTML/JSX/Astro/Svelte/Vue, validates against a bundled subset of ~20 SEO-impactful schema.org types — Article, NewsArticle, BlogPosting, Product, Offer, Organization, Person, WebSite, WebPage, BreadcrumbList, FAQPage, Question, Answer, HowTo, Recipe, Event, LocalBusiness, SoftwareApplication, VideoObject — checks required + recommended properties, URL/date field shapes, supports @graph form), `audit-meta-tags.py` (title length, meta description length, canonical URL shape, charset, viewport, robots sanity, Open Graph 5-prop coverage, Twitter Card 3-prop coverage, hreflang x-default), `check-broken-links.py` (parallel HEAD scanner with GET-Range fallback, accepts inline URLs / URL list file / sitemap.xml URL or file / HTML root directory scan, threaded via concurrent.futures). Plus knowledge skills for AEO/GEO content optimization, keyword ideation, content strategy, schema generation, E-E-A-T, and observable competitive research. Honest scope: does NOT measure numerical Core Web Vitals, keyword volumes, backlink profiles, or actual AI citation rates — those require Path B MCP integrations documented in references/CAPABILITIES.md.",
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-seo-optimizer",
-  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-seo-optimizer",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
   "keywords": ["seo", "aeo", "geo", "schema-markup", "e-e-a-t", "keywords", "link-building", "content-strategy", "serp"]
 }

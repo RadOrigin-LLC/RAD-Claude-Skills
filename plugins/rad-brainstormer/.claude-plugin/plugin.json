@@ -4,10 +4,10 @@
   "description": "Brainstorming in Claude Code with an optional local visual companion. Mockups, diagrams, and side-by-side comparisons render in a browser tab when the next question benefits from them — entirely local (no npm deps; Node stdlib only), terminal-vs-browser routing decided per question. Methodology skills cover SCAMPER, Six Hats, 5 Whys, How Might We, reverse brainstorming, creative unblock, idea generation, idea evaluation, and a design-sprint flow. Three agents handle domain research, idea challenging, and spec review.",
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-brainstormer",
-  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-brainstormer",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
   "keywords": ["brainstorming", "ideation", "scamper", "six-hats", "creativity", "design-sprint", "product", "research"]
 }

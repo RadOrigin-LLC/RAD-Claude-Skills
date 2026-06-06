@@ -4,10 +4,10 @@
   "description": "Reverse-engineer, write, and migrate AI prompts. The prompt-decompiler skill routes between six modes — anatomize, translate, compress, decompose, forensics, diagnose — on prompts you paste in. The prompt-engineering skill covers writing patterns and platform-specific shape (Claude, GPT, Gemini, image generators, agentic tools). An autonomous prompt-debugger agent handles prompt-output failure analysis.\n\nBundled `scripts/lint-prompt.py` is a pure-stdlib Python linter that mechanically detects common prompt-engineering issues: missing role/system frame, vague instructions (\"make it better\", \"be helpful\"), unbounded length adjectives (\"concise\" with no limit), subjective quality claims, conflicting output formats (JSON + markdown), missing examples after few-shot intent, excessive YOU MUST / ALWAYS / NEVER emphasis, superhuman-role framing (\"world-class expert\"), and imperative collisions (same verb both demanded and forbidden). Reads prompts from file or stdin; emits JSON or human-readable findings.",
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-context-prompter",
-  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-context-prompter",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
   "keywords": ["prompt-engineering", "context-engineering", "system-prompts", "tool-routing", "anti-patterns", "prompt-debugging", "prompt-decompiler", "claude", "gpt", "midjourney", "agentic-workflows", "few-shot", "chain-of-thought", "claude-md"]
 }

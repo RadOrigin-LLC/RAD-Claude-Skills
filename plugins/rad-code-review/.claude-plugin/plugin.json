@@ -4,10 +4,10 @@
   "description": "3-role adversarial code review for Claude Code, optimized for Opus 4.7 (Sonnet 4.6 / Haiku 4.5 compatible). Parallel tool-call pipeline, JSON-first subagent output, compaction-safe checkpointing with `--resume`, and `--non-interactive` mode for agents/CI. Blame-aware diff scoping, 14-pattern AI slop detection (hallucinated imports, fake error handling, ghost type assertions, mock-shaped fallbacks, etc.), framework-specific IDOR for Next.js / Express / Fastify / Django / Rails / Go, WCAG 2.2 + dynamic ARIA state detection, performance heuristics, severity-ranked findings with release verdict, and accepted-risk expiry enforcement. Includes a `code-reviewer` agent for proactive autonomous review.\n\nBacked by `check-hallucinated-imports.py` — a pure-stdlib Python 3.8+ script that parses 9 lockfile formats (package-lock.json, yarn.lock, pnpm-lock.yaml, package.json deps, requirements.txt, pyproject.toml, Pipfile.lock, poetry.lock, uv.lock), extracts imports via Python `ast` + JS/TS regex, and flags packages not declared in any lockfile (slopsquatting risk). Runs standalone or as part of the orchestrator's automated-checks phase.",
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-code-review",
-  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-code-review",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
   "keywords": ["code-review", "security", "owasp", "ai-slop", "diff-aware", "architecture", "performance", "accessibility", "release-readiness"]
 }

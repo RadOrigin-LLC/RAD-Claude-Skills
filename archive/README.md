@@ -1,6 +1,6 @@
 # Archived Plugins
 
-These plugins are paused — they remain in the repository for reference and potential revival, but are **not** listed in the marketplace and will not be installed by anyone browsing `radesjardins/RAD-Claude-Skills`.
+These plugins are paused — they remain in the repository for reference and potential revival, but are **not** listed in the marketplace and will not be installed by anyone browsing `RadOrigin-LLC/RAD-Claude-Skills`.
 
 ## Why archived
 

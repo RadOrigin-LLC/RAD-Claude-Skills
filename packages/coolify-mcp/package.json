@@ -24,15 +24,15 @@
   ],
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/radesjardins/RAD-Claude-Skills.git",
+    "url": "git+https://github.com/RadOrigin-LLC/RAD-Claude-Skills.git",
     "directory": "packages/coolify-mcp"
   },
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/packages/coolify-mcp",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/packages/coolify-mcp",
   "engines": {
     "node": ">=18.0.0"
   },

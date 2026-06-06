@@ -69,7 +69,7 @@ Add the entire marketplace to Claude Code or Claude Desktop — browse and insta
 
 ```bash
 # Add the marketplace
-claude plugin marketplace add https://github.com/radesjardins/RAD-Claude-Skills
+claude plugin marketplace add https://github.com/RadOrigin-LLC/RAD-Claude-Skills
 
 # Install any plugin from the marketplace
 claude plugin install rad-session@rad-claude-skills
@@ -85,7 +85,7 @@ claude plugin marketplace update
 
 ```bash
 # Clone the repo
-git clone https://github.com/radesjardins/RAD-Claude-Skills.git
+git clone https://github.com/RadOrigin-LLC/RAD-Claude-Skills.git
 
 # Install any plugin
 claude plugins add ./RAD-Claude-Skills/plugins/rad-session
@@ -224,7 +224,7 @@ Found a bug? Have an idea for a new skill? See:
 - [Contributing Guide](CONTRIBUTING.md) — how to submit changes
 - [Code of Conduct](CODE_OF_CONDUCT.md) — community standards
 - [Security Policy](SECURITY.md) — reporting vulnerabilities
-- [Discussions](https://github.com/radesjardins/RAD-Claude-Skills/discussions) — questions & ideas
+- [Discussions](https://github.com/RadOrigin-LLC/RAD-Claude-Skills/discussions) — questions & ideas
 
 ---
 
@@ -234,4 +234,4 @@ Found a bug? Have an idea for a new skill? See:
 
 ---
 
-Built with Claude Code by [RAD](https://github.com/radesjardins)
+Built with Claude Code by [RAD](https://github.com/RadOrigin-LLC)

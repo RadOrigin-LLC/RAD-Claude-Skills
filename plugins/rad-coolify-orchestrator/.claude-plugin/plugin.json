@@ -4,10 +4,10 @@
   "description": "End-to-end Coolify self-hosted PaaS management — 8 skills covering deployments (Nixpacks/Dockerfile/Compose), databases, security, CI/CD, troubleshooting, observability, multi-server infrastructure, and live MCP-backed actions; coolify-reviewer agent (Opus 4.7 default) with 4 Python validators (lint-dockerfile, lint-compose, check-coolify-env, audit-cicd) that catch the patterns LLM eyeballing misses; bundled @radoriginllc/coolify-mcp (27 verified tools) for live operations against your Coolify instance. Covers Coolify v4 self-hosted (currently v4.0.0-beta.474, rolling beta). Honest about what's experimental (Sentinel, Swarm, Caddy proxy, Railpack-NOT-yet-shipped) and what's production-ready.",
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-coolify-orchestrator",
-  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-coolify-orchestrator",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
   "keywords": ["coolify", "deployment", "self-hosted", "paas", "docker", "devops", "infrastructure", "mcp", "validators", "dockerfile-lint"]
 }

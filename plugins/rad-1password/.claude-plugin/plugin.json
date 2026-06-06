@@ -4,10 +4,10 @@
   "description": "End-to-end 1Password CLI (`op`) coverage with a hardcoded-secrets scanner. Skills cover secret references (`op://...`), `op inject` / `op run` / `op read` for keeping secrets out of code and shell history, item CRUD with assignment statements and JSON templates, vault and user provisioning with granular permissions, SSH key generation and use, third-party CLI auth via `op plugin run`, and service-account / Connect-server patterns for CI/CD and headless servers. One router skill, ten topical sub-skills, four slash commands.\n\nBundled `scripts/scan-hardcoded-secrets.py` is a pure-stdlib Python scanner that finds provider-prefixed tokens (OpenAI, Anthropic, GitHub PAT, Stripe, AWS, Slack, Google, Twilio, SendGrid, Mailgun, Supabase JWT), URL-embedded passwords (postgres / mongodb / mysql / redis / https / etc.), and assignment-shaped credentials (`api_key = \"...\"`, `password: \"...\"`). For each finding, suggests a concrete `op://<vault>/<item>/<field>` reference shape for replacement. Skips `.env*` files, lockfiles, test fixtures, and obvious placeholders. Not a replacement for gitleaks/trufflehog — it's for in-editor use during development with explicit op:// migration suggestions. Cross-checked against `op` v2.34.0.",
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-1password",
-  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-1password",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
   "keywords": ["1password", "op", "cli", "secrets", "secret-references", "service-account", "ssh-keys", "provisioning", "shell-plugins", "connect"]
 }

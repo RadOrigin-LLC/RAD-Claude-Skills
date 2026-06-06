@@ -27,7 +27,7 @@ RAD Code Review is the harsh reviewer that runs AFTER the build phase. It is int
 ### Installation
 
 ```bash
-git clone https://github.com/radesjardins/RAD-Claude-Skills.git
+git clone https://github.com/RadOrigin-LLC/RAD-Claude-Skills.git
 cd RAD-Claude-Skills
 
 # Install as a plugin

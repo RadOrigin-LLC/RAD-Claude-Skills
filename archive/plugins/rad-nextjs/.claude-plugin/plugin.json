@@ -4,10 +4,10 @@
   "description": "RAD Next.js — comprehensive Next.js coding standards, security hardening, testing patterns, and troubleshooting guidance. Covers App Router architecture, Server/Client component boundaries, data fetching, caching, performance optimization (Core Web Vitals), authentication, OWASP protection, Vitest/Cypress/Playwright testing, and common bug diagnosis.",
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-nextjs",
-  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-nextjs",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
   "keywords": ["nextjs", "react", "app-router", "server-components", "caching", "core-web-vitals", "owasp", "testing", "typescript"]
 }

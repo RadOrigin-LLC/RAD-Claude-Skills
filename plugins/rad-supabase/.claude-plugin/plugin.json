@@ -4,10 +4,10 @@
   "description": "Static pre-deploy audit for Supabase migration SQL — runs before deploy, no live database needed. Four pure-stdlib Python validators: `audit-rls.py` (mirrors Splinter lint codes 0002 auth_users_exposed, 0003 auth_rls_initplan, 0008 rls_enabled_no_policy, 0011 function_search_path_mutable, 0013 rls_disabled_in_public, 0015 rls_references_user_metadata; plus structural checks for `using(true)` with no `with check` and `FOR ALL` policies), `check-secret-leaks.py`, `audit-edge-functions.py`, and `audit-functions-permissions.py` (Postgres function GRANT/REVOKE patterns — flags `GRANT ALL TO PUBLIC`, SECURITY DEFINER functions without REVOKE FROM PUBLIC, SECURITY DEFINER without SET search_path, public-schema functions with no explicit grants). Knowledge skills cover migrations, edge functions, auth, storage, realtime, branching, security, and troubleshooting; these overlap with the official Supabase plugin — pair the two for full coverage. Compatible with Supabase CLI v2.95+ and Supabase MCP server v0.7+.",
   "author": {
     "name": "RAD",
-    "url": "https://github.com/radesjardins"
+    "url": "https://github.com/RadOrigin-LLC"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/radesjardins/RAD-Claude-Skills/tree/main/plugins/rad-supabase",
-  "repository": "https://github.com/radesjardins/RAD-Claude-Skills",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-supabase",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
   "keywords": ["supabase", "postgres", "database", "edge-functions", "auth", "rls", "migrations", "branching", "storage", "mcp", "cli", "baas"]
 }
