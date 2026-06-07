@@ -4,7 +4,9 @@ These plugins are paused — they remain in the repository for reference and pot
 
 ## Why archived
 
-Two waves of archival:
+Several waves of archival:
+
+**Repo-manager reboot (June 2026).** `rad-session` is superseded by [`rad-repo-manager`](../plugins/rad-repo-manager). rad-session was built around a v4.x canonical doc tree (`docs/status.md`, `docs/planning/current.md`, plus vision / architecture / decisions) that became redundant and confused coding agents. rad-repo-manager rebuilds the session lifecycle (`/startup`, `/wrapup`) around a minimal four-doc core (`AGENTS.md`, `docs/prd.md`, `docs/plan.md`, `docs/handoff.md`) and adds `/analyze` for doc hygiene. The old skills don't carry forward — the doc model changed underneath them. Paired with rad-planner's 5.0 reboot to *strictly planning* (single `docs/plan.md`).
 
 **Single-framework reviewers (April 2026).** Modern frontier coding models (Opus 4.7+) have strong baseline knowledge of these frameworks and languages. The skills here mostly duplicated that baseline knowledge without adding meaningful uplift, and contributed noise to skill selection. Generic "best practices" and "anti-pattern" skills for popular frameworks were the lowest-leverage portion of the toolkit. Reviewer agents in these plugins were partially redundant with [`rad-code-review`](../plugins/rad-code-review), which orchestrates ship-readiness reviews using a stack-aware approach.
 
@@ -21,6 +23,7 @@ Two waves of archival:
 | `rad-google-workspace` | Full Google Workspace — 44 service skills + 41 workflow recipes + 10 role personas. Superseded by [`rad-gws-core`](../plugins/rad-gws-core) (14 essential skills). |
 | `rad-nextjs` | App Router, RSC, security, testing |
 | `rad-react` | React 19 patterns, hooks, security, perf |
+| `rad-session` | Session lifecycle (`/startup`, `/wrapup`, `/add-resource`) built on the v4.x canonical doc tree. Superseded by [`rad-repo-manager`](../plugins/rad-repo-manager) — minimal four-doc model + `/analyze`. |
 | `rad-stack-guide` | Stack detection + specialist reviewer orchestration. Superseded by [`rad-session`](../plugins/rad-session) 3.0 — stack detection moved into `/init`; review orchestration deprecated when framework reviewers were archived. |
 | `rad-stripe-fastify-webhooks` | Stripe webhook handling, idempotency, Zod contracts |
 | `rad-typescript` | Strict mode, type narrowing, API safety |
