@@ -5,7 +5,7 @@ description: >
   "check my implementation plan", "is this plan complete", "what's missing from my
   plan", "validate my plan", "plan review", "check plan quality", "risk review",
   "check dependencies", "are there any risks in my plan", or has an existing plan
-  (`docs/planning/plan.md`) that needs a quality audit before execution begins.
+  (`docs/plan.md`) that needs a quality audit before execution begins.
 argument-hint: "[path to plan file]"
 user-invocable: true
 allowed-tools: Read Glob Grep Agent Write Bash
@@ -28,7 +28,7 @@ and does not modify the plan unless explicitly authorized (Step 5).
 ### 1. Locate the plan
 
 If a path was provided, read it. Otherwise detect the plan in order:
-`docs/planning/plan.md`, `docs/planning/current-execution.md`,
+`docs/plan.md`, `docs/planning/current-execution.md`,
 `docs/planning/current.md`, root `PLAN.md`. Read it completely.
 
 If none exists, report that there's no plan to review and recommend `/rad-planner:plan`.

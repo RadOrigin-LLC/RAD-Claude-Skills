@@ -17,15 +17,15 @@ Claude can already write a plan. rad-planner's method is **risk-first, adversari
 
 ## Output — one file
 
-The planner writes a single plan at `docs/planning/plan.md` (created fresh, or an existing plan updated in place). Everything folds into it — objective, scope, assumptions, stack, milestones, tasks, checkpoints, risks, validation, stop conditions, next step. No strategic-doc tree.
+The planner writes a single plan at `docs/plan.md` (created fresh, or an existing plan updated in place). Everything folds into it — objective, scope, assumptions, stack, milestones, tasks, checkpoints, risks, validation, stop conditions. No strategic-doc tree.
 
-When the conversation surfaces something that belongs in a **durable doc the planner does not own** (a PRD / product contract, a decision log, an architecture reference), it does *not* write that doc. It writes a paste-ready `docs/planning/[date]-update-prompt.md` you run in Claude or Codex to apply the change, and points `plan.md` at it. Durable docs stay under your control.
+When the conversation surfaces something that belongs in a **durable doc the planner does not own** (a PRD / product contract, a decision log, an architecture reference), it does *not* write that doc. It writes a paste-ready `docs/[date]-update-prompt.md` you run in Claude or Codex to apply the change, and points `plan.md` at it. Durable docs stay under your control.
 
 ## Skills
 
 | Skill | Trigger | What it does |
 |---|---|---|
-| `/rad-planner:plan` | "plan my project", "create an implementation plan", "help me architect this", "break this into tasks" | The six-phase planning conversation → `docs/planning/plan.md` (+ a conditional update-prompt). |
+| `/rad-planner:plan` | "plan my project", "create an implementation plan", "help me architect this", "break this into tasks" | The six-phase planning conversation → `docs/plan.md` (+ a conditional update-prompt). |
 | `/rad-planner:review-plan` | "review my plan", "audit this plan", "is this plan complete" | Two-layer quality audit of an existing plan: mechanical lint + adversarial risk review. |
 
 ## Agents

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-plan-lint.py — Mechanical validation for docs/planning/plan.md.
+plan-lint.py — Mechanical validation for docs/plan.md.
 
 Validates the single-file plan rad-planner emits against the structure in
 references/plan-template.md. Catches what an LLM eyeballing the plan can miss:
@@ -14,8 +14,8 @@ v5.0 targets one plan.md whose tasks each carry: Objective, Files, Depends on,
 Done when, Validate, Rollback.
 
 Usage:
-  python3 plan-lint.py docs/planning/plan.md
-  python3 plan-lint.py docs/planning/plan.md --json
+  python3 plan-lint.py docs/plan.md
+  python3 plan-lint.py docs/plan.md --json
 
 Output:
   Default — human-readable text. Exit 1 if CRITICAL or HIGH issues, else 0.
@@ -48,7 +48,6 @@ REQUIRED_SECTIONS = (
     "Risks & mitigations",
     "Validation",
     "Stop conditions",
-    "Next step",
 )
 
 RECOMMENDED_SECTIONS = (
@@ -368,7 +367,7 @@ def main(argv: list[str]) -> int:
     p = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    p.add_argument("path", help="Path to docs/planning/plan.md")
+    p.add_argument("path", help="Path to docs/plan.md")
     p.add_argument("--json", action="store_true", help="Emit a single JSON object instead of text")
     args = p.parse_args(argv)
 

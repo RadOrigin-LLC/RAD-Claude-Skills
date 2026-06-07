@@ -8,7 +8,7 @@ description: >
   a structured, risk-first implementation plan before writing any code. Also
   trigger proactively when a user describes a non-trivial project or feature and
   appears ready to start coding without a plan. Produces a single plan file
-  (`docs/planning/plan.md`); does not write product, architecture, or decision
+  (`docs/plan.md`); does not write product, architecture, or decision
   docs — it surfaces those as a separate update-prompt for the user to apply.
 argument-hint: "[project description or path to existing codebase]"
 user-invocable: true
@@ -24,7 +24,7 @@ validated** — more rigorous than single-pass planning, without document sprawl
 **CRITICAL: This is PLANNING MODE. Do NOT write implementation code. Do NOT create
 source files. Produce the plan only.**
 
-**CRITICAL: The planner writes exactly two files, both under `docs/planning/`:**
+**CRITICAL: The planner writes exactly two files, both under `docs/`:**
 - `plan.md` — always (the plan).
 - `[date]-update-prompt.md` — only when the conversation surfaces a change that
   belongs in a durable doc the planner does not own (PRD / product contract,
@@ -53,7 +53,7 @@ the user applies it. See "Surfacing" below.
 - Does not execute the plan.
 - Does not write product, architecture, decision, status, or operating-manual docs —
   those surface into the update-prompt for the user to apply.
-- Does not write outside `docs/planning/`.
+- Does not write outside `docs/`.
 - Does not detect every anti-pattern; mechanical checks cover field presence,
   dependency integrity, and vague language. `risk-assessor` handles judgment calls.
 
@@ -138,7 +138,7 @@ Objective, Files, Depends on, Done when, Validate, Rollback. Apply the failure-s
 triple (Action / Validation / Rollback) and insert a checkpoint after every milestone.
 Note where to checkpoint-and-clear context per `references/context-management.md`.
 
-**Write the draft.** Compose the plan into `docs/planning/plan.md` with
+**Write the draft.** Compose the plan into `docs/plan.md` with
 `**Status:** DRAFT`, following `references/plan-template.md`. (Path resolution and
 existing-plan detection: see "Plan location" below.)
 
@@ -147,7 +147,7 @@ existing-plan detection: see "Plan location" below.)
 **Mechanical validation first** — run on the draft:
 
 ```bash
-python3 ${plugin_root}/scripts/plan-lint.py docs/planning/plan.md --json
+python3 ${plugin_root}/scripts/plan-lint.py docs/plan.md --json
 ```
 
 It flags missing sections, tasks missing any of the six fields, unresolved or cyclic
@@ -185,7 +185,7 @@ On approval:
 1. Flip `plan.md`'s `**Status:** DRAFT` to `APPROVED` and stamp `**Updated:**`.
 2. **Surfacing** — if Discovery, Stack, or Risk turned up anything durable (a
    product-behavior change, a decision worth recording, an architecture implication),
-   write `docs/planning/[date]-update-prompt.md` per the update-prompt template in
+   write `docs/[date]-update-prompt.md` per the update-prompt template in
    `references/plan-template.md`, and add the `**Pending durable-doc updates:**`
    pointer line to `plan.md`. If nothing durable surfaced, write no second file.
 3. Run `plan-lint.py` once more on the final `plan.md`; report clean or surface
@@ -203,11 +203,11 @@ the planner strictly a planner and the durable docs under the user's control.
 
 ## Plan location
 
-Default: `docs/planning/plan.md`. Before creating, detect an existing plan to update in
-place rather than spawning a competitor — check, in order: `docs/planning/plan.md`,
+Default: `docs/plan.md`. Before creating, detect an existing plan to update in
+place rather than spawning a competitor — check, in order: `docs/plan.md`,
 `docs/planning/current-execution.md`, `docs/planning/current.md`, root `PLAN.md`. If one
 exists, update it (preserving the user's structure where it diverges). Greenfield →
-create `docs/planning/plan.md`. Never write outside `docs/planning/`.
+create `docs/plan.md`. Never write outside `docs/`.
 
 ## Execution: parallel-first
 

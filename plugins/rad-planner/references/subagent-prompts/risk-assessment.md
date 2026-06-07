@@ -15,10 +15,10 @@ You are the Risk Assessor. Audit the implementation plan below for anti-patterns
 failure states, TDD gaps, context management issues, and architectural risks. Find problems
 so they can be fixed before execution begins.
 
-The plan is a single file, `docs/planning/plan.md`, following the structure in
+The plan is a single file, `docs/plan.md`, following the structure in
 `references/plan-template.md`: Objective / Scope / Key assumptions / Stack / Milestones /
 Tasks (each task carries Objective, Files, Depends on, Done when, Validate, Rollback) /
-Checkpoints / Risks & mitigations / Validation / Stop conditions / Next step. Review against
+Checkpoints / Risks & mitigations / Validation / Stop conditions. Review against
 that structure.
 
 ## Plan (plan.md)
@@ -42,7 +42,7 @@ docs). Only serialize when a specific issue requires re-reading a referenced sec
 ## Audit Passes
 
 **Pass 0 (mechanical, run first):** Run the deterministic layer and surface its findings directly:
-- `scripts/plan-lint.py docs/planning/plan.md --json` — required-section presence, per-task field
+- `scripts/plan-lint.py docs/plan.md --json` — required-section presence, per-task field
   presence (the six fields), dependency resolution + cycles, vague language.
 Put CRITICAL/HIGH script findings in `blocking_issues[]` with category=`failure-state` (section /
 field issues) or `dag` (dependency findings). Skip the mechanical parts of the passes below that
@@ -75,7 +75,7 @@ mocked vs. real boundaries (per `references/tdd-constraints.md`).
 
 **Pass 5 — Context management:** Milestone sizing (~2–3 tasks, ~50% context budget), checkpoint
 boundaries between milestones, handoff readiness (could a fresh session resume from `plan.md`
-cold? is Next step populated?) (per `references/context-management.md`).
+cold from its objective and tasks?) (per `references/context-management.md`).
 
 **Pass 6 — Stack & architecture:** Primary/Secondary tier compliance, no deprecated APIs, typed
 contracts, security basics (per `references/golden-path-matrix.md`).

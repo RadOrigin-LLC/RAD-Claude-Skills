@@ -4,16 +4,16 @@ Mechanical validators that complement the skill prompts with deterministic check
 
 ## plan-lint.py
 
-Validates `docs/planning/plan.md` against the structure in `references/plan-template.md`.
+Validates `docs/plan.md` against the structure in `references/plan-template.md`.
 
 ```bash
-python3 scripts/plan-lint.py docs/planning/plan.md
-python3 scripts/plan-lint.py docs/planning/plan.md --json   # machine-readable
+python3 scripts/plan-lint.py docs/plan.md
+python3 scripts/plan-lint.py docs/plan.md --json   # machine-readable
 ```
 
 **What it catches:**
 
-- **Missing required sections** — Objective, Scope, Key assumptions, Milestones, Tasks, Checkpoints, Risks & mitigations, Validation, Stop conditions, Next step. (`Stack` is recommended, not required — flagged LOW when absent.) Empty or placeholder-only required sections are flagged too.
+- **Missing required sections** — Objective, Scope, Key assumptions, Milestones, Tasks, Checkpoints, Risks & mitigations, Validation, Stop conditions. (`Stack` is recommended, not required — flagged LOW when absent.) Empty or placeholder-only required sections are flagged too.
 - **Per-task field presence** — every task in `## Tasks` must carry all six fields: Objective, Files, Depends on, Done when, Validate, Rollback. A missing or placeholder field is HIGH.
 - **Dependency integrity** — `Depends on` references must resolve to a task that exists in the file (no phantoms), no task may depend on itself, and the dependency graph must be acyclic. A cycle is CRITICAL.
 - **Vague language** — phrases like "verify it works", "should work", "tbd", "looks right" in a task's `Done when` or `Validate` field are HIGH; those fields must be concrete and runnable.

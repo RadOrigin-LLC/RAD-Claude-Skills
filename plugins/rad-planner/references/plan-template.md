@@ -1,8 +1,8 @@
 # Plan Output Template — single-file `plan.md`
 
-rad-planner emits **one** plan file: `docs/planning/plan.md` (created if absent; updated in place if a plan already exists there or at a detected legacy path). Everything the planning conversation produces — objective, scope, assumptions, stack, milestones, tasks, checkpoints, risks — folds into this one file as sections. No separate `tasks.md`, no strategic-doc tree.
+rad-planner emits **one** plan file: `docs/plan.md` (created if absent; updated in place if a plan already exists there or at a detected legacy path). Everything the planning conversation produces — objective, scope, assumptions, stack, milestones, tasks, checkpoints, risks — folds into this one file as sections. No separate `tasks.md`, no strategic-doc tree.
 
-A second file, `docs/planning/[date]-update-prompt.md`, is written **only when** the conversation surfaces a change that belongs in a durable doc the planner does not own (PRD / product contract, decision log, architecture). See "Update-prompt template" below.
+A second file, `docs/[date]-update-prompt.md`, is written **only when** the conversation surfaces a change that belongs in a durable doc the planner does not own (PRD / product contract, decision log, architecture). See "Update-prompt template" below.
 
 `plan.md` is validated mechanically by `scripts/plan-lint.py` after every write.
 
@@ -91,10 +91,6 @@ aim for 2–3 tasks per milestone; a milestone over 5 tasks is a split candidate
 [When the executing agent must halt and ask rather than guess — e.g. requirement
 conflict, change touches auth/billing/data model, validation fails and the fix
 needs scope expansion.]
-
-## Next step
-
-[The single immediate next action. One sentence.]
 ```
 
 ---
@@ -121,7 +117,7 @@ Every task in `## Tasks` MUST carry all six fields: **Objective, Files, Depends 
 
 ## Update-prompt template
 
-Written to `docs/planning/[date]-update-prompt.md` **only** when the conversation surfaced a durable-doc change. `plan.md` gets a one-line `**Pending durable-doc updates:**` pointer (above). One source of truth: the surfaced items live here, not duplicated into `plan.md`.
+Written to `docs/[date]-update-prompt.md` **only** when the conversation surfaced a durable-doc change. `plan.md` gets a one-line `**Pending durable-doc updates:**` pointer (above). One source of truth: the surfaced items live here, not duplicated into `plan.md`.
 
 ```markdown
 # [YYYY-MM-DD] — Doc update prompt

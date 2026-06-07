@@ -117,7 +117,3 @@ spike, before the dependent core service in M2.
 - The redirect or shorten path needs to touch auth — out of scope; stop and ask.
 - A schema change beyond the `urls` table is required — stop and ask before migrating.
 - Validation fails and the fix needs new dependencies — stop and ask.
-
-## Next step
-
-Implement T1 — write the concurrency spike test against `ON CONFLICT ... RETURNING` and confirm one row per URL.

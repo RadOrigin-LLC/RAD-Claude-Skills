@@ -17,7 +17,7 @@ Run `/clear` to reset the session. This erases conversational context.
 ### Step 3: Rehydration
 
 Start a fresh session pointed at:
-1. `docs/planning/plan.md` — the plan; load the current milestone and its tasks, not the whole file
+1. `docs/plan.md` — the plan; load the current milestone and its tasks, not the whole file
 2. The committed changes on the Git branch
 3. The operating manual (`CLAUDE.md` / `AGENTS.md`) for conventions, if the project has one
 
@@ -63,7 +63,7 @@ The agent now operates with a clean context window, focused only on the next mil
 ### Externalize
 - Completed work → commit to git
 - Durable facts the planning conversation surfaced (product behavior, decisions, architecture) → the update-prompt, for the user to record in the durable docs (the planner does not write those)
-- The full plan → `docs/planning/plan.md`; load only the current milestone
+- The full plan → `docs/plan.md`; load only the current milestone
 
 ## Sizing for context (what the risk-assessor checks)
 
