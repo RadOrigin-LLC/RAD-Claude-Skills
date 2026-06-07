@@ -91,14 +91,6 @@
       "license": "Apache-2.0"
     },
     {
-      "name": "rad-session",
-      "source": "./plugins/rad-session",
-      "description": "Make AI coding sessions remember each other — across machines, across agents (Claude + Codex), across days. Three commands manage the lifecycle: `/startup` orients you in under five seconds, `/wrapup` writes status from evidence (git diff, test output, plan state) rather than chat memory, and `/add-resource` registers new tools as you discover them.\n\nBuilt around a canonical doc set — operating manual (CLAUDE.md and/or AGENTS.md per agent scope), `docs/status.md`, `docs/planning/current.md`, `docs/decisions/` — aligned with published OpenAI/Anthropic project-structure research. Auto-bootstraps on first run, auto-commits to keep PC ↔ GitHub ↔ laptop in sync, and refuses to overwrite user-authored work even under autonomous permission modes.\n\n**v5.6 — user-owned content visibility audit at `/wrapup` and `/startup`.** Invokes rad-planner 4.10's `audit-user-content.py` to surface stale terminology + dead paths in user-owned operating-manual sections. Advisory only — neither plugin modifies the content. New principle codified in `docs/cross-plugin-contracts.md`: refusal to modify ≠ refusal to be silent about staleness.\n\n**v5.5 — compact milestone contract render at `/startup`.** When `docs/planning/current.md` has a `### Session contract` sub-section (rad-planner 4.8+), `/startup` Phase 1.5.2 renders it as the first user-visible block after the v5.3 floor line — putting the 7-field build-readiness contract in the agent's context window before the first tool call. Graceful skip when absent.\n\n**v5.4** — recognizes the new `Lanes` Constitution section (rad-planner v4.7+ role-separation contract) and treats it as never-prunable; `/startup` Phase 1.5 reads it as part of the operating-manual orientation. Pairs with rad-planner; works standalone.",
-      "category": "productivity",
-      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-session",
-      "license": "Apache-2.0"
-    },
-    {
       "name": "rad-gws-core",
       "source": "./plugins/rad-gws-core",
       "description": "Google Workspace core integration — 14 essential skills covering Gmail (send, read, reply, triage), Docs (write), Sheets (read, append), Slides, Drive, and Calendar. Requires the gws CLI binary.",
@@ -117,9 +109,17 @@
     {
       "name": "rad-explain",
       "source": "./plugins/rad-explain",
-      "description": "Explain a project to humans, honestly — without overpromising or inventing features that aren't in the repo. Five skills generate audience-targeted communications from your project's actual artifacts: `narrate-project` (plain-English description, audience-adaptive), `elevator-pitch` (~150 words / ~30 seconds spoken), `draft-pitch` (one-pager for funding, grants, partnerships), `explain-document` (interpret a specific repo file — \"what does this commit me to?\", \"where could this go wrong?\"), and `ground-readme` (generate or audit a README so it stays grounded in source).\n\nTwo pure-stdlib Python validators check every output: `check-grounding.py` traces each substantive claim back to repo source, and `check-overpromise.py` flags superlatives, marketing fluff, and production-readiness assertions without evidence. Works on any repo — no rad-planner dependency. Reads `docs/` if present, falls back to README + project manifest + source structure when absent. Pairs with `/rad-planner:project-story` for canonical-doc projects. The plugin's own README passes its own validators.",
+      "description": "Explain a project to humans, honestly — without overpromising or inventing features that aren't in the repo. Five skills generate audience-targeted communications from your project's actual artifacts: `narrate-project` (plain-English description, audience-adaptive), `elevator-pitch` (~150 words / ~30 seconds spoken), `draft-pitch` (one-pager for funding, grants, partnerships), `explain-document` (interpret a specific repo file — \"what does this commit me to?\", \"where could this go wrong?\"), and `ground-readme` (generate or audit a README so it stays grounded in source).\n\nTwo pure-stdlib Python validators check every output: `check-grounding.py` traces each substantive claim back to repo source, and `check-overpromise.py` flags superlatives, marketing fluff, and production-readiness assertions without evidence. Works on any repo — no rad-planner dependency. Reads `docs/` if present, falls back to README + project manifest + source structure when absent. The plugin's own README passes its own validators.",
       "category": "productivity",
       "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-explain",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "rad-repo-manager",
+      "source": "./plugins/rad-repo-manager",
+      "description": "A repo manager for vibe coders — keeps a project's docs minimal, consistent, and honest so coding agents don't get confused by contradictory information. It's the 'manager'; your coding agent is the 'employee.'\n\nThree commands, two intentionally lean: `/startup` orients you (or, on a fresh repo, onboards it — scaffolds a lean AGENTS.md, agent shims, and the minimal doc structure, then points you at `/rad-planner:plan`); `/wrapup` leaves a clean handoff for a new chat or post-compaction continuation, written from git evidence; `/analyze` is the opt-in deep clean that finds contradictions, redundancy, stale content, and loose/unfiled docs, then proposes fixes interactively — never auto-acts.\n\nThe early-warning lives inside the fast commands: a one-line health verdict (🟢/🟡/🔴 + a loose-ends count) you watch climb across sessions, so drift is visible long before it's a mess; the explicit `/analyze` nudge is rate-limited so it never nags.\n\nThe doc model is a tiny, declared, defended core — AGENTS.md, docs/prd.md, docs/plan.md, docs/handoff.md — plus a closed reference catalog, a docs/inbox/ for new docs awaiting filing, and docs/archive/ for history. The plugin only authors AGENTS.md operational sections, the shims, and docs/handoff.md; it surfaces durable changes (prd, decision-log) via a paste-ready update-prompt rather than writing them. Four pure-stdlib validators back `analyze`.\n\nReplaces rad-session. Pairs with rad-planner (which owns docs/plan.md); works standalone.",
+      "category": "productivity",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-repo-manager",
       "license": "Apache-2.0"
     }
   ]

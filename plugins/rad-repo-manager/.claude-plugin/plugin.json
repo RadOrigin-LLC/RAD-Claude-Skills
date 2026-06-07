@@ -1,0 +1,13 @@
+{
+  "name": "rad-repo-manager",
+  "version": "1.0.0",
+  "description": "A repo manager for vibe coders — keeps a project's docs minimal, consistent, and honest so coding agents don't get confused or misled by contradictory information. It is the 'manager'; your coding agent is the 'employee.'\n\nThree commands, two of them intentionally lean:\n- `/startup` — orient at the start of a session (read the active docs, surface where you are + a one-line health verdict). On a fresh repo it onboards instead: scaffolds the minimal doc structure, a lean AGENTS.md, agent shims, and skeletons, then points you at `/rad-planner:plan`.\n- `/wrapup` — leave a clean handoff for a new chat or a post-compaction continuation. Overwrites `docs/handoff.md` from git evidence (not chat memory), then the health line. No auto-commit.\n- `/analyze` — the opt-in deep clean: scans for contradictions, redundancy, orphaned/stale content, operating-manual bloat, and loose/unfiled docs, then proposes fixes interactively. Proposes — never auto-acts.\n\nThe early-warning is built into the fast commands: a one-line health verdict (🟢/🟡/🔴 + a loose-ends count) that you watch climb across sessions, so drift is visible long before it's a mess. The explicit `/analyze` nudge is rate-limited so it never nags.\n\nThe doc model is a tiny, declared, defended core — `AGENTS.md`, `docs/prd.md`, `docs/plan.md`, `docs/handoff.md` — plus a closed reference catalog (`docs/reference/`), a `docs/inbox/` for new docs awaiting filing, and `docs/archive/` for history. The plugin only authors `AGENTS.md` operational sections, thin `CLAUDE.md`/`GEMINI.md` shims, and `docs/handoff.md`; it surfaces durable changes (prd, decision-log) via a paste-ready update-prompt rather than writing them. Four pure-stdlib validators back `analyze` (`repo-scan`, `doc-contradiction`, `doc-redundancy`, `audit-user-content`).\n\nReplaces rad-session. Pairs with rad-planner (which owns `docs/plan.md`); works standalone.",
+  "author": {
+    "name": "RAD",
+    "url": "https://github.com/RadOrigin-LLC"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-repo-manager",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
+  "keywords": ["repo-manager", "session-management", "startup", "wrapup", "doc-hygiene", "drift-detection", "context-handoff", "vibe-coding", "minimal-docs", "agents-md"]
+}
