@@ -203,6 +203,6 @@ Specific things to verify before sending:
 ## Cross-plugin notes
 
 - For a much shorter pitch (~150 words / 30 seconds spoken), use `elevator-pitch`.
-- For a full project narrative, use `narrate-project` in this plugin or `/rad-planner:project-story` for canonical-doc projects.
+- For a full project narrative, use `narrate-project` in this plugin.
 - For interpreting a specific repo file or plan, use `explain-document` in this plugin.
 - Both validators live in this plugin's `scripts/` dir.

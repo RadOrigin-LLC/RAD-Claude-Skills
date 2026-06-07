@@ -194,7 +194,7 @@ For a developer who will work with the doc directly.
 
 ## Cross-plugin notes
 
-- For a narrative summary of a whole project, use `narrate-project` (any repo) or `/rad-planner:project-story` (rad-planner-shaped projects).
+- For a narrative summary of a whole project, use `narrate-project` (any repo).
 - For pitching, use `elevator-pitch` or `draft-pitch`.
 - For auditing a README specifically, use `ground-readme`.
 - For interpreting a specific PROMPT (not a project document), see rad-context-prompter's `prompt-decompiler` skill.

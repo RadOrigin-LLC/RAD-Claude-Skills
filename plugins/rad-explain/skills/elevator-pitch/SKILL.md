@@ -156,5 +156,5 @@ Read aloud once. If it doesn't sound like something you'd actually say, revise.
 ## Cross-plugin notes
 
 - For longer pitch shapes (one-pager, executive summary, deck-equivalent), use `draft-pitch` in this plugin.
-- For a full project narrative (much longer than a pitch), use `narrate-project` in this plugin or `/rad-planner:project-story` if the project has the canonical doc set.
+- For a full project narrative (much longer than a pitch), use `narrate-project` in this plugin.
 - Both validators live in this plugin's `scripts/` dir.

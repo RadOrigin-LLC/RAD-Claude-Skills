@@ -19,7 +19,7 @@ allowed-tools: Read Glob Bash Write Edit Grep
 
 You are synthesizing a plain-language description of a project from whatever artifacts the repo actually has. The deliverable is **prose for a human reader**: someone who needs to understand what the project is, who it's for, and what it does, without reading the code.
 
-This skill is the **cross-project default** in rad-explain. It works on any repo whether or not rad-planner is in use. For rad-planner-shaped projects with a full canonical doc set, prefer rad-planner's `/project-story` (which knows the canonical structure intimately). `narrate-project` is the fallback / general case.
+This skill is the **cross-project default** in rad-explain. It works on any repo whether or not rad-planner is in use. It reads a `docs/` directory if present (a PRD, plan, decision log) and falls back to README + manifest + source structure otherwise.
 
 ## Foundational rules
 
@@ -45,7 +45,7 @@ Try these in order. Stop reading once you have enough material for the chosen au
 | 7 | Source content: imports, exports, public APIs | What the codebase actually exposes |
 | 8 | `tests/` or `__tests__/` directories | What's verified to work |
 
-If a `docs/` directory with rad-planner canonical files is present, this skill **should defer to rad-planner's `/project-story`** for full coverage. Suggest the switch to the user before proceeding.
+If a `docs/` directory is present (a PRD, plan, decision log), read it for richer, source-grounded coverage; otherwise fall back to README + manifest + source structure.
 
 ## Audience modes
 
@@ -146,13 +146,7 @@ If `--output` was passed, use it. Otherwise offer:
 
 In parallel, gather what's available. **Always read** `README.md`, `package.json` / `pyproject.toml` / `Cargo.toml` / equivalent manifest. **If present**, also read the rad-planner canonical doc set, `AGENTS.md` / `CLAUDE.md`, `CHANGELOG.md`, top-level directory structure.
 
-If a full `docs/` canonical doc set IS present, suggest to the user:
-
-```
-This repo has the rad-planner canonical doc set. For a richer narrative
-generated specifically for that structure, consider /rad-planner:project-story
-instead. Proceed with rad-explain narrate-project, or switch?
-```
+If a `docs/` directory is present (a PRD, plan, decision log), read those for richer, source-grounded coverage.
 
 ### Step 4: Synthesize section by section per audience
 
@@ -215,6 +209,6 @@ Sections written: {list}
 
 ## Cross-plugin notes
 
-- For rad-planner-shaped projects with the full canonical doc set, prefer `/rad-planner:project-story` (purpose-built for that input).
+- Reads a `docs/` directory if present; otherwise works from README + manifest + source structure.
 - The two validators (`check-grounding.py` and `check-overpromise.py`) live in this plugin's `scripts/` dir; they can be invoked by other plugins too.
 - This skill does NOT write to canonical docs. It reads them; never modifies them.

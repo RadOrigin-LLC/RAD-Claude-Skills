@@ -221,7 +221,7 @@ in check.
 
 ## Cross-plugin notes
 
-- For a longer project narrative (much more than a README), use `narrate-project` in this plugin or `/rad-planner:project-story` for canonical-doc projects.
+- For a longer project narrative (much more than a README), use `narrate-project` in this plugin.
 - For pitches (different shape — persuasive vs informational), use `elevator-pitch` or `draft-pitch`.
 - For interpreting a specific file (not generating one), use `explain-document`.
 - Both validators live in this plugin's `scripts/` dir.

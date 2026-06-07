@@ -14,7 +14,7 @@ v0.1.0 — initial release. Built as part of the rad-claude-skills marketplace a
 
 | Skill | What it produces | When to use it |
 |---|---|---|
-| `/rad-explain:narrate-project` | Plain-English description of a project, audience-adaptive (non-dev / investor / future-self / new-collaborator) | "Explain what this project is" for a human reader. Works on any repo; for rad-planner-shaped projects, prefer `/rad-planner:project-story`. |
+| `/rad-explain:narrate-project` | Plain-English description of a project, audience-adaptive (non-dev / investor / future-self / new-collaborator) | "Explain what this project is" for a human reader. Works on any repo. |
 | `/rad-explain:elevator-pitch` | ~150-word / ~30-second-spoken pitch | Cold introductions, conference one-liners, "what do you do?" answers, party explanations |
 | `/rad-explain:draft-pitch` | One-pager / executive summary / deck-equivalent text | Funding applications, grant proposals, partnership memos, pitch-deck content |
 | `/rad-explain:explain-document` | Interpretation of a specific repo file (a plan, ADR, architecture doc, AI-generated spec, contract) | "What does this commit me to?", "What does this assume?", "Where could this go wrong?" before approving an AI-generated plan |
@@ -41,7 +41,7 @@ These rules are non-negotiable. If a skill's draft fails either validator, the s
 ## Cross-plugin notes
 
 - **Works on any repo.** No rad-planner dependency. Skills read `docs/vision.md`, `docs/decisions/*.md`, `docs/planning/current.md`, `docs/status.md`, `docs/roadmap.md` if present; fall back to README + project manifest + source structure when absent.
-- **For rad-planner-shaped projects**, `/rad-planner:project-story` is purpose-built for the canonical doc set and may produce a richer narrative than `narrate-project` does. Use `/rad-planner:project-story` when the rad-planner doc set is fully populated; use `narrate-project` otherwise.
+- **`narrate-project` works on any repo.** It reads a `docs/` directory if present (a PRD, plan, decision log) and falls back to README + project manifest + source structure otherwise.
 - **The validators are reusable.** Other rad-* plugins can shell out to `check-grounding.py` and `check-overpromise.py` directly. They take a Markdown file and produce JSON findings.
 
 ## Honest scope
