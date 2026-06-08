@@ -8,8 +8,7 @@ demoted to on-demand reference or cold archive. This is the spine of the plugin.
 | Tier | Where | Read policy |
 |---|---|---|
 | **Active** | the 4 core docs (below) | every session |
-| **Reference** | `docs/reference/*` — a closed, named catalog | only when the task touches that area |
-| **Inbox** | `docs/inbox/*` | not read for work; flagged by wrapup, filed by analyze |
+| **Conditional** | `docs/design.md` · `docs/reference/*` (closed catalog) · `docs/README.md` | only when the task touches that area |
 | **Archive** | `docs/archive/*` | never by default; only on explicit request |
 
 ## The active core — hard ceiling of 4 (+ shims)
@@ -17,24 +16,34 @@ demoted to on-demand reference or cold archive. This is the spine of the plugin.
 ```
 AGENTS.md         · operating manual: how we work, boundaries, the declared read path
 docs/prd.md       · durable product authority: what we're building / current behavior
-docs/plan.md      · the plan: scope, milestones, tasks (owned by /rad-planner:plan)
-docs/handoff.md   · live session state: where we are, what's next, gotchas
+docs/plan.md      · the plan: roadmap, milestones, scope, gates, stop conditions (owned by /rad-planner:plan)
+docs/handoff.md   · the short resume snapshot: where we are, what's next, gotchas
 ```
 
 Plus thin `CLAUDE.md` / `GEMINI.md` that are *only* an `@AGENTS.md` import, created per
 the agents the user actually uses. (Codex reads `AGENTS.md` natively — no shim.)
 
-The active set is **declared in `AGENTS.md`** and **capped at four**. "On track" =
-reality matches the declared set, nothing floating, nothing bloated.
+The active set is **declared in `AGENTS.md`** and **capped at four**. "Aligned" =
+reality matches the declared set: nothing floating, nothing bloated, no off-model
+status/roadmap docs.
+
+## The plan ↔ handoff boundary (the one that matters most)
+
+- `docs/plan.md` owns everything **durable**: roadmap, milestones, allowed scope,
+  forbidden scope, validation gates, stop conditions.
+- `docs/handoff.md` owns only the **short resume snapshot** for the next chat.
+- **If a statement must remain true after the next session, it does not belong only in
+  `docs/handoff.md`.** Put it in `docs/plan.md` (or `prd.md` / `design.md` / a
+  reference doc) and let the handoff point at it.
+
+"What's next" lives in `docs/handoff.md`. One source.
 
 ## Who writes what
 
-- **rad-repo-manager writes:** `AGENTS.md` operational sections (never user-authored content), the shims, `docs/handoff.md`. Scaffolds `prd.md`/`plan.md` skeletons once at onboarding.
-- **rad-planner writes:** `docs/plan.md` content (scope/milestones/tasks).
-- **the user owns:** `docs/prd.md`, `docs/reference/decision-log.md`, reference docs.
-- **surfaced, never written by the manager:** changes to `prd.md` / `decision-log.md` → a paste-ready update-prompt in `docs/inbox/`.
-
-"What's next" lives only in `docs/handoff.md`. One source.
+- **rad-repo-manager writes:** `AGENTS.md` operational sections (never user-authored content), the shims, `docs/handoff.md`. Scaffolds `prd.md`/`plan.md` skeletons once at `repo-init`. Updates `docs/plan.md` at `wrapup` only when durable execution state changed.
+- **rad-planner writes:** `docs/plan.md` content (roadmap / milestones / scope / gates).
+- **the user owns:** `docs/prd.md`, `docs/design.md`, `docs/reference/decision-log.md`, reference docs.
+- **surfaced, never written by the manager:** a change to `prd.md` / `decision-log.md` is described for the user to apply — the manager flags, the user owns product and decisions.
 
 ## Reference catalog (closed)
 
@@ -45,39 +54,33 @@ filed; anything off-catalog is itself a loose end.
 |---|---|
 | `decision-log.md` | active decisions, compact |
 | `architecture.md` | system shape, data model, stack rationale |
-| `design.md` | visual / UI design direction |
 | `api-contracts.md` | API routes, provider / AI integration contracts |
-| `commands.md` | build / release / deployment commands (don't duplicate AGENTS.md's short pre-push list) |
+| `commands.md` | build / release / deployment commands |
 | `lessons-learned.md` | known traps and their fixes |
 | `testing.md` | test strategy / coverage |
 
-Reference docs are **scaffolded by none** — each appears only when a project needs it.
-The catalog is the menu, not the starter set.
+Visual / UI design direction lives at top-level `docs/design.md` (conditional), not in
+the catalog. Reference docs are **scaffolded by none** — each appears only when a
+project needs it. The catalog is the menu, not the starter set.
 
-## Document intake & filing
+## Drift signals (mechanical, for repo-align)
 
-New docs are expected (side brainstorms, smoke tests, AI reports). There's a process,
-not a ban.
-
-- **Intended path:** agents write any new, un-homed `.md` into `docs/inbox/`.
-- **Backstop:** any `.md` outside core / reference / inbox / archive is *floating* —
-  flagged harder (an agent or a manual save dropped it loose).
-- **Filing (analyze, user-confirmed):** Fold · Extract · Promote · Archive · Relocate.
-
-## Loose ends (the health-line signals)
-
-Cheap, high-precision, mechanical — so the count is trustworthy and never cries wolf:
+Cheap, high-precision, mechanical checks — `scripts/repo-scan.py` plus three deeper
+validators — surface **candidates** for `/rad-repo-manager:repo-align`:
 
 1. active set grew beyond the declared four
-2. a `.md` is floating (outside any tier) or sitting in the inbox
+2. a `.md` is floating (outside any tier) or sitting loose at the root / under `docs/`
 3. `AGENTS.md` past a soft size cap (bloating)
-4. an active doc unchanged while code churned N+ commits (possibly stale)
+4. an active doc unchanged while code churned (possibly stale)
+5. plan ↔ PRD contradiction (scope-creep), cross-doc redundancy, AGENTS.md orphan terms / dead paths
 
-Fuzzy checks (semantic contradiction, redundancy) never feed the health line — they
-live in `analyze`, which the user opts into.
+These feed **judgment**, not auto-action — `startup` and `wrapup` stay read-only and
+evidence-only; `repo-align` is where the signals are read and dispositioned, always
+with your confirmation.
 
 ## Non-goals
 
-No status/roadmap/per-feature docs. No writing durable content (surfaced only). No deep
-audit in startup/wrapup. No auto-action on judgment calls. No doc-type classifier. Not
-a correctness guarantee — a drift early-warning, honestly scoped.
+No status/roadmap/implementation-plan/per-feature docs. No `docs/inbox/` staging tier.
+No writing durable content (surfaced only). No deep audit in startup/wrapup. No
+auto-action on judgment calls. No doc-type classifier. No folder-specific agent files.
+Not a correctness guarantee — a drift early-warning, honestly scoped.

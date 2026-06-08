@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-repo-scan.py — the cheap tripwire scan behind rad-repo-manager's health line.
+repo-scan.py — mechanical drift signals consumed by rad-repo-manager's repo-align.
 
 High-precision, mechanical signals only — so the loose-ends count is trustworthy and
-never cries wolf. Fuzzy checks (contradiction, redundancy) live in /analyze, not here.
+never cries wolf. Fuzzy checks (contradiction, redundancy) have their own scripts.
 
 Signals (each a "loose end"):
   1. Active-set growth — AGENTS.md's declared cold-start read path lists more than the
@@ -11,14 +11,14 @@ Signals (each a "loose end"):
   2. Floating docs — a .md at the repo root or directly under docs/ that isn't a known
      core/allowed file. (Scoped narrowly on purpose: .md inside source trees, packages,
      etc. is NOT considered — component READMEs must never false-flag.)
-  3. Inbox items — docs/inbox/*.md awaiting filing (gently counted).
+  3. Legacy inbox items — docs/inbox/*.md (a retired tier; flagged so contents get filed out).
   4. AGENTS.md bloat — past a soft line cap.
 
 Severity: 0 -> green, 1-4 -> yellow, >=5 -> red.
 
-Nudge cooldown: the explicit "/analyze" suggestion (red only) is rate-limited via a
-small state file (.rad/repo-manager-state.json) so it can't nag every session. The
-loose-ends count itself always shows.
+Nudge cooldown: the optional "run repo-align" suggestion (red only, standalone runs
+only) is rate-limited via a small state file (.rad/repo-manager-state.json) so it
+can't nag. repo-align itself calls with --no-record, so it never writes state.
 
 Usage:
   python3 repo-scan.py <project-dir>
@@ -163,7 +163,7 @@ def scan(root: Path, record: bool) -> dict:
     else:
         severity = "red"
 
-    # Nudge cooldown — only the red /analyze tail is rate-limited.
+    # Nudge cooldown — only the red repo-align tail is rate-limited.
     state = load_state(root)
     scan_count = int(state.get("scan_count", 0)) + 1
     last_nudge = int(state.get("last_red_nudge_scan", -NUDGE_COOLDOWN_SCANS))
@@ -190,7 +190,7 @@ def render_text(report: dict) -> str:
         return "Repo's tidy — nothing loose."
     if sev == "yellow":
         return f"A few loose ends ({n}) — fine for now."
-    tail = " — worth a /rad-repo-manager:analyze to sort it." if report["show_nudge"] else "."
+    tail = " — worth a /rad-repo-manager:repo-align to sort it." if report["show_nudge"] else "."
     return f"Getting cluttered ({n}){tail}"
 
 

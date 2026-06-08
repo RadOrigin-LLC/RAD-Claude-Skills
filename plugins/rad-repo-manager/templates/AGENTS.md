@@ -20,15 +20,16 @@ Conditional references (read only when the task touches the area):
 
 - Decision conflict or active-rule lookup: `docs/reference/decision-log.md`.
 - Architecture task: `docs/reference/architecture.md`, if present.
-- Design task: `docs/reference/design.md`, if present.
+- Design task: `docs/design.md`, if present.
 - API/AI route task: `docs/reference/api-contracts.md`, if present.
 - Build/release/deployment task: `docs/reference/commands.md`, if present.
 - Known trap/task pattern: `docs/reference/lessons-learned.md`, if present.
 - Test strategy task: `docs/reference/testing.md`, if present.
 
-Newly generated docs that aren't one of the above (a side brainstorm, a smoke-test
-report, an AI-produced analysis) go in `docs/inbox/` to be filed later — never
-scattered elsewhere.
+A newly generated doc that isn't one of the above (a side brainstorm, a smoke-test
+report, an AI-produced analysis) is a candidate for the reference catalog (if it's
+durable) or `docs/archive/` (if it's historical). Don't scatter loose `.md` files at
+the repo root or under `docs/`; `/rad-repo-manager:repo-align` helps file them.
 
 Archive rule: do **not** read `docs/archive/` during normal work. Archive files
 are historical context only and are not current authority unless the user
@@ -75,7 +76,7 @@ Stop and ask before touching:
 - The plan (scope, milestones, tasks) belongs in `docs/plan.md` (owned by `/rad-planner:plan`).
 - Current task / status / resume point belongs in `docs/handoff.md`.
 - Active decisions belong in `docs/reference/decision-log.md`.
-- Newly generated docs awaiting filing go in `docs/inbox/`.
+- A new doc with no home yet is filed into the reference catalog or archived via `/rad-repo-manager:repo-align` — not left loose at the root or under `docs/`.
 - Historical summaries, old plans, smoke notes, superseded decisions, and audit handoffs belong in `docs/archive/` with an archive banner.
 - Do not edit archived files except to add an archive/supersession banner or move them.
 
