@@ -27,6 +27,7 @@ not onboarding (that's `/rad-repo-manager:repo-init`) and not an audit (that's
 - No reading of `docs/archive/`.
 - No cleanup, no writes of any kind, no commits.
 - No product or implementation changes.
+- No offering to run `wrapup` or any end-of-session action — `startup` only orients.
 
 ## Procedure
 
@@ -47,8 +48,11 @@ not onboarding (that's `/rad-repo-manager:repo-init`) and not an audit (that's
    at the root / under `docs/`, missing core docs, off-model `status`/`roadmap` docs,
    or a stale handoff? If it looks drifted, recommend `/rad-repo-manager:repo-align` —
    don't fix anything here.
-5. **Surface the briefing** (format below). Ground every line in what you actually
-   read; if a doc is missing or stale, say so plainly rather than inventing.
+5. **Surface the briefing** (format below), then stop — the briefing is the whole
+   deliverable. Ground every line in what you actually read; if a doc is missing or
+   stale, say so plainly rather than inventing. The only forward action you may suggest
+   is `repo-init` (fresh repo) or `repo-align` (drift) — never offer to run `wrapup`,
+   commit, or anything else.
 
 ## Output format
 

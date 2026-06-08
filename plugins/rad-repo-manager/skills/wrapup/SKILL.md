@@ -18,6 +18,15 @@ End the session at a spot a fresh chat (or a post-compaction continuation) can r
 from cold. **Lean and evidence-grounded** — gather what actually changed, overwrite
 the handoff snapshot, and stop. The deep pass is `/rad-repo-manager:repo-align`.
 
+**Two hard rules:**
+
+- **The one required output is an overwritten `docs/handoff.md`.** Always write it —
+  even if nothing changed this session (then it just snapshots the current resting
+  state). Never finish `wrapup` without having written it.
+- **Do not run tests, builds, linters, or any command beyond the read-only git
+  inspection in step 1.** `wrapup` only *records* validation that already ran this
+  session; it never runs validation itself.
+
 ## Ownership boundary (read this first)
 
 - `docs/plan.md` owns the durable roadmap, milestone scope, allowed/forbidden work,
@@ -39,15 +48,19 @@ git log --oneline -10
 ```
 
 Determine what changed from the working tree, staged files, and recent commits — not
-from a chat summary. If validation (tests/build/lint) ran this session, capture the
-command and its result; if not, record "Not run this session." If nothing happened,
-say so — don't manufacture a narrative.
+from a chat summary. For the Validation line, report only what *already* ran this
+session (read it from the conversation — do **not** re-run): if tests/build/lint ran,
+record the command and its result; if not, write "Not run this session." If nothing
+changed at all this session, still write the handoff — it snapshots the current
+resting state.
 
 ## 2. Overwrite the handoff snapshot
 
-Overwrite `docs/handoff.md` from `${CLAUDE_PLUGIN_ROOT}/templates/handoff.md`. Keep it
-~10–25 lines. Stamp `**Updated:**` with today's date (ask the user for the date if you
-don't have it — do not call a clock). The shape:
+Overwrite `docs/handoff.md` from `${CLAUDE_PLUGIN_ROOT}/templates/handoff.md` (create
+the `docs/` folder first if it doesn't exist). This is the deliverable — write it; do
+not let the Validation line or anything else crowd it out. Keep it ~10–25 lines. Stamp
+`**Updated:**` with today's date (ask the user for the date if you don't have it — do
+not call a clock). The shape:
 
 - **Last completed** — 1–3 bullets grounded in the diff / commits / test output.
 - **Current focus** — the current milestone or active task from `docs/plan.md`.
@@ -74,6 +87,7 @@ the current branch with a short message — otherwise leave it.
 ## What this skill does NOT do
 
 - No deep audit, contradiction check, or doc filing — that's `repo-align`.
+- Does not run tests, builds, linters, or validators — it only records validation that already ran.
 - Does not create `docs/status.md`, `docs/roadmap.md`, `docs/implementation-plan.md`,
   loose root-level handoff/status/audit docs, or folder-specific agent files.
 - No writing of product content; no appending to the handoff; no auto-commit or push.
