@@ -40,10 +40,10 @@ status/roadmap docs.
 
 ## Who writes what
 
-- **rad-repo-manager writes:** `AGENTS.md` operational sections (never user-authored content), the shims, `docs/handoff.md`. Scaffolds `prd.md`/`plan.md` skeletons once at `repo-init`. Updates `docs/plan.md` at `wrapup` only when durable execution state changed.
+- **rad-repo-manager writes:** `AGENTS.md` operational sections (never user-authored content), the shims, `docs/handoff.md`. Scaffolds `prd.md`/`plan.md` skeletons once at `repo-init`. At `wrapup`, offers scoped updates to `docs/plan.md` and `AGENTS.md` operational sections when the session made them stale.
 - **rad-planner writes:** `docs/plan.md` content (roadmap / milestones / scope / gates).
 - **the user owns:** `docs/prd.md`, `docs/design.md`, `docs/reference/decision-log.md`, reference docs.
-- **surfaced, never written by the manager:** a change to `prd.md` / `decision-log.md` is described for the user to apply — the manager flags, the user owns product and decisions.
+- **surfaced, never written by the manager:** a change to `prd.md` / `design.md` / `decision-log.md` is described for the user to apply — including at `wrapup` when the session made one stale. The manager flags; the user owns product and decisions.
 
 ## Reference catalog (closed)
 
@@ -74,13 +74,14 @@ validators — surface **candidates** for `/rad-repo-manager:repo-align`:
 4. an active doc unchanged while code churned (possibly stale)
 5. plan ↔ PRD contradiction (scope-creep), cross-doc redundancy, AGENTS.md orphan terms / dead paths
 
-These feed **judgment**, not auto-action — `startup` and `wrapup` stay read-only and
-evidence-only; `repo-align` is where the signals are read and dispositioned, always
-with your confirmation.
+These feed **judgment**, not auto-action — `startup` stays read-only; `wrapup` only
+reconciles the core docs against the current session (offering owned-doc edits,
+surfacing user-owned ones). These whole-repo mechanical signals are read and
+dispositioned in `repo-align`, always with your confirmation.
 
 ## Non-goals
 
 No status/roadmap/implementation-plan/per-feature docs. No `docs/inbox/` staging tier.
-No writing durable content (surfaced only). No deep audit in startup/wrapup. No
+No writing durable content (surfaced only). No whole-repo audit in startup/wrapup (wrapup's core reconcile is session-scoped). No
 auto-action on judgment calls. No doc-type classifier. No folder-specific agent files.
 Not a correctness guarantee — a drift early-warning, honestly scoped.

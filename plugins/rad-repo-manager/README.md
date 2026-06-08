@@ -40,20 +40,21 @@ must still be true after the next session, it belongs in the plan, not the hando
 | Skill | Job | Speed |
 |---|---|---|
 | `/rad-repo-manager:startup` | Orient — read the four active docs + git state, surface where you are and what's next. Read-only; recommends `repo-init` (fresh repo) or `repo-align` (drift). | fast |
-| `/rad-repo-manager:wrapup` | Leave a clean handoff — overwrite `docs/handoff.md` from git evidence; update `docs/plan.md` only if durable state changed. No auto-commit. | fast |
+| `/rad-repo-manager:wrapup` | Leave a clean handoff — overwrite `docs/handoff.md` from git evidence, then reconcile the core docs with the session: offer scoped updates to the docs it owns (`plan.md`, AGENTS.md operational sections) and surface stale user-owned docs (prd/design/decisions). No auto-commit, never runs tests. | fast |
 | `/rad-repo-manager:repo-init` | First-run setup — scaffold the compact doc model (core docs, agent shims, minimal folders) on a new or nearly empty repo. Never invents product content. | one-time |
 | `/rad-repo-manager:repo-align` | The opt-in deep clean — find drift (contradictions, redundancy, stale/loose/misplaced docs, broken read paths) and propose fixes interactively. Proposes, never auto-acts; moves with `git mv`. | deep |
 
-`startup` and `wrapup` are deliberately lean and read-only / evidence-only. The
-mechanical drift detection lives in `repo-align`, where it's reviewed with your
-confirmation — not run on every session.
+`startup` is read-only; `wrapup` is evidence-grounded — it writes the handoff, offers
+scoped updates to the docs it owns, and surfaces stale user-owned docs, all within the
+session's changes. The deep, whole-repo drift detection lives in `repo-align`, where
+it's reviewed with your confirmation — not run on every session.
 
 ## What it writes (and what it doesn't)
 
 - **Authors:** `AGENTS.md` operational sections (never your authored content), the
   `CLAUDE.md`/`GEMINI.md` shims, `docs/handoff.md`. Scaffolds `prd.md`/`plan.md`
-  skeletons once at `repo-init`. Updates `docs/plan.md` at `wrapup` only when durable
-  execution state changed.
+  skeletons once at `repo-init`. At `wrapup`, offers scoped updates to `docs/plan.md`
+  and `AGENTS.md` operational sections when the session made them stale.
 - **Never writes** durable content — a change to `docs/prd.md` or
   `docs/reference/decision-log.md` is **surfaced** in plain language for you to apply.
   Product and decisions stay yours.

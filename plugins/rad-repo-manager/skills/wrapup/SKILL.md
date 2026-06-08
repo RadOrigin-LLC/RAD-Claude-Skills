@@ -4,9 +4,12 @@ description: >
   This skill should be used when the user says "wrapup", "wrap up", "end of
   session", "save state", "handoff", "leave a clean stopping point", "I'm done for
   now", or "before I close". Writes a short, evidence-grounded docs/handoff.md
-  (overwrite, not append) from git evidence — not chat memory — and updates
-  docs/plan.md only if durable execution state changed. No deep audit, no
-  status/roadmap/implementation-plan files, no auto-commit or push.
+  (overwrite, not append) from git evidence — not chat memory — then reconciles
+  the active core docs with this session's changes: offers scoped updates to the
+  docs it owns (docs/plan.md, AGENTS.md operational sections) and surfaces stale
+  user-owned docs (prd/design/decision-log) for the user to apply. Scoped to recent
+  changes, not a deep audit. No status/roadmap/implementation-plan files, no
+  auto-commit or push.
 argument-hint: ""
 user-invocable: true
 allowed-tools: Read Glob Grep Bash Write Edit
@@ -68,15 +71,26 @@ not call a clock). The shape:
 - **Validation** — commands run this session and their result, or "Not run this session."
 - **Watchouts** — only material gotchas; omit if none.
 
-## 3. Update the plan only if durable state changed
+## 3. Reconcile the core docs with this session
 
-Touch `docs/plan.md` **only** if durable execution state actually changed this session
-— a milestone shipped or changed status, the current milestone advanced,
-allowed/forbidden scope shifted, or a validation gate / stop condition changed. Make
-the minimal edit. If nothing durable changed, leave `docs/plan.md` untouched.
+Check whether *this session's changes* left any active core doc stale — scoped to what
+actually changed (the diff/commits above), **not** a whole-repo audit (that's
+`/rad-repo-manager:repo-align`). Read `AGENTS.md`, `docs/prd.md`, and `docs/plan.md` and
+compare each against what the session did. Then split by ownership:
 
-Do **not** edit `docs/prd.md` (product) or `docs/design.md` unless the user explicitly
-asks and a product/design decision actually changed.
+- **Docs the plugin owns — `docs/plan.md` and `AGENTS.md`'s operational sections.**
+  Offer the specific, scoped update (one line each: what's stale → what it should say)
+  and apply it on the user's OK. Typical `plan.md` updates: a milestone shipped or
+  changed status, the current milestone advanced, allowed/forbidden scope shifted, or a
+  validation gate / stop condition changed. Keep every edit minimal and within the
+  session's scope — never rewrite beyond what changed.
+
+- **Docs the user owns — `docs/prd.md`, `docs/design.md`,
+  `docs/reference/decision-log.md`.** Do **not** edit these. Surface the change in plain
+  language: name the file, point to the stale spot, and state what should change and why
+  — for the user to apply. Product and decisions stay theirs.
+
+If nothing the session touched made a core doc stale, say so and change nothing here.
 
 ## 4. Commit
 
@@ -86,8 +100,9 @@ the current branch with a short message — otherwise leave it.
 
 ## What this skill does NOT do
 
-- No deep audit, contradiction check, or doc filing — that's `repo-align`.
+- No whole-repo audit, contradiction/redundancy scan, or doc filing — that's `repo-align`. The core-doc reconcile in step 3 is scoped to this session's changes only.
 - Does not run tests, builds, linters, or validators — it only records validation that already ran.
+- Does not edit `docs/prd.md`, `docs/design.md`, or `docs/reference/decision-log.md` — those are surfaced for the user, never written.
 - Does not create `docs/status.md`, `docs/roadmap.md`, `docs/implementation-plan.md`,
   loose root-level handoff/status/audit docs, or folder-specific agent files.
 - No writing of product content; no appending to the handoff; no auto-commit or push.
