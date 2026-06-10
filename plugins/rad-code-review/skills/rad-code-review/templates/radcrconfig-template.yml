@@ -197,15 +197,15 @@ custom_rules:
 #             - "production" Standard — critical, major, and moderate (default)
 #             - "public"     Public release — all severity levels matter
 #
-# engine:     Which AI engine to use. Options:
-#             - "claude"  Claude only (default)
-#             - "codex"   Codex only
-#             - "both"    Both engines with result merging
+# review_model:      Default primary-review model: "opus" (default) | "sonnet" | "haiku".
+# adversarial_model: Optional cross-model challenge pass — set a model different from
+#                    review_model (omit for the default self-adversarial pass).
+#                    (v5.0 replaced the old never-implemented "engine" option.)
 
 # defaults:
 #   scope: "repo"
 #   strictness: "production"
-#   engine: "claude"
+#   review_model: "opus"
 
 
 # -----------------------------------------------------------------------------

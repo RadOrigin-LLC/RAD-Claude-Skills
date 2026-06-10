@@ -8,9 +8,13 @@ This workflow governs how the orchestrator assembles, masks, and writes the fina
 
 ### Primary report
 
-- **Filename**: `rad-code-review-report.md`
-- **Location**: Repository root
-- **Overwrites**: Yes, if a previous report exists at this path
+- **Filename**: `{YYYY-MM-DD}-{HHmmss}-{scope}-{strictness}.md`
+- **Location**: `.radcr/history/` (v5.0 — reports no longer write to the repository
+  root by default; a loose root-level report file is exactly the kind of floating doc
+  repo-hygiene tooling flags). Print the full path when done.
+- **Root copy (opt-in)**: only if the user explicitly asks for a root-level copy,
+  write `rad-code-review-report.md` at the repo root and say it will be flagged by
+  doc-hygiene tools unless gitignored.
 
 ### History archive
 
@@ -73,10 +77,10 @@ Before writing ANY code snippet, configuration fragment, environment variable, o
 2. **If a finding is ABOUT a secret exposure**, describe the type and location of the secret but NEVER include the actual value.
 
    Correct:
-   > RADCR-004: Hardcoded database password found in `src/config/db.ts` at line 12. The password is assigned directly to the `DB_PASSWORD` constant.
+   > CR-004: Hardcoded database password found in `src/config/db.ts` at line 12. The password is assigned directly to the `DB_PASSWORD` constant.
 
    Incorrect:
-   > RADCR-004: Hardcoded database password `supersecret` found in `src/config/db.ts` at line 12.
+   > CR-004: Hardcoded database password `supersecret` found in `src/config/db.ts` at line 12.
 
 3. **Multi-line secrets** (e.g., PEM keys): Replace the entire block with `[MASKED: private key]` or `[MASKED: certificate]`.
 
@@ -176,7 +180,7 @@ Four subsections, in order: Critical, Major, Moderate, Minor.
 Each finding follows this format:
 
 ```markdown
-#### RADCR-{NNN}: {Title}
+#### CR-{NNN}: {Title}
 
 - **Severity**: {Critical | Major | Moderate | Minor}
 - **Category**: {category}
@@ -329,7 +333,7 @@ An ordered list of findings to fix, prioritized by:
 Each entry includes:
 
 ```markdown
-{priority}. **RADCR-{id}**: {title} — Effort: {estimate}, Impact: {high/medium/low}
+{priority}. **CR-{id}**: {title} — Effort: {estimate}, Impact: {high/medium/low}
 ```
 
 ### 3.23 Fastest Path to Production Readiness
@@ -350,9 +354,9 @@ Include only if previous reports exist in `.radcr/history/`.
 
 | Status | Count | Findings |
 |--------|-------|----------|
-| Resolved since last review | {count} | RADCR-{ids} |
-| Remaining from last review | {count} | RADCR-{ids} |
-| New since last review | {count} | RADCR-{ids} |
+| Resolved since last review | {count} | CR-{ids} |
+| Remaining from last review | {count} | CR-{ids} |
+| New since last review | {count} | CR-{ids} |
 
 **Trend**: {Improving / Stable / Degrading} — {one sentence explanation}
 ```
@@ -392,7 +396,12 @@ Sort history files by filename (which encodes the date). Read the most recent on
 
 ### Step 3: Extract previous findings
 
-Parse the previous report's findings sections. Extract finding IDs and titles. If the previous report used a different ID scheme, match by title and file location instead.
+Parse the previous report's findings sections. Extract each finding's **fingerprint**
+(v5.0 field), title, file paths, and category. **Never match by bare finding ID** —
+IDs are assigned sequentially per run and are NOT stable across runs (two consecutive
+reviews both start at CR-001); ID-based matching produces false "already known"
+collisions. If the previous report predates fingerprints, fall back to title+file
+matching and note that the comparison is approximate.
 
 ### Step 4: Compare
 
@@ -404,9 +413,11 @@ For each finding in the previous report:
 - If no match exists in the current review: **Resolved**
 
 Matching criteria (in order of precedence):
-1. Same finding ID referencing the same file and line range
+1. Same `fingerprint` (category + primary file + normalized title terms — see the findings schema)
 2. Same title and same file (line numbers may have shifted)
 3. Same category, same file, similar description (fuzzy match — note this in the comparison)
+
+Bare ID equality is never a match criterion.
 
 ### Step 5: Assess trend
 
@@ -440,7 +451,8 @@ When generated, the JSON file contains:
   },
   "findings": [
     {
-      "id": "RADCR-001",
+      "id": "CR-001",
+      "fingerprint": "{category}:{primary file path}:{first 6 normalized title terms, kebab-cased}",
       "title": "{title}",
       "severity": "critical",
       "category": "{category}",
@@ -460,15 +472,16 @@ When generated, the JSON file contains:
   ],
   "history": {
     "previous_date": "{date or null}",
-    "resolved": ["RADCR-xxx"],
-    "remaining": ["RADCR-xxx"],
-    "new": ["RADCR-xxx"],
+    "resolved": ["CR-xxx"],
+    "remaining": ["CR-xxx"],
+    "new": ["CR-xxx"],
     "trend": "improving"
   }
 }
 ```
 
 Field notes:
+- `fingerprint` is the cross-run identity (IDs are per-run only) — used by the history comparison
 - `severity` values: `"critical"`, `"major"`, `"moderate"`, `"minor"`
 - `confidence` values: `"confirmed"`, `"high"`, `"possible"`
 - `effort` values: `"quick-fix"`, `"moderate"`, `"significant-refactor"`
@@ -550,7 +563,7 @@ The triage report is a shorter, recovery-focused document generated when the cod
 - **Secret masking is mandatory.** Every code snippet, config fragment, and log output must pass through the masking protocol before being written to any report file.
 - **Never omit mandatory sections.** If a section has no content, include it with a "No findings" or "Not applicable" note.
 - **History directory creation is automatic.** If `.radcr/history/` does not exist, create it. Do not ask the user.
-- **Overwrite the primary report.** The file at repo root is always the latest. History preserves previous versions.
+- **Each run writes a new history file** (`HHmmss` in the name prevents collisions). The opt-in root copy, when requested, overwrites — history preserves previous versions.
 - **JSON companion is opt-in.** Only generate it if the user's config requests it or the user asks for it.
 - **Triage mode is automatic.** If the criteria are met, generate the triage report in addition to (not instead of) the full report.
 - **Report must be self-contained.** A reader should be able to understand every finding without access to the codebase.

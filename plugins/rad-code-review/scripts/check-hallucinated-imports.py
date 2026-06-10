@@ -619,7 +619,7 @@ def check_imports(root: Path, files: list[Path] | None,
                 if not ok:
                     finding_seq += 1
                     findings.append(Finding(
-                        id_suggestion=f"RADCR-HALLUC-{finding_seq:03d}",
+                        id_suggestion=f"CR-HALLUC-{finding_seq:03d}",
                         severity="major",
                         category="dependency",
                         confidence="confirmed",
@@ -642,7 +642,7 @@ def check_imports(root: Path, files: list[Path] | None,
                     if not py_lockfile_has(pkg, py_pkgs):
                         finding_seq += 1
                         findings.append(Finding(
-                            id_suggestion=f"RADCR-HALLUC-{finding_seq:03d}",
+                            id_suggestion=f"CR-HALLUC-{finding_seq:03d}",
                             severity="major",
                             category="dependency",
                             confidence="confirmed",
@@ -667,7 +667,7 @@ def check_imports(root: Path, files: list[Path] | None,
                     if pkg not in js_pkgs:
                         finding_seq += 1
                         findings.append(Finding(
-                            id_suggestion=f"RADCR-HALLUC-{finding_seq:03d}",
+                            id_suggestion=f"CR-HALLUC-{finding_seq:03d}",
                             severity="major",
                             category="dependency",
                             confidence="confirmed",

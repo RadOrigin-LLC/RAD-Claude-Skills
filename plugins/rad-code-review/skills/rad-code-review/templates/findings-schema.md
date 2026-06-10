@@ -14,7 +14,7 @@ below must be followed exactly — the report parser and history-comparison logi
 depend on consistent structure.
 
 ```markdown
-#### RADCR-{{id}}: {{title}}
+#### CR-{{id}}: {{title}}
 
 | Field | Value |
 |-------|-------|
@@ -46,10 +46,16 @@ depend on consistent structure.
 ### Field Definitions
 
 #### `id`
-- Format: zero-padded three-digit number (e.g., `001`, `042`, `187`)
+- Format: zero-padded three-digit number (e.g., `001`, `042`, `187`), rendered as `CR-NNN`
 - Assigned sequentially within a single review run
-- Stable within one report; not guaranteed stable across runs
+- Stable within one report; **not stable across runs** — never used for cross-run comparison
 - Used for cross-referencing within the report (fix order, related findings)
+
+#### `fingerprint` (v5.0)
+- Format: `{category}:{primary file path}:{first 6 normalized title terms, kebab-cased}`
+- Example: `security:src/api/users.ts:sql-injection-via-unsanitized-user-input`
+- The **cross-run identity** of a finding — history comparison and "show new findings only" match on fingerprint (then title+file as fallback), never on `id`
+- Deterministic: recomputing it for the same finding in a later run must yield the same string (lowercase the path, strip articles/punctuation from the title)
 
 #### `title`
 - Short, specific description of the finding
@@ -148,7 +154,8 @@ integrations, CI/CD gates, and historical comparison.
 
 ```json
 {
-  "id": "RADCR-001",
+  "id": "CR-001",
+  "fingerprint": "security:src/api/search.js:sql-injection-via-unsanitized-user-input",
   "title": "SQL injection via unsanitized user input in search endpoint",
   "severity": "critical",
   "category": "security",
@@ -172,7 +179,7 @@ integrations, CI/CD gates, and historical comparison.
   "verification": "Send GET /api/search?q=' OR '1'='1 and observe that all rows are returned.",
   "remediation": "Use parameterized queries: db.query('SELECT * FROM items WHERE name LIKE $1', [`%${req.query.q}%`])",
   "fix_effort": "trivial",
-  "related_findings": ["RADCR-003", "RADCR-015"],
+  "related_findings": ["CR-003", "CR-015"],
   "cwe": "CWE-89",
   "owasp": "A03:2021",
   "wcag": null
@@ -216,7 +223,7 @@ metadata, summary counts, the full findings array, and history comparison data.
   "commit": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
   "scope": "repo",
   "strictness": "production",
-  "engine": "claude",
+  "model": "opus",
   "verdict": "Not ready for release",
   "verdict_justification": "3 critical and 7 major findings must be resolved.",
   "duration_seconds": 342,
@@ -230,7 +237,7 @@ metadata, summary counts, the full findings array, and history comparison data.
   },
   "findings": [
     {
-      "id": "RADCR-001",
+      "id": "CR-001",
       "title": "...",
       "severity": "...",
       "...": "... (full finding object as defined above)"
@@ -246,16 +253,16 @@ metadata, summary counts, the full findings array, and history comparison data.
     "Concurrency behavior under load was not testable via static analysis."
   ],
   "adversarial_pass": {
-    "confirmed": ["RADCR-001", "RADCR-002"],
+    "confirmed": ["CR-001", "CR-002"],
     "severity_adjusted": [
       {
-        "id": "RADCR-005",
+        "id": "CR-005",
         "original_severity": "critical",
         "revised_severity": "major",
         "reason": "Mitigated by upstream validation in middleware."
       }
     ],
-    "new_findings": ["RADCR-028"],
+    "new_findings": ["CR-028"],
     "disagreements": []
   },
   "config": {
@@ -267,9 +274,9 @@ metadata, summary counts, the full findings array, and history comparison data.
   },
   "history": {
     "previous_report": "radcr-report-2026-03-01.json",
-    "resolved": ["RADCR-004", "RADCR-009"],
-    "remaining": ["RADCR-001", "RADCR-003"],
-    "new": ["RADCR-028", "RADCR-029"],
+    "resolved": ["CR-004", "CR-009"],
+    "remaining": ["CR-001", "CR-003"],
+    "new": ["CR-028", "CR-029"],
     "trend": "improving"
   }
 }
@@ -288,8 +295,10 @@ One of: `repo` (full repository), `diff` (changed files only), `commit`
 One of: `mvp` (minimum viable), `production` (standard), `public`
 (public-release grade).
 
-#### `engine`
-One of: `claude`, `codex`, `both`.
+#### `model` / `adversarial_model`
+The primary-review model and, when a cross-model pass ran, the adversarial model
+(absent or equal to `model` for self-adversarial runs). Replaces the v4.x `engine`
+field — readers of old reports may still encounter `engine: claude|codex|both`.
 
 #### `verdict`
 Human-readable verdict string. Examples: "Ready for release",

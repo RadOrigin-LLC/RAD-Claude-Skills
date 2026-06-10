@@ -3,24 +3,33 @@ name: rad-code-review
 description: >
   Review my code, code review, is this ready to ship, check for bugs, security audit,
   review this PR, pre-merge check, is this safe to deploy, check code quality. Blame-aware
-  diff scoping, 3-role adversarial review, AI slop detection (14 patterns), framework IDOR,
-  WCAG 2.2, performance heuristics, severity-ranked findings, optional fix application.
-  v3.0: Opus 4.7 optimized with parallel tool calls, JSON-first subagent output,
-  compaction-safe checkpointing, non-interactive mode for agents/CI.
-argument-hint: "[repo|diff|commit] [--since commit] [--strictness mvp|production|public] [--model opus|sonnet|haiku] [--non-interactive] [--resume RUN-ID] [--fix blockers|critical-major|IDs]"
+  diff scoping, 3-role adversarial review, AI slop detection (14 patterns including a
+  mechanical hallucinated-imports validator), framework IDOR (6 frameworks), WCAG 2.2,
+  performance heuristics, severity-ranked CR-NNN findings, fingerprint-based history
+  comparison, optional fix application. Parallel tool calls, JSON-first subagent output,
+  compaction-safe checkpointing, non-interactive mode for agents/CI, cross-model
+  adversarial pass via --adversarial-model.
+argument-hint: "[repo|diff|commit] [--since commit] [--strictness mvp|production|public] [--model opus|sonnet|haiku] [--adversarial-model name] [--non-interactive] [--resume RUN-ID] [--fix blockers|critical-major|IDs]"
 allowed-tools: Read Write Edit Bash Glob Grep Agent AskUserQuestion WebSearch WebFetch mcp__context7__resolve-library-id mcp__context7__query-docs
 ---
 
-**Cross-model note.** v3.0 defaults to **Opus 4.7** for the primary review (best reasoning for the adversarial protocol + severity calibration). **Sonnet 4.6** is a first-class fallback — set `--model sonnet` for cost-sensitive PR scans. **Haiku 4.5** only for narrow blame-aware diffs with `--local-only`. Cross-engine (`--engine both`) runs primary on Opus and adversarial on whatever the config specifies, defaulting to Opus.
+**Cross-model note.** Defaults to **Opus** for the primary review (best reasoning for the adversarial protocol + severity calibration). **Sonnet** is a first-class fallback — set `--model sonnet` for cost-sensitive PR scans. **Haiku** only for narrow blame-aware diffs with `--local-only`. The adversarial pass is self-adversarial (same model) by default; pass `--adversarial-model <name>` for a cross-model challenge pass.
 
-**Naming.** Config (`.radcrconfig.yml`), finding IDs (`RADCR-NNN`), and history/state directories (`.radcr/history/`, `.radcr/state/`) use the RADCR prefix matching the plugin name. Users with an existing `.ucrconfig.yml` from a prior version of this plugin should rename it to `.radcrconfig.yml` and rename `.ucr/` to `.radcr/` — earlier versions used a `UCR` prefix as a heritage from this plugin's "Universal Code Review" predecessor. See `README.md` for details.
+**Naming.** Finding IDs are **`CR-NNN`** (v5.0 — short to type and reference; previously `RADCR-NNN`). The config file (`.radcrconfig.yml`) and history/state directories (`.radcr/history/`, `.radcr/state/`) keep the longer `radcr` prefix — renaming those would break existing per-repo state for zero readability gain: you type finding IDs, not paths. Users with a `.ucrconfig.yml` from the oldest versions should rename it to `.radcrconfig.yml` and `.ucr/` to `.radcr/`. See `README.md` for details.
 
 <objective>
 Run a professional-grade, diff-aware code review and produce a structured report with
 severity-ranked findings, release verdict, and optional fix application.
 
-**v3.0 differentiators (new):**
-- **Opus 4.7 as the default primary-review model** with explicit `--model` override
+**v5.0 differentiators (new):**
+- **`CR-NNN` finding IDs** — short to type and reference (previously `RADCR-NNN`)
+- **Mechanical hallucinated-imports validator wired into Step 5g** — deterministic, offline, lockfile-verified; runs before the LLM phases
+- **Fingerprint-based history comparison** — findings match across runs by category+file+title fingerprint, never by per-run IDs
+- **Honest adversarial flags** — `--engine claude|codex|both` removed (Codex execution was never implemented); `--adversarial-model` provides the real cross-model pass
+- **Reports save to `.radcr/history/` only** — no more loose root-level report files (root copy on explicit request)
+
+**v3.0 differentiators (retained):**
+- **Opus as the default primary-review model** with explicit `--model` override
 - **Parallel tool calls** across Steps 1–5 — deep reviews complete ~3–5× faster on Opus/Sonnet
 - **JSON-first subagent output** — more robust across model variance than markdown parsing
 - **Checkpoint / `--resume`** — compaction-safe state writes after Steps 5, 7, 9
@@ -81,18 +90,19 @@ Arguments: $ARGUMENTS
 - `production` — full review across all dimensions
 - `public` — production + open-source readiness, public scrutiny resilience, trust signals
 
-**Engine:** claude | codex | both (default: claude)
-- `claude` — Claude performs all review phases
-- `codex` — Codex performs all review phases
-- `both` — Claude does primary review (Phase 3), Codex does adversarial pass (Phase 4)
+**Adversarial pass:** self-adversarial by default (same model challenges its own
+findings); `--adversarial-model <name>` switches to a cross-model pass (a different
+model family does the challenge). v5.0 removed the old `--engine claude|codex|both`
+flag — it implied Codex execution that was never implemented; if a caller passes
+`--engine`, say so and map `both` → cross-model adversarial on Opus.
 
 **Connectivity:** --local-only (default: internet-enabled)
 **Fix mode:** --fix blockers | --fix critical-major | --fix id1,id2,...
 
 **Model selection (v3.0):**
-- `--model opus` (default) — Opus 4.7 primary review
-- `--model sonnet` — Sonnet 4.6 for cost-sensitive reviews
-- `--model haiku` — Haiku 4.5 only for narrow blame-aware + --local-only scopes
+- `--model opus` (default) — Opus primary review
+- `--model sonnet` — Sonnet for cost-sensitive reviews
+- `--model haiku` — Haiku only for narrow blame-aware + --local-only scopes
 - `--adversarial-model <name>` — override adversarial-pass model separately
 
 **Non-interactive mode (v3.0):**
@@ -128,11 +138,11 @@ Preserve all workflow gates, user checkpoints, and subagent boundaries.
 </critical_rules>
 
 <success_criteria>
-- [ ] User confirmed scope, strictness, engine, and connectivity
+- [ ] User confirmed scope, strictness, model(s), and connectivity
 - [ ] Diff context computed and annotated (if blame-aware mode)
 - [ ] Project type(s) detected and relevant modules loaded
 - [ ] Primary review completed with findings scoped to changed lines (if blame-aware)
-- [ ] Adversarial pass completed (if dual-engine or self-adversarial)
+- [ ] Adversarial pass completed (self-adversarial or cross-model)
 - [ ] Review-of-review pass completed (de-duplication, calibration)
 - [ ] Findings presented to user with severity ranking
 - [ ] Fix option offered (if findings exist)

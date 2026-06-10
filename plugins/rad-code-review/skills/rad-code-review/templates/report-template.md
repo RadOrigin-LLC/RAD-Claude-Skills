@@ -10,7 +10,7 @@
 **Commit:** {{commit_hash}}
 **Scope:** {{scope}}
 **Strictness:** {{strictness}}
-**Engine:** {{engine}}
+**Model:** {{model}} ({{adversarial_mode}} adversarial{{#if adversarial_model}}: {{adversarial_model}}{{/if}})
 **Review Duration:** {{duration}}
 
 ---

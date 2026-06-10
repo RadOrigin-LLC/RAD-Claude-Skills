@@ -2,7 +2,7 @@
 
 Template loaded by `orchestrate-review.md` Step 6. Substitute the `{placeholder}` tokens before passing to the `Agent` tool.
 
-**Cross-model note.** This prompt is neutral across Opus 4.7 / Sonnet 4.6 / Haiku 4.5. The orchestrator picks the right model (Opus preferred for primary review, see Step 6 model-selection logic) and passes this prompt verbatim. Output format is JSON-first (see `## Output Format` below) so downstream parsing is robust across model variance.
+**Cross-model note.** This prompt is neutral across Opus / Sonnet / Haiku. The orchestrator picks the right model (Opus preferred for primary review, see Step 6 model-selection logic) and passes this prompt verbatim. Output format is JSON-first (see `## Output Format` below) so downstream parsing is robust across model variance.
 
 ---
 
@@ -170,7 +170,8 @@ MAY follow the JSON block, but the JSON is authoritative and is what the orchest
   },
   "findings": [
     {
-      "id": "RADCR-001",
+      "id": "CR-001",
+      "fingerprint": "{category}:{primary file path, lowercased}:{first 6 normalized title terms, kebab-cased} — the cross-run identity; IDs restart every run",
       "title": "string (prefix with [PRE-EXISTING] if attribution != introduced)",
       "severity": "critical | major | moderate | minor",
       "category": "functional | security | ai-slop | architecture | tests | performance | ux | accessibility | release | documentation",

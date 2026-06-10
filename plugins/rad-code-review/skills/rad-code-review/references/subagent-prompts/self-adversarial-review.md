@@ -1,8 +1,8 @@
 # Self-Adversarial Review Subagent Prompt
 
-Template loaded by `orchestrate-review.md` Step 8 when `engine = claude` or `engine = codex` (single-engine self-challenge). Substitute the `{placeholder}` tokens before passing to the `Agent` tool.
+Template loaded by `orchestrate-review.md` Step 8 when the adversarial model is the same as the primary model (the default, self-challenge mode). Substitute the `{placeholder}` tokens before passing to the `Agent` tool.
 
-**Cross-model note.** Self-adversarial should use the SAME model as the primary review — the goal is to catch the primary reviewer's own blind spots, not introduce a different model's biases. If compute budget allows, prefer Opus 4.7 for both passes. If primary ran on Sonnet, run self-adversarial on Sonnet too.
+**Cross-model note.** Self-adversarial should use the SAME model as the primary review — the goal is to catch the primary reviewer's own blind spots, not introduce a different model's biases. If compute budget allows, prefer Opus for both passes. If primary ran on Sonnet, run self-adversarial on Sonnet too.
 
 ---
 

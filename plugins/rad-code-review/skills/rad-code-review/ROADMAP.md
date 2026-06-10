@@ -1,10 +1,14 @@
 # RAD Code Review — Roadmap
 
-## v3.0 (current)
+## v5.0 (current)
 
-**Optimized for Claude Opus 4.7** — major platform-level upgrade, no new review dimensions. Retains full compatibility with Sonnet 4.6 and (for narrow scopes) Haiku 4.5.
+**Shorter IDs, honest flags, wired validator.** Finding IDs `CR-NNN` (config/state paths unchanged); `check-hallucinated-imports.py` wired into automated checks (Step 5g, offline); fingerprint-based history comparison (per-run IDs never compared across runs); `--engine claude|codex|both` removed — it implied Codex execution that was never implemented; `--adversarial-model` provides the real cross-model pass; reports save to `.radcr/history/` only; model references de-versioned.
 
-- **Opus 4.7 as default primary-review model** — agent and skill both default to Opus; `--model sonnet|haiku` overrides per-run; `.radcrconfig.yml` `review_model` sets a project default.
+## v3.0
+
+**Optimized for Claude Opus** — major platform-level upgrade, no new review dimensions. Retains full compatibility with Sonnet and (for narrow scopes) Haiku.
+
+- **Opus as default primary-review model** — agent and skill both default to Opus; `--model sonnet|haiku` overrides per-run; `.radcrconfig.yml` `review_model` sets a project default.
 - **Parallel tool-call pipeline** — agent Phase 1 issues Glob/Grep/Read as a single parallel batch. Orchestrator Steps 3a–3e run in parallel. Step 5 automated checks (npm audit, pip-audit, gitleaks, tsc, eslint, etc.) run concurrently via `run_in_background`. Deep reviews ~3–5× faster on Opus/Sonnet.
 - **JSON-first subagent output** — primary and adversarial subagents emit structured JSON per the schema in `references/subagent-prompts/*.md`. Orchestrator parses JSON as authoritative. Markdown fallback retained for legacy resilience.
 - **Compaction-safe checkpointing** — state written to `.radcr/state/<run-id>.json` after Steps 5, 7, 9. `--resume <run-id>` rehydrates mid-review and continues from the last checkpoint. Long reviews of 500+ file repos no longer lose progress when context compacts.
@@ -38,7 +42,7 @@ The foundation. A complete, production-ready code review skill.
 
 - Full 10-category review (functional, security, AI slop, architecture, tests, performance, UX, accessibility, release readiness, documentation)
 - 8 project-type modules (web app, API, Chrome extension, CLI, library, Electron, mobile, SaaS)
-- Sequential adversarial review (dual-engine mode with Claude and Codex)
+- Sequential adversarial review (the v1.0 docs described a "dual-engine Claude+Codex" mode; the Codex half was never actually implemented and the flag was removed in v5.0)
 - Review-of-review calibration pass
 - Fix application with build/test validation
 - Structured JSON report with severity-ranked findings

@@ -1,8 +1,8 @@
 # Adversarial Review Subagent Prompt
 
-Template loaded by `orchestrate-review.md` Step 8 when `engine = both` (sequential adversarial). Substitute the `{placeholder}` tokens before passing to the `Agent` tool.
+Template loaded by `orchestrate-review.md` Step 8 when the adversarial model differs from the primary model (cross-model challenge pass). Substitute the `{placeholder}` tokens before passing to the `Agent` tool.
 
-**Cross-model note.** This pass benefits meaningfully from deep reasoning. Default to Opus 4.7 when the primary review used Sonnet (so the adversary brings stronger reasoning), or Sonnet 4.6 when the primary used Opus (cost-balanced cross-check). Haiku is not recommended for adversarial review — the protocol requires counter-factual reasoning and severity calibration that small models do unreliably.
+**Cross-model note.** This pass benefits meaningfully from deep reasoning. Default to Opus when the primary review used Sonnet (so the adversary brings stronger reasoning), or Sonnet when the primary used Opus (cost-balanced cross-check). Haiku is not recommended for adversarial review — the protocol requires counter-factual reasoning and severity calibration that small models do unreliably.
 
 ---
 
@@ -73,10 +73,10 @@ MAY follow the JSON block, but the JSON is authoritative.
 ```json
 {
   "adversarial_review_complete": true,
-  "confirmed_ids": ["RADCR-001", "RADCR-003"],
+  "confirmed_ids": ["CR-001", "CR-003"],
   "challenged": [
     {
-      "id": "RADCR-002",
+      "id": "CR-002",
       "reasoning": "string — what disconfirming evidence was found",
       "proposed_action": "remove | downgrade | change-confidence",
       "proposed_severity": "critical | major | moderate | minor | null",
@@ -88,7 +88,7 @@ MAY follow the JSON block, but the JSON is authoritative.
   ],
   "severity_adjustments": [
     {
-      "id": "RADCR-004",
+      "id": "CR-004",
       "old_severity": "critical",
       "new_severity": "major",
       "reasoning": "string"
@@ -96,7 +96,7 @@ MAY follow the JSON block, but the JSON is authoritative.
   ],
   "disagreements": [
     {
-      "id": "RADCR-005",
+      "id": "CR-005",
       "summary": "string — substantive disagreement not covered above"
     }
   ],

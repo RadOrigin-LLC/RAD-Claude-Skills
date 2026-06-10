@@ -1,10 +1,10 @@
 # rad-code-review — Catch what AI wrote wrong before it ships.
 
-> **v4.1 — current release.** Refinement pass on the v4.0 naming changeover (RADCR config + state dirs) plus small surface tightening. No breaking changes; users on 4.0 upgrade in place.
+> **v5.0 — current release. Shorter IDs, honest flags, wired validator.** Finding IDs are now **`CR-NNN`** (was `RADCR-NNN`) — config and state paths keep the `radcr` prefix, so nothing on disk breaks. The `check-hallucinated-imports.py` validator is now actually wired into the review (Step 5g, offline, lockfile-verified) — previously documented but never invoked. History comparison now matches findings across runs by **fingerprint** (category+file+title), never by per-run IDs, which silently produced false "already known" matches. The `--engine claude|codex|both` flag is removed — it implied Codex execution that was never implemented; `--adversarial-model <name>` provides the real cross-model challenge pass. Reports save to `.radcr/history/` only (no more loose root-level report file; root copy on request). Model references de-versioned (Opus/Sonnet/Haiku, no point versions).
 >
-> **v4.0 — Naming pass.** The `UCR-` heritage prefix on config / finding IDs / state dirs renamed to `RADCR-` for naming consistency. **Existing users on 3.x:** rename `.ucrconfig.yml` → `.radcrconfig.yml` and `.ucr/` → `.radcr/` before running this version (no content changes). See the Naming section below.
+> **v4.x.** Naming changeover (`UCR-` heritage prefix → `RADCR-` on config/state dirs) plus surface tightening.
 >
-> **v3.0 (prior) — Optimized for Claude Opus 4.7.** Opus 4.7 default; parallel tool calls across discovery/stack-detection/automated-checks; JSON-first subagent output; compaction-safe checkpointing with `--resume <run-id>`; `--non-interactive` mode for agents and CI; externalized subagent prompt templates; `.radcrconfig.yml` accepted-risk expiry enforced. Sonnet 4.6 first-class fallback; Haiku 4.5 for narrow blame-aware diffs.
+> **v3.0 — Optimized for Claude Opus.** Opus default; parallel tool calls across discovery/stack-detection/automated-checks; JSON-first subagent output; compaction-safe checkpointing with `--resume <run-id>`; `--non-interactive` mode for agents and CI; externalized subagent prompt templates; accepted-risk expiry enforced.
 
 When you build with Claude, you move fast. Fast enough that subtle bugs, fake error handling, and hardcoded accessibility states slip through — and they look fine at a glance. rad-code-review is the adversarial reviewer that knows exactly which mistakes AI code generators make. It only flags what *you* changed, not the whole codebase. And it understands your framework well enough to catch the security holes that generic linters miss.
 
@@ -29,13 +29,15 @@ rad-code-review runs three review roles in sequence — bug finder, architecture
 
 ## Key Capabilities
 
-- **Opus 4.7 default, Sonnet/Haiku compatible** — set `--model` per run or pin via `.radcrconfig.yml`'s `review_model`
+- **Opus default, Sonnet/Haiku compatible** — set `--model` per run or pin via `.radcrconfig.yml`'s `review_model`
 - **Parallel tool-call pipeline** — Steps 1–5 batch reads, greps, and shell checks; `run_in_background` for automated scans
 - **JSON-first subagent output** — authoritative findings schema; markdown fallback only on parse failure
 - **Checkpoint + `--resume`** — state written after Steps 5/7/9 so compaction mid-review is recoverable
 - **`--non-interactive`** — structured return path for `code-reviewer` agent, `/loop`, CI
 - **Blame-aware diff scoping** — only flag issues you introduced, not pre-existing noise
 - **14-pattern AI slop detection** — hallucinated imports, fake error handling, placeholder stubs, silent failures, and 10 more
+- **Mechanical hallucinated-imports validator** — `check-hallucinated-imports.py` runs in the automated-checks phase (offline, pure stdlib): every external import verified against your lockfiles, every relative import against disk
+- **Fingerprint-based history comparison** — findings match across runs by category+file+title fingerprint (per-run IDs are never compared), so "show new findings only" means it
 - **Framework-specific IDOR detection** — Next.js, Express, Fastify, Django, Rails, Go
 - **Dynamic ARIA state detection** — catches hardcoded `aria-expanded`, `aria-selected`, `aria-checked`, `aria-pressed`
 - **Performance heuristics** — N+1 queries, unbounded lists, sync blocking, bundle bloat, re-renders
@@ -61,10 +63,10 @@ Review changes since last release
 Or use slash commands:
 
 ```bash
-/rad-code-review diff                               # Review current diff (blame-aware, Opus 4.7)
+/rad-code-review diff                               # Review current diff (blame-aware, Opus)
 /rad-code-review --since abc123                     # Review since a specific commit
 /rad-code-review repo --strictness public           # Full repo, public release standard
-/rad-code-review diff --model sonnet                # Cost-sensitive scan on Sonnet 4.6
+/rad-code-review diff --model sonnet                # Cost-sensitive scan on Sonnet
 /rad-code-review diff --non-interactive             # Agent/CI mode (no findings menu)
 /rad-code-review --resume 2026-04-16-143022         # Resume an interrupted review
 ```
@@ -78,25 +80,15 @@ The agent always runs in non-interactive mode. The skill supports `--non-interac
 
 ## Naming
 
-Config file (`.radcrconfig.yml`), finding IDs (`RADCR-NNN`), and the state/history directories (`.radcr/state/`, `.radcr/history/`) use the RADCR prefix matching the plugin name.
+Finding IDs are **`CR-NNN`** (v5.0) — short to type, reference in conversation ("fix CR-7"), and fit in commit messages (`fix(review): … [CR-001]`). The config file (`.radcrconfig.yml`) and the state/history directories (`.radcr/state/`, `.radcr/history/`) keep the longer `radcr` prefix: renaming them would break existing per-repo state and configs for zero readability gain — you type finding IDs, not paths.
 
-**If you have an existing `.ucrconfig.yml`** from a prior version of this plugin: rename it to `.radcrconfig.yml`, and rename `.ucr/` (if present) to `.radcr/`. Earlier versions used a `UCR` prefix as a heritage from this plugin's "Universal Code Review" predecessor; that prefix was retired for consistency with the plugin name. Existing history files under `.ucr/history/` are still readable after the directory rename — no content changes required.
+**If you have an existing `.ucrconfig.yml`** from the oldest versions of this plugin: rename it to `.radcrconfig.yml`, and rename `.ucr/` (if present) to `.radcr/`. Existing history files remain readable after the rename. Reports written before v5.0 use `RADCR-NNN` IDs — the fingerprint-based history comparison handles them via title+file matching.
 
 ## Version
 
-**3.0.0** — **Optimized for Claude Opus 4.7** while retaining Sonnet 4.6 and Haiku 4.5 compatibility.
+**5.0.0** — Shorter IDs, honest flags, wired validator. See the release notes at the top of this README.
 
-- **Opus 4.7 default** — agent and skill primary-review model switched from Sonnet to Opus; `--model` flag + `.radcrconfig.yml` `review_model` override.
-- **Parallel tool calls everywhere** — agent Phase 1 (entry points, auth, DB, APIs, config), orchestrator Steps 3a–3e (metadata, stack, trust, file list), Step 5 (automated checks via `run_in_background`). Deep reviews complete ~3–5× faster on Opus/Sonnet.
-- **JSON-first subagent output** — primary and adversarial subagents emit JSON per schema in `references/subagent-prompts/*.md`. Markdown parsing retained as fallback.
-- **Checkpoint + `--resume <run-id>`** — state written to `.radcr/state/<run-id>.json` after Steps 5/7/9. Compaction-safe.
-- **`--non-interactive`** — skips the Step 10 findings menu; returns structured findings + verdict + report path. Used by the `code-reviewer` agent, `/loop`, CI.
-- **Externalized subagent prompts** — moved from inline in `orchestrate-review.md` to `references/subagent-prompts/{primary,adversarial,self-adversarial}-review.md`. Easier to audit, version, and reuse.
-- **`.radcrconfig.yml` expiry enforcement** — accepted risks with `expires < today` are surfaced as stale and re-evaluated rather than silently suppressed.
-- **History filename unified** — `{YYYY-MM-DD}-{HHmmss}-{scope}-{strictness}.md` across both orchestrator Step 12 and report-generation.md. Multiple same-day reviews no longer overwrite each other.
-- **Cleanup** — removed vestigial `install.sh`/`install.ps1` (plugin manifest handles install) and unused `scripts/*.sh` that no workflow referenced.
-
-**2.2.0 and earlier** — see git log for history; v2.0 introduced blame-aware scoping, framework IDOR, performance heuristics, dynamic ARIA detection.
+**History:** v4.x — `UCR-` → `RADCR-` naming changeover. v3.0 — Opus default, parallel tool calls, JSON-first subagent output, checkpoint/`--resume`, `--non-interactive`, externalized prompts, accepted-risk expiry, unified history filenames. v2.0 — blame-aware scoping, framework IDOR, performance heuristics, dynamic ARIA detection. Full detail in git log.
 
 ## License
 Apache-2.0

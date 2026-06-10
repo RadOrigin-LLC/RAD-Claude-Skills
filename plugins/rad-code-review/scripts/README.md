@@ -44,7 +44,7 @@ python3 scripts/check-hallucinated-imports.py <project-root> --include-tests
 - Common build / vendor directories (`node_modules/`, `.venv/`, `dist/`, `build/`, `__pycache__/`, etc.) — never scanned.
 - Files in a project with NO matching lockfile — flagged via the summary, not via per-import findings (without a lockfile we can't be authoritative).
 
-**Output:** human-readable text by default; structured JSON with `--json`. Each finding emits an `id_suggestion` shaped as `RADCR-HALLUC-NNN` for downstream use by the review report assembly.
+**Output:** human-readable text by default; structured JSON with `--json`. Each finding emits an `id_suggestion` shaped as `CR-HALLUC-NNN` for downstream use by the review report assembly.
 
 **Exit codes:** `0` clean, `1` findings present, `2` script error.
 
@@ -52,6 +52,6 @@ python3 scripts/check-hallucinated-imports.py <project-root> --include-tests
 
 | Caller | Invocation | When |
 |---|---|---|
-| `/rad-code-review` skill | Step 5g (automated checks phase) | After Step 5a-5f run in parallel, before the LLM phases — the validator's findings are part of the `automated_check_output` consumed by the primary-review subagent. |
+| `/rad-code-review` skill | Step 5g (automated checks phase) | Runs in the Step 5 parallel batch (5a–5e + 5g), aggregated in 5h before the LLM phases — the validator's findings are part of the `automated_check_output` consumed by the primary-review subagent. Not skipped in `--local-only` (pure offline check). |
 | User direct | `python3 plugins/rad-code-review/scripts/check-hallucinated-imports.py <root>` | Standalone use without the full review workflow. |
 | CI / hook | Same, with `--json` and `--files <changed-files>` | Pre-merge or pre-commit gate. |

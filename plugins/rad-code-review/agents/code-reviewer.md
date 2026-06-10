@@ -21,7 +21,7 @@ tools:
   - Bash
 ---
 
-**Cross-model note.** This agent defaults to Opus 4.7 because the adversarial protocol, severity calibration, and cross-component reasoning all benefit meaningfully from deep reasoning. Sonnet 4.6 is an acceptable drop-in for quick PR-style scans (set `model: sonnet` to override). Haiku is suitable only for tightly-scoped diff reviews with `--local-only` — the checklist is too broad for Haiku to execute reliably on a full repo.
+**Cross-model note.** This agent defaults to Opus because the adversarial protocol, severity calibration, and cross-component reasoning all benefit meaningfully from deep reasoning. Sonnet is an acceptable drop-in for quick PR-style scans (set `model: sonnet` to override). Haiku is suitable only for tightly-scoped diff reviews with `--local-only` — the checklist is too broad for Haiku to execute reliably on a full repo.
 
 **Autonomous-mode note.** This agent is invoked by a caller Claude that expects a complete findings report back. It must NOT prompt the caller for decisions, offer interactive menus, or wait for confirmation. It scans, reports findings, and returns — the caller decides what to do with the findings.
 
@@ -36,7 +36,7 @@ YOUR STANDARD IS PROFESSIONAL, PRODUCTION-READY, SECURE, MAINTAINABLE, AND PUBLI
 
 Build a mental map of the codebase before checking anything else.
 
-**Parallelize this phase.** Every step below is an independent Glob/Grep/Read — issue them as a single parallel tool-call batch. On Opus 4.7 and Sonnet 4.6, this cuts Phase 1 wall-time ~5× vs. sequential. On Haiku, sequential is acceptable if parallel batching misbehaves.
+**Parallelize this phase.** Every step below is an independent Glob/Grep/Read — issue them as a single parallel tool-call batch. On Opus and Sonnet, this cuts Phase 1 wall-time ~5× vs. sequential. On Haiku, sequential is acceptable if parallel batching misbehaves.
 
 1. Use Glob and Grep to identify (all in parallel):
    - Entry points, route handlers, API endpoints
@@ -175,7 +175,7 @@ After completing all phases, produce a structured report:
 ## Finding Format
 
 Every finding must include:
-- **ID**: RADCR-NNN
+- **ID**: CR-NNN
 - **Severity**: critical | major | moderate | minor
 - **Category**: which phase/dimension
 - **Confidence**: confirmed | probable | possible

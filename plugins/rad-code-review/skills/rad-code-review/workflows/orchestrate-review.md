@@ -2,13 +2,13 @@
 
 This workflow is loaded by the orchestrator SKILL.md and executed end-to-end.
 
-**Cross-model note.** Optimized for Opus 4.7 — parallel tool calls across Steps 1–5, JSON-first subagent output, compaction-safe checkpointing. Sonnet 4.6 is a first-class fallback. Haiku 4.5 should be used only for small-scope blame-aware reviews with `--local-only`; the full protocol exceeds Haiku's reliable capacity.
+**Cross-model note.** Optimized for Opus — parallel tool calls across Steps 1–5, JSON-first subagent output, compaction-safe checkpointing. Sonnet is a first-class fallback. Haiku should be used only for small-scope blame-aware reviews with `--local-only`; the full protocol exceeds Haiku's reliable capacity.
 
 **v3.0 changes from v2.x:**
 - **Step 3a/3b/3c/3d/3e run in a single parallel batch** (was sequential)
 - **Step 3f emits structured JSON blame context** (was prose-annotated diff)
 - **Step 5 automated checks run in parallel** via `run_in_background` (was sequential, blocking)
-- **Step 6 selects the subagent model explicitly** (primary: Opus 4.7 default; configurable)
+- **Step 6 selects the subagent model explicitly** (primary: Opus default; configurable)
 - **Step 6 subagent prompt externalized** to `references/subagent-prompts/primary-review.md`
 - **Step 6 subagent emits JSON-first findings** (was markdown, fragile across models)
 - **Step 8 adversarial prompt externalized** to `references/subagent-prompts/adversarial-review.md` and `self-adversarial-review.md`
@@ -28,14 +28,13 @@ Parse $ARGUMENTS for:
 - **Incremental**: --since <commit> (review changes since a specific commit)
 - **Scan mode**: --full-scan (override blame-aware default; flag all issues regardless of authorship)
 - **Strictness**: mvp | production | public (default: production)
-- **Engine**: claude | codex | both (default: claude)
 - **Local-only**: --local-only flag (default: internet-enabled)
 - **Fix mode**: --fix blockers | --fix critical-major | --fix <ids> (default: no fixes)
 - **Non-interactive**: --non-interactive (skip the findings menu, return findings + save report directly — for agent/loop invocation)
 - **Resume**: --resume <run-id> (rehydrate state from `.radcr/state/<run-id>.json` and continue from last checkpoint)
 - **Model overrides**:
   - `--model <name>` — override the default primary-review model (default: opus, resolved from `.radcrconfig.yml` `review_model` if present)
-  - `--adversarial-model <name>` — override the adversarial-pass model (default: same as primary if engine=claude|codex, or Opus for engine=both cross-check)
+  - `--adversarial-model <name>` — override the adversarial-pass model. Default: same model as primary (**self-adversarial**). Pass a different model for a **cross-model** adversarial pass — a different model family challenges the primary's findings. (v5.0 removed `--engine claude|codex|both`: it implied Codex execution that was never implemented. If a caller passes `--engine`, say so plainly and map `both` → cross-model adversarial on Opus, anything else → ignored.)
 
 ### Resolve scan mode:
 
@@ -70,7 +69,7 @@ If user chooses option 5, prompt for the commit hash.
 ### If `--resume <run-id>` was provided
 
 1. Read `.radcr/state/<run-id>.json`. If missing, error: `No resumable state found for run-id <run-id>. Starting fresh.` and fall through to Step 1.
-2. Rehydrate state variables from the JSON: `scope`, `strictness`, `engine`, `blame_aware`, `commit_hash`, `file_count`, `annotated_diff_context`, `accepted_risks`, `exclusions`, `automated_check_output`, `primary_findings`, `adversarial_findings`, `phase_completed`.
+2. Rehydrate state variables from the JSON: `scope`, `strictness`, `model`, `adversarial_model`, `blame_aware`, `commit_hash`, `file_count`, `annotated_diff_context`, `accepted_risks`, `exclusions`, `automated_check_output`, `primary_findings`, `adversarial_findings`, `phase_completed`.
 3. Jump directly to the step AFTER `phase_completed`:
    - `phase_completed: "step_5"` → jump to Step 6
    - `phase_completed: "step_7"` → jump to Step 8
@@ -89,7 +88,7 @@ After each of the following steps completes, write/overwrite `.radcr/state/<run-
 
 **Cleanup:** After a successful report write in Step 12, move the state file to `.radcr/state/completed/<run-id>.json` so future resumes don't accidentally target a finished run. Prune `completed/` entries older than 30 days.
 
-**Why this matters on Opus 4.7:** deep reviews of 500+ file repos can trip compaction mid-flight. Without checkpoints, the orchestrator loses track of findings and must restart. With checkpoints, resume is one flag.
+**Why this matters on Opus:** deep reviews of 500+ file repos can trip compaction mid-flight. Without checkpoints, the orchestrator loses track of findings and must restart. With checkpoints, resume is one flag.
 
 ---
 
@@ -149,7 +148,7 @@ If NOT present, proceed with defaults. Note in report: "No .radcrconfig.yml foun
 
 ## Step 3: Detect Project Context
 
-**Execution: parallel-first.** Steps 3a (metadata), 3b (stack detection reads), 3d (trust boundary greps), and 3e (file list commands) have no inter-step dependencies and MUST be issued as a single parallel batch. On Opus 4.7 and Sonnet 4.6 this cuts Step 3 wall-time ~4–6×. Step 3c (classification) and Step 3f (blame context) depend on 3a/3b/3e output and run after the parallel batch resolves. Haiku may serialize if batching misbehaves.
+**Execution: parallel-first.** Steps 3a (metadata), 3b (stack detection reads), 3d (trust boundary greps), and 3e (file list commands) have no inter-step dependencies and MUST be issued as a single parallel batch. On Opus and Sonnet this cuts Step 3 wall-time ~4–6×. Step 3c (classification) and Step 3f (blame context) depend on 3a/3b/3e output and run after the parallel batch resolves. Haiku may serialize if batching misbehaves.
 
 Run the following detection steps:
 
@@ -346,7 +345,7 @@ Also load universal references:
 
 If NOT --local-only, and tools are available:
 
-**Execution: parallel-first.** All checks below (5a–5e) are independent and should run concurrently. Use `run_in_background: true` on the Bash tool to start each check, then read their outputs once all have completed. Each check gets a per-command timeout (default 120s; configurable via `.radcrconfig.yml` `check_timeout_seconds`). A slow `npm audit` must not block `tsc` or `ruff`.
+**Execution: parallel-first.** All checks below (5a–5e, plus the 5g validator) are independent and should run concurrently. Use `run_in_background: true` on the Bash tool to start each check, then read their outputs once all have completed. Each check gets a per-command timeout (default 120s; configurable via `.radcrconfig.yml` `check_timeout_seconds`). A slow `npm audit` must not block `tsc` or `ruff`.
 
 Run only the checks that match the detected stack (from Step 3b) — do not spawn `cargo audit` on a Node project. Detect tool availability via presence of config files / lockfiles rather than `which`; failed commands exit 0 via `|| true`.
 
@@ -405,9 +404,29 @@ python -m build 2>/dev/null || true
 go build ./... 2>/dev/null || true
 ```
 
-### 5f: Aggregate & checkpoint
+### 5g: AI-Slop Mechanical Validator — Hallucinated Imports
 
-Collect results from all background commands. Build `automated_check_output` — a structured dict keyed by check name (`npm_audit`, `pip_audit`, `gitleaks`, `tsc`, `eslint`, `npm_test`, `npm_build`, etc.) with per-check: exit code, duration (ms), stdout (truncated to 50KB per check), stderr (truncated).
+Run the plugin's own validator (pure stdlib; runs offline, so it is NOT skipped in
+`--local-only` mode). Use `python3`, or `python` on Windows:
+
+```bash
+# blame-aware scopes — check only the changed files
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check-hallucinated-imports.py . --files <comma-separated changed files> --json || true
+# repo / tree / --full-scan scopes
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check-hallucinated-imports.py . --json || true
+```
+
+This is the deterministic pass for AI-slop Pattern #1 (hallucinated imports /
+slopsquatting): every external import is verified against the project's lockfiles, and
+every relative import against the disk. Its JSON findings (with `CR-HALLUC-NNN`
+id suggestions) join `automated_check_output` under the key `hallucinated_imports` —
+the primary-review subagent treats them as confirmed-severity evidence rather than
+re-deriving them. If Python is unavailable, record `hallucinated_imports: skipped
+(no python)` and let the LLM pass cover Pattern #1 on its own.
+
+### 5h: Aggregate & checkpoint
+
+Collect results from all background commands. Build `automated_check_output` — a structured dict keyed by check name (`npm_audit`, `pip_audit`, `gitleaks`, `tsc`, `eslint`, `npm_test`, `npm_build`, `hallucinated_imports`, etc.) with per-check: exit code, duration (ms), stdout (truncated to 50KB per check), stderr (truncated).
 
 Write checkpoint to `.radcr/state/<run-id>.json` with `phase_completed: "step_5"` and the aggregated output.
 
@@ -419,12 +438,12 @@ Resolve the primary-review model in this order (first match wins):
 
 1. `--model <name>` CLI argument
 2. `.radcrconfig.yml` `review_model` field
-3. Default: **`opus`** (Opus 4.7 — best for deep reasoning, adversarial protocol, severity calibration)
+3. Default: **`opus`** (Opus — best for deep reasoning, adversarial protocol, severity calibration)
 
 Fallback guidance:
-- **Opus 4.7** — default. Best reasoning quality; recommended for production/public strictness.
-- **Sonnet 4.6** — drop-in for cost-sensitive reviews or quick PR scans. Retains adversarial rigor.
-- **Haiku 4.5** — only for narrow blame-aware diffs (≤20 changed files) with `--local-only`. Too fast to over-think but also too fast to execute the full 10-category checklist reliably on wide scopes.
+- **Opus** — default. Best reasoning quality; recommended for production/public strictness.
+- **Sonnet** — drop-in for cost-sensitive reviews or quick PR scans. Retains adversarial rigor.
+- **Haiku** — only for narrow blame-aware diffs (≤20 changed files) with `--local-only`. Too fast to over-think but also too fast to execute the full 10-category checklist reliably on wide scopes.
 
 Record the chosen model in the run state and in the final report.
 
@@ -440,7 +459,7 @@ Read `${RADCR_DIR}/references/subagent-prompts/primary-review.md`. Substitute pl
 | `{strictness}` | Step 0 |
 | `{trust_boundaries}` | Step 3d |
 | `{exclusions}`, `{accepted_risks}` | Step 2 (active, non-stale only) |
-| `{automated_check_output}` | Step 5f |
+| `{automated_check_output}` | Step 5h |
 | `{annotated_diff_context_json}` | Step 3f (only if blame_aware) |
 | `{scoped_file_list}` | Step 3e |
 
@@ -490,15 +509,13 @@ Otherwise, continue to Step 8.
 
 Resolve adversarial model:
 
-1. `--adversarial-model <name>` CLI arg
-2. Default based on engine mode:
-   - `engine = "both"` → Opus 4.7 (cross-check reasoning)
-   - `engine = "claude"` or `engine = "codex"` → same model as primary (self-adversarial — uncovers the primary's own blind spots without introducing a different model's biases)
+1. `--adversarial-model <name>` CLI arg → if it differs from the primary model, this is a **cross-model** pass (a different model family challenges the primary's findings — catches blind spots redundancy can't).
+2. Default: same model as primary (**self-adversarial** — uncovers the primary's own blind spots without introducing a different model's biases).
 
 ### 8.2 Load externalized prompt
 
-- `engine = "both"` → read `${RADCR_DIR}/references/subagent-prompts/adversarial-review.md`
-- otherwise → read `${RADCR_DIR}/references/subagent-prompts/self-adversarial-review.md`
+- cross-model (adversarial model ≠ primary model) → read `${RADCR_DIR}/references/subagent-prompts/adversarial-review.md`
+- self-adversarial (same model) → read `${RADCR_DIR}/references/subagent-prompts/self-adversarial-review.md`
 
 Substitute placeholders:
 
@@ -564,7 +581,7 @@ This path is what the `code-reviewer` agent uses when it invokes the skill, and 
 ```
 ## Review Complete
 
-**Scope:** {scope} | **Strictness:** {strictness} | **Engine:** {engine}
+**Scope:** {scope} | **Strictness:** {strictness} | **Model:** {model}{IF adversarial model differs} (adversarial: {adversarial_model}){ENDIF}
 **Scan mode:** {blame_aware ? "blame-aware (changed lines only)" : "full-scan"}
 **Commit:** {commit_hash}
 {IF since_commit}**Since:** {since_commit}{ENDIF}
@@ -597,28 +614,28 @@ What would you like to do?
 
 Fix Findings
   1. Fix all blockers
-  2. Fix specific findings          (I'll ask which RADCRs)
+  2. Fix specific findings          (I'll ask which CR IDs)
   3. Get details on a finding       (I'll ask which one)
 
 Accept Findings  ← marks as intentional; won't affect verdict, tracked in .radcrconfig.yml
-  4. Accept specific findings       (I'll ask which RADCRs)
+  4. Accept specific findings       (I'll ask which CR IDs)
   5. Accept all minor findings
 
 View
   6. Show new findings only         (compares against your previous review)
 
-Or type a RADCR ID directly (e.g. RADCR-003), or ask me anything about the findings.
+Or type a CR ID directly (e.g. CR-003), or ask me anything about the findings.
 ```
 
 ### Option 1: Fix all blockers
 Load and execute `${RADCR_DIR}/workflows/offer-fixes.md` with preset `blockers`.
 
 ### Option 2: Fix specific findings
-Prompt: `Which RADCR IDs would you like to fix? Enter IDs separated by commas (e.g. RADCR-001, RADCR-003).`
+Prompt: `Which CR IDs would you like to fix? Enter IDs separated by commas (e.g. CR-001, CR-003).`
 Load and execute `${RADCR_DIR}/workflows/offer-fixes.md` with the specified IDs.
 
 ### Option 3: Get details on a finding
-Prompt: `Which RADCR ID would you like more details on?`
+Prompt: `Which CR ID would you like more details on?`
 Display the full finding entry for that ID: description, evidence, impact, recommendation, and references.
 Return to the menu.
 
@@ -626,14 +643,14 @@ Return to the menu.
 
 Prompt:
 ```
-Which findings would you like to accept? Enter RADCR IDs separated by commas.
-(e.g. RADCR-004, RADCR-007)
+Which findings would you like to accept? Enter CR IDs separated by commas.
+(e.g. CR-004, CR-007)
 ```
 
 Validate that each provided ID exists in the current report's findings list.
 If any ID is not found, respond:
 ```
-These IDs were not found in the current report: RADCR-XXX
+These IDs were not found in the current report: CR-XXX
 Please check the finding IDs above and try again.
 ```
 Re-prompt until all IDs are valid or the user cancels.
@@ -733,7 +750,7 @@ Return to menu.
 Otherwise, list them:
 ```
 Found {N} minor findings:
-{list of RADCR IDs and titles}
+{list of CR IDs and titles}
 
 Optional: add a brief note on why these are intentional? Press Enter to skip.
 ```
@@ -764,9 +781,9 @@ Return to menu without filtering.
 
 **If a previous report exists**:
 - Read the most recent report file from `.radcr/history/`
-- Extract all RADCR IDs present in that report (grep for `RADCR-[0-9]+` pattern)
-- Identify the scope and strictness used in the previous report from its filename (format: `YYYY-MM-DD-{scope}-{strictness}.md`)
-- Filter current findings to those whose ID does NOT appear in the previous report
+- Extract each previous finding's **fingerprint** (or title + file paths for pre-fingerprint reports). **Never compare by bare finding ID** — IDs restart each run, so ID matching produces false "already known" collisions.
+- Identify the scope and strictness used in the previous report from its filename (format: `YYYY-MM-DD-{HHmmss}-{scope}-{strictness}.md`)
+- Filter current findings to those with NO fingerprint (or title+file) match in the previous report, per the matching criteria in `report-generation.md` §4
 
 If the previous report used a different scope than the current review, note:
 ```
@@ -783,7 +800,7 @@ Already known:       {matched} (not shown)
 New this review:     {new_count}
 
 ─────────────────────────────────────────
-{new findings only, formatted as: [SEVERITY] RADCR-NNN — Title}
+{new findings only, formatted as: [SEVERITY] CR-NNN — Title}
 ─────────────────────────────────────────
 ```
 
@@ -800,8 +817,8 @@ in the previous report.
 
 Redisplay the menu scoped to the new findings (options 1-5 operate on the filtered set).
 
-### RADCR ID typed directly
-If the user types a RADCR ID (matches pattern `RADCR-[0-9]+`), display the full finding detail for that ID (same as Option 3). Return to menu.
+### CR ID typed directly
+If the user types a CR ID (matches pattern `CR-[0-9]+`), display the full finding detail for that ID (same as Option 3). Return to menu.
 
 ### Free text / question
 Answer the question using the current findings as context. Return to menu.
@@ -830,7 +847,7 @@ Load the fix workflow:
       - If linter is configured, run it on affected files
       - Verify the fix addresses the finding
    c. Commit: one commit per logical fix group
-      - Message format: `fix(radcr): {group description} [RADCR-{ids}]`
+      - Message format: `fix(review): {group description} [CR-{ids}]`
 5. **After all fix groups**: Run final scoped re-review of affected areas
    plus blocker revalidation
 6. **Report deferred fixes**: List fixes that were deferred due to conflicts,
@@ -845,7 +862,11 @@ Load the report workflow:
 
 ### Report Generation Summary:
 
-Generate `rad-code-review-report.md` in the repository root using the report template.
+Generate the report using the report template and save it to
+`.radcr/history/{YYYY-MM-DD}-{HHmmss}-{scope}-{strictness}.md` — **not** to the
+repository root (v5.0: a loose root-level report is exactly the floating doc that
+repo-hygiene tooling flags). Print the path. Write a root-level
+`rad-code-review-report.md` copy only if the user explicitly asks.
 
 The report must include:
 1. Executive summary
@@ -914,7 +935,8 @@ Generate a triage report instead of the full report:
 5. **What works**: Be honest about what IS good. Don't make it a wall of negativity.
 6. **Realistic assessment**: How much work would it take to reach each strictness level?
 
-Save triage report as `rad-code-review-triage.md` in repo root.
+Save the triage report to `.radcr/history/{YYYY-MM-DD}-{HHmmss}-{scope}-triage.md`
+and print the path (root copy only on explicit request, same rule as Step 12).
 
 ## Step 13: Wrap Up
 
@@ -929,8 +951,7 @@ After report generation:
 ```
 ## Review Complete
 
-Report saved: rad-code-review-report.md
-History saved: .radcr/history/{filename}
+Report saved: .radcr/history/{filename}
 
 Reviewed at commit: {hash}
 This report reflects the codebase at that point in time.

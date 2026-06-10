@@ -1,8 +1,8 @@
 # RAD Code Review
 
-**3-role adversarial review with diff-aware scoping and AI slop detection — the only code reviewer that catches what AI wrote badly and only flags what you changed.**
+**3-role adversarial review with diff-aware scoping and AI slop detection — built specifically to catch what AI wrote badly, and to flag only what you changed.**
 
-## What's New in v2.0
+## The Diff-Awareness Foundation (v2.0)
 
 | Feature | v1.0 | v2.0 |
 |---------|------|------|
@@ -55,8 +55,8 @@ claude plugins add ./plugins/rad-code-review
 # Strict mode for public release
 /rad-code-review repo --strictness public
 
-# Dual-engine adversarial review
-/rad-code-review diff --engine both
+# Cross-model adversarial review (a different model challenges the findings)
+/rad-code-review diff --adversarial-model sonnet
 ```
 
 Or just say it naturally:
@@ -95,13 +95,14 @@ When reviewing a diff or commit, v2.0 only flags issues on lines you changed. Th
 | `production` | Full review across all 12 dimensions. Default. |
 | `public` | Everything in production plus: public API surface, docs completeness, license compliance, security hardening. |
 
-### Engine Options
+### Adversarial Pass Options
 
-| Engine | Behavior |
-|--------|----------|
-| `claude` | Single-pass review using Claude. Default. |
-| `codex` | Single-pass review using Codex. |
-| `both` | Sequential adversarial: Claude reviews first, then Codex challenges findings and hunts for what was missed. |
+| Mode | How | Behavior |
+|------|-----|----------|
+| Self-adversarial | default | The same model re-attacks its own findings — challenges, validates blame-scoping, hunts for misses. |
+| Cross-model | `--adversarial-model <name>` | A different model family runs the challenge pass — catches blind spots self-review can't. |
+
+(v5.0 removed the old `--engine claude|codex|both` flag — it implied Codex execution that was never implemented. `--adversarial-model` is the honest cross-model equivalent.)
 
 ## What It Reviews
 
@@ -148,7 +149,7 @@ version: 1
 defaults:
   scope: diff
   strictness: production
-  engine: claude
+  review_model: opus
 
 project_type: web-app
 
@@ -182,13 +183,15 @@ User triggers review
         +-- Computes blame-aware diff context (if applicable)
         |
         v
-   Pre-review scripts (parallel)
-        +-- dep-audit.sh    -> dependency vulnerabilities
-        +-- license-check.sh -> license compliance
-        +-- secrets-scan.sh  -> secret detection
+   Automated checks (parallel)
+        +-- npm audit / pip-audit / cargo audit -> dependency vulnerabilities
+        +-- license-checker / pip-licenses      -> license compliance
+        +-- gitleaks                            -> secret detection
+        +-- tsc / eslint / project tests        -> existing project tools
+        +-- check-hallucinated-imports.py       -> mechanical AI-slop Pattern #1 (offline)
         |
         v
-   Primary review (Engine 1)
+   Primary review (Opus subagent by default)
         +-- Receives annotated diff + blame context
         +-- 12-dimension analysis scoped to changed lines
         +-- Framework-specific IDOR heuristics
@@ -197,7 +200,7 @@ User triggers review
         +-- AI slop detection (14 patterns)
         |
         v
-   Adversarial pass (Engine 2 or self-adversarial)
+   Adversarial pass (self-adversarial, or cross-model via --adversarial-model)
         +-- Challenges findings
         +-- Validates blame-scoping decisions
         +-- Hunts for missed issues
