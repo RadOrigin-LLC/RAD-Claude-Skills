@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Curated marketplace of Claude Code plugins for developer frameworks, productivity, accessibility, SEO, and DevOps. Each plugin is built for a specific job — code review, project planning, accessibility audits, secret management, Coolify ops, and so on — with explicit honesty about what each does and doesn't do. Pair them where it makes sense; use them standalone where it doesn't. Version history lives in CHANGELOG.md.",
-    "version": "1.25.0",
+    "version": "1.26.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -37,7 +37,7 @@
     {
       "name": "rad-coolify-orchestrator",
       "source": "./plugins/rad-coolify-orchestrator",
-      "description": "End-to-end Coolify self-hosted PaaS management — deployments, databases, security, CI/CD, troubleshooting, observability, and multi-server infrastructure. Coolify v4 self-hosted.",
+      "description": "End-to-end Coolify self-hosted PaaS management — deployments, databases, security, CI/CD, troubleshooting, observability, multi-server infrastructure, live MCP-backed actions (36 tools), status dashboard, and auto-linting of Dockerfile/compose edits. Coolify v4 self-hosted.",
       "category": "devops",
       "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-coolify-orchestrator",
       "license": "Apache-2.0"
