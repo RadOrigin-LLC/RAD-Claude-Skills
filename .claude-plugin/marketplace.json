@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Curated marketplace of Claude Code plugins for developer frameworks, productivity, accessibility, SEO, and DevOps. Each plugin is built for a specific job — code review, project planning, accessibility audits, secret management, Coolify ops, and so on — with explicit honesty about what each does and doesn't do. Pair them where it makes sense; use them standalone where it doesn't. Version history lives in CHANGELOG.md.",
-    "version": "1.24.0",
+    "version": "1.25.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
     {
       "name": "rad-code-review",
       "source": "./plugins/rad-code-review",
-      "description": "3-role adversarial code review with diff-aware scoping and AI slop detection — blame-aware diff filtering, framework-specific IDOR heuristics, 14 AI slop patterns, performance profiling, WCAG 2.2 dynamic ARIA state detection, interactive findings management with accept/filter/fix workflow, and severity-ranked findings with optional fix application.",
+      "description": "3-role adversarial code review for Claude Code — Opus default, Sonnet/Haiku compatible. Parallel tool-call pipeline, JSON-first subagent output, compaction-safe checkpointing with `--resume`, and `--non-interactive` mode for agents/CI. Blame-aware diff scoping, 14-pattern AI slop detection (hallucinated imports, fake error handling, ghost type assertions, mock-shaped fallbacks, etc.), framework-specific IDOR for Next.js / Express / Fastify / Django / Rails / Go, WCAG 2.2 + dynamic ARIA state detection, performance heuristics, severity-ranked findings with release verdict, and accepted-risk expiry enforcement. Includes a `code-reviewer` agent for proactive autonomous review.\n\nv5.0: finding IDs shortened to `CR-NNN` (config/state paths unchanged); the hallucinated-imports validator is now wired into the automated-checks phase (offline, lockfile-verified, runs even in --local-only); history comparison matches findings across runs by fingerprint (category+file+title) instead of per-run IDs, making \"show new findings only\" trustworthy; the never-implemented `--engine claude|codex|both` flag removed in favor of the real `--adversarial-model <name>` cross-model challenge pass; reports save to `.radcr/history/` only (no loose root-level report file).\n\nBacked by `check-hallucinated-imports.py` — a pure-stdlib Python 3.8+ script that parses 9 lockfile formats (package-lock.json, yarn.lock, pnpm-lock.yaml, package.json deps, requirements.txt, pyproject.toml, Pipfile.lock, poetry.lock, uv.lock), extracts imports via Python `ast` + JS/TS regex, and flags packages not declared in any lockfile (slopsquatting risk). Runs standalone or in the orchestrator's Step 5g.",
       "category": "development",
       "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-code-review",
       "license": "Apache-2.0"
