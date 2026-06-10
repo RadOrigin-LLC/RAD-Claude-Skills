@@ -136,6 +136,15 @@ When conversations approach context limits, summarize while preserving:
 3. Extract key decisions/facts into structured notes
 4. Start a fresh context window with state loaded from files
 
+**Resets over compaction for long-horizon work (current guidance).** Anthropic's
+harness-design guidance (Mar 2026) now favors option 4 — a clean **context reset
+with a handoff artifact** — over in-context summarization for long-running
+agents: "A reset provides a clean slate, at the cost of the handoff artifact
+having enough state for the next agent to pick up the work cleanly." Related
+named failure: **context anxiety** — models prematurely wrap up work as they
+approach perceived context limits. Design the handoff artifact (plan file +
+status log + git history) so a cold start loses nothing.
+
 ### Structured Note-Taking (Agentic Memory)
 
 Have agents write notes persisted outside the context window. Reintroduce
@@ -195,6 +204,26 @@ For tasks too large for a single context window:
    for autonomous correctness checking
 5. **Encourage full usage:** "Continue working systematically until you have
    completed this task" prevents premature stopping
+
+### Completion Gating (stop-condition ladder)
+
+"Claude stops when the work looks done. Without a check it can run, 'looks
+done' is the only signal available, and you become the verification loop."
+Official options, weakest to strongest:
+
+1. **In one prompt** — ask Claude to run the check and iterate in the same message
+2. **`/goal` condition** — a separate evaluator re-checks the condition after
+   every turn; Claude keeps working until it holds. The evaluator runs no
+   commands — the condition must be provable from the agent's own output
+3. **Stop hook** — a deterministic script blocks the turn from ending until it
+   passes (the harness overrides after 8 consecutive blocks)
+4. **Verification subagent** — a fresh model tries to refute the result, so the
+   agent doing the work isn't the one grading it (self-assessment bias is
+   documented: generators "confidently praise the work" even when mediocre)
+
+Always: "Have Claude show evidence rather than asserting success."
+For authoring goal conditions and loop prompts, use the
+**loop-goal-engineering** skill in this plugin.
 
 ---
 

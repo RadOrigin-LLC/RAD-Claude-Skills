@@ -36,6 +36,11 @@ that's fast mode. If they say "help me design the system prompt for my customer
 support agent," that's design mode. When ambiguous, start fast and escalate if the
 task proves complex.
 
+**Hand-off**: if the deliverable is an agentic LOOP prompt (re-run each iteration),
+a GOAL/completion condition (`/goal`, Codex Goal Mode, Stop hook), or a long-horizon
+scaffold, use the **loop-goal-engineering** skill instead — those artifacts have their
+own anatomy and linter.
+
 ---
 
 ## Hard Rules — NEVER Violate
@@ -249,10 +254,26 @@ For the complete technique catalog with structural examples, read `references/te
 
 1. Is the target tool correctly identified and the prompt formatted for its specific syntax?
 2. Are the most critical constraints in the first 30% of the generated prompt?
-3. Does every instruction use the strongest signal word? MUST over should. NEVER over avoid.
+3. Is emphasis calibrated to the target model? Current-generation models (Claude 4.5+,
+   GPT-5.x) over-trigger on aggressive emphasis — reserve MUST/NEVER/CRITICAL for genuine
+   hard rules (2-3 per prompt max) and use plain imperatives ("Use this tool when...") for
+   everything else. Older/smaller models may still need the stronger signal words.
 4. Has every fabricated technique been removed?
 5. Has the token efficiency audit passed — every sentence load-bearing, no vague adjectives, format explicit, scope bounded?
 6. Would this prompt produce the right output on the first attempt?
+
+For system prompts, CLAUDE.md/AGENTS.md files, and other durable prompts, also run the
+mechanical linter and fix critical/warning findings before delivering:
+
+```bash
+PY=$(command -v python3 || command -v python)
+echo "<draft prompt>" | "$PY" "${CLAUDE_PLUGIN_ROOT}/scripts/lint-prompt.py" - --json
+```
+
+It catches what eyeballing misses: missing role frame, vague instructions, unbounded
+length adjectives, conflicting output formats, excessive MUST/ALWAYS/NEVER emphasis,
+superhuman-role framing, and imperative collisions. Exit 1 means findings exist — that's
+signal, not failure. Skip it for short one-shot prompts where the overhead isn't worth it.
 
 **Success criteria**: The user pastes the prompt into their target tool. It works on
 the first try. Zero re-prompts needed. That is the only metric.

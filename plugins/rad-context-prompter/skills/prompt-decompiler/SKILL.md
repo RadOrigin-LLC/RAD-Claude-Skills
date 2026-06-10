@@ -317,7 +317,7 @@ Part 5. Scan for critical red flags first, then moderate, then minor.
 - **Escalate to prompt-debugger agent**: When the user provides a prompt-output pair showing
   unexpected behavior, when multiple interacting failure modes are suspected, when the prompt
   is for an agentic system with complex failure modes, or when root cause requires tracing
-  through the failure taxonomy (F1-F7).
+  through the failure taxonomy (F1-F8).
 
 ### Inline Diagnosis Output
 

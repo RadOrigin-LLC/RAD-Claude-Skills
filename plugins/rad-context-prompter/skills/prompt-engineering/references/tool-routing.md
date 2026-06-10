@@ -6,7 +6,7 @@ optimization tips for that target.
 
 ---
 
-### Claude (claude.ai, Claude API, Claude 4.x)
+### Claude (claude.ai, Claude API, Claude 4.x and newer)
 
 - Be explicit and specific — Claude follows instructions literally, not by inference
 - XML tags for complex multi-section prompts: `<context>`, `<task>`, `<constraints>`, `<output_format>`
@@ -14,7 +14,7 @@ optimization tips for that target.
 - Always specify output format and length explicitly
 - Use `references/context-engineering.md` for system prompt design, tool descriptions, and agentic architectures
 
-**Claude 4.5 / 4.6 specifics:**
+**Current-generation specifics (Claude 4.5 and newer):**
 - More concise by default. Don't add "be concise" — it's the baseline. Ask explicitly for thorough output when needed.
 - Responsive to system prompts. Dial back aggressive language. Replace "CRITICAL: You MUST use this tool" with "Use this tool when..."
 - Adaptive thinking: use `thinking: {type: "adaptive"}` with effort levels (low/medium/high/max). Outperforms manual extended thinking.
@@ -85,12 +85,44 @@ optimization tips for that target.
 ### Claude Code
 - Agentic — runs tools, edits files, executes commands autonomously
 - Starting state + target state + allowed actions + forbidden actions + stop conditions + checkpoints
-- Stop conditions are MANDATORY — runaway loops are the biggest credit killer
-- Opus 4.x over-engineers — add "Only make changes directly requested. Do not add extra files, abstractions, or features."
+- Stop conditions are MANDATORY — runaway loops are the biggest credit killer. Route them to the official
+  ladder (weakest → strongest): in-prompt "run the check and iterate" → `/goal` condition (separate
+  evaluator re-checks after every turn) → Stop hook (deterministic script gate; harness overrides after
+  8 consecutive blocks) → verification subagent (fresh model tries to refute the result)
+- `/goal` conditions: one measurable end state + a stated proof command + constraints + a turn bound.
+  The evaluator runs no commands itself — instruct the agent to SHOW evidence (command output) in its
+  response. For authoring these, use the **loop-goal-engineering** skill
+- `/loop` re-runs a prompt on an interval or self-paced — loop prompts must be idempotent, one task per
+  iteration, state in files/git (see loop-goal-engineering skill)
+- Have Claude show evidence rather than asserting success
+- Opus over-engineers — add "Only make changes directly requested. Do not add extra files, abstractions, or features."
 - Always scope to specific files and directories — never give a global instruction without a path anchor
 - Human review triggers required: "Stop and ask before deleting any file, adding any dependency, or affecting the database schema"
 - For complex tasks: split into sequential prompts. Output Prompt 1 and add "Run this first, then ask for Prompt 2" below it
-- See `references/context-engineering.md` for sub-agent architecture, compaction, and multi-context-window workflows
+- Durable layering: CLAUDE.md = always-loaded quick-reference; skills = on-demand workflows (commands are
+  converging into skills via `disable-model-invocation: true`); hooks = deterministic, zero-exception actions.
+  "If Claude already does something correctly without the instruction, delete it or convert it to a hook."
+- See `references/context-engineering.md` for sub-agent architecture, compaction vs resets, and multi-context-window workflows
+
+### OpenAI Codex (CLI, IDE, cloud)
+- Official prompt skeleton — four elements: **Goal, Context, Constraints, "Done when"** (success criteria)
+- AGENTS.md is the durable layer (the CLAUDE.md equivalent): build/test commands, style rules, repo
+  etiquette. Hard mechanics: ~32 KiB default cap (`project_doc_max_bytes`), one file per directory,
+  root-to-cwd concatenation, nested files override parents. Don't stuff durable rules into one-off
+  prompts — OpenAI names this the #1 common mistake
+- `config.toml` (~/.codex/ and .codex/) is a separate control surface: approval mode, sandbox, model.
+  Start conservative, loosen per trusted repo
+- Goal Mode (`/goal`): outcome + TESTABLE success criteria; runs a plan-act-test loop autonomously.
+  Canonical stop idioms: "until the test suite is green", "until grep returns zero matches". Vague
+  goals are the documented failure mode (early surrender or endless flailing). Author conditions with
+  the **loop-goal-engineering** skill
+- Plan Mode (`/plan`) before coding on complex/ambiguous tasks — but never end a turn with only a plan:
+  "the deliverable is working code"
+- Show Codex how to run builds/tests or it can't self-verify
+- Long-horizon runs: use the PLANS.md / four-file scaffold (spec, plan, runbook, status log) with
+  per-milestone acceptance criteria and a stop-and-fix rule
+- Skills (SKILL.md) ≈ Claude Code skills; one thread per TASK, not per project (context bloat)
+- Scope discipline is explicit in OpenAI guidance: "Implement EXACTLY and ONLY what the user requests"
 
 ### Antigravity (Google's agent-first IDE, powered by Gemini 3 Pro)
 - Task-based prompting — describe outcomes, not steps
