@@ -1,7 +1,7 @@
 {
   "name": "rad-coolify-orchestrator",
-  "version": "2.0.0",
-  "description": "End-to-end Coolify self-hosted PaaS management — 8 skills covering deployments (Nixpacks/Dockerfile/Compose), databases, security, CI/CD, troubleshooting, observability, multi-server infrastructure, and live MCP-backed actions; coolify-reviewer agent (Opus 4.7 default) with 4 Python validators (lint-dockerfile, lint-compose, check-coolify-env, audit-cicd) that catch the patterns LLM eyeballing misses; bundled @radoriginllc/coolify-mcp (27 verified tools) for live operations against your Coolify instance. Covers Coolify v4 self-hosted (currently v4.0.0-beta.474, rolling beta). Honest about what's experimental (Sentinel, Swarm, Caddy proxy, Railpack-NOT-yet-shipped) and what's production-ready.",
+  "version": "2.1.0",
+  "description": "End-to-end Coolify self-hosted PaaS management — 9 skills covering deployments (Nixpacks/Dockerfile/Compose), databases, security, CI/CD, troubleshooting, observability, multi-server infrastructure, live MCP-backed actions, and a read-only status dashboard; coolify-reviewer agent (Opus default) with 4 Python validators (lint-dockerfile, lint-compose, check-coolify-env, audit-cicd) that catch the patterns LLM eyeballing misses; PostToolUse hook that auto-lints Dockerfile/compose edits; bundled @radoriginllc/coolify-mcp (36 tools, endpoints verified against the OpenAPI spec) for live operations against your Coolify instance. Covers Coolify v4 self-hosted (rolling beta — version-specific advice grounded via coolify_version). Honest about what's experimental (Sentinel, Swarm, Caddy proxy, Railpack-NOT-yet-shipped) and what's production-ready.",
   "author": {
     "name": "RAD",
     "url": "https://github.com/RadOrigin-LLC"

@@ -1,0 +1,17 @@
+{
+  "description": "Ambient Coolify guardrail: after Claude edits a Dockerfile or docker-compose file, the matching deterministic linter (lint-dockerfile.py / lint-compose.py) runs automatically and surfaces CRITICAL/WARNING findings as context. Silent on clean files, silent on non-Docker files, never blocks.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/post-edit-lint.py\" || python \"${CLAUDE_PLUGIN_ROOT}/hooks/post-edit-lint.py\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -123,14 +123,24 @@ Step 2: coolify_list_env_vars(uuid: "<APP_UUID>")
 coolify_create_env_var(
   uuid: "<APP_UUID>",
   key: "DATABASE_URL",
-  value: "postgresql://...",
-  is_build_time: false
+  value: "postgresql://..."
 )
 ```
 
-**Important**: After changing env vars, the app must be redeployed for changes to take effect:
+**Update an existing env var** (matched by key):
 ```
-coolify_restart_application(uuid: "<APP_UUID>")
+coolify_update_env_var(uuid: "<APP_UUID>", key: "DATABASE_URL", value: "postgresql://new-host...")
+```
+
+**Delete an env var** (needs the env var's own UUID, from the list call):
+```
+Step 1: coolify_list_env_vars(uuid: "<APP_UUID>")   → find the env var UUID
+Step 2: coolify_delete_env_var(uuid: "<APP_UUID>", env_uuid: "<ENV_UUID>")
+```
+
+**Important**: Env var changes take effect on the next **deploy**, not on restart — a restart reuses the existing container with the old values:
+```
+coolify_deploy(uuid: "<APP_UUID>")
 ```
 
 **Security reminder**: Never set secrets as build-time variables unless using Docker Build Secrets. See **coolify-security** skill for the decision tree.
@@ -155,6 +165,7 @@ For CPU/memory/disk metrics, the Coolify API does not expose Sentinel data — a
 
 **Applications**: `coolify_start_application`, `coolify_stop_application`, `coolify_restart_application`
 **Databases**: `coolify_start_database`, `coolify_stop_database`, `coolify_restart_database`
+**Services**: `coolify_start_service`, `coolify_stop_service`, `coolify_restart_service`
 
 Always confirm with the user before stopping production resources.
 
@@ -173,6 +184,12 @@ Step 4: coolify_deploy(uuid: "<APP_UUID>")
 
 For git-based apps, rollback by updating the branch or commit reference rather than the image tag.
 
+**Cancel a bad deploy in progress**: if a broken deployment is still building, cancel it instead of waiting it out:
+```
+Step 1: coolify_list_running_deployments         → find the in-progress deployment UUID
+Step 2: coolify_cancel_deployment(uuid: "<DEPLOYMENT_UUID>")
+```
+
 ## Workflow 10: Database Status and Backups
 
 **Intent**: "check my databases", "are backups running?", "database status"
@@ -180,9 +197,11 @@ For git-based apps, rollback by updating the branch or commit reference rather t
 ```
 Step 1: coolify_list_databases         → list all databases with status
 Step 2: coolify_get_database(uuid: "<DB_UUID>") → detailed config and backup info
+Step 3: coolify_list_database_backups(uuid: "<DB_UUID>")  → scheduled backup configs
+Step 4: coolify_list_backup_executions(uuid: "<DB_UUID>", scheduled_backup_uuid: "<BACKUP_UUID>") → run history
 ```
 
-The API shows database configuration. For triggering manual backups or checking backup history, use the Coolify dashboard — the backup execution API is available at `POST /api/v1/databases/{uuid}/backups`.
+Check the execution history for failed runs and the timestamp of the last successful backup. **Note**: the API manages *scheduled* backups (`POST /databases/{uuid}/backups` creates a schedule, not a one-off run) — triggering an immediate manual backup still requires the Coolify dashboard.
 
 ## Tool Quick Reference
 
@@ -192,12 +211,19 @@ The API shows database configuration. For triggering manual backups or checking 
 | Find an app | `coolify_list_applications` | — |
 | Deploy | `coolify_deploy` | `uuid`, `tag`, `force` |
 | Check deploy status | `coolify_get_deployment` | `uuid` (deployment UUID) |
+| Cancel a deploy | `coolify_cancel_deployment` | `uuid` (deployment UUID) |
+| What's deploying now | `coolify_list_running_deployments` | — |
 | View logs | `coolify_get_application_logs` | `uuid`, `lines` |
 | App details | `coolify_get_application` | `uuid` |
 | Restart | `coolify_restart_application` | `uuid` |
 | Env vars | `coolify_list_env_vars` | `uuid` |
-| Add env var | `coolify_create_env_var` | `uuid`, `key`, `value`, `is_build_time` |
+| Add env var | `coolify_create_env_var` | `uuid`, `key`, `value` |
+| Update env var | `coolify_update_env_var` | `uuid`, `key`, `value` |
+| Delete env var | `coolify_delete_env_var` | `uuid`, `env_uuid` |
 | Update app config | `coolify_update_application` | `uuid`, `settings` |
+| Service lifecycle | `coolify_start/stop/restart_service` | `uuid` |
+| Backup configs | `coolify_list_database_backups` | `uuid` |
+| Backup run history | `coolify_list_backup_executions` | `uuid`, `scheduled_backup_uuid` |
 | Server health | `coolify_get_server` | `uuid` |
 | Server resources | `coolify_get_server_resources` | `uuid` |
 
@@ -208,7 +234,7 @@ The API shows database configuration. For triggering manual backups or checking 
 | Deploying without checking current status first | May deploy over a running debug session or ongoing rollback |
 | Polling deployment status in a tight loop (< 5 seconds) | Overloads Coolify's database; use 10-15 second intervals |
 | Restarting apps to "fix" problems without checking logs first | Masks the root cause; problem recurs on next deploy |
-| Adding env vars without redeploying | Changes don't take effect until restart/redeploy |
+| Adding env vars without redeploying | Changes don't take effect until the next deploy — restarting is not enough |
 | Stopping a database without checking which apps depend on it | Apps crash with connection errors |
 | Using `force: true` on every deploy | Defeats build caching; 3-10x slower builds for no benefit |
 

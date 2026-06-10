@@ -5,7 +5,7 @@ Coolify is a self-hosted Heroku/Netlify alternative with its own patterns for Do
 ## Read this first: scope and honest framing
 
 - **Self-hosted only.** All content assumes self-hosted Coolify v4.x. **Coolify Cloud** (managed control plane, $5/month + $3/month per server, launched 2025) is a different product — many things differ.
-- **Coolify v4 is a rolling beta.** Latest as of April 2026 is `v4.0.0-beta.474` (~474 betas over 2 years). The v4.0.0 stable milestone hasn't been closed. Treat the API and UI as evolving — pin to a specific Coolify version for production automation.
+- **Coolify v4 is a rolling beta.** This plugin's content was last verified against `v4.0.0-beta.474` (April 2026); Coolify ships new betas constantly, so don't treat that as "latest" — when version-specific behavior matters, the plugin checks your actual instance via the MCP `coolify_version` tool instead of assuming. Pin to a specific Coolify version for production automation.
 - **No Kubernetes support.** Plugin covers Coolify's actual orchestration: single-server (default) and Docker Swarm (experimental in Coolify, but Swarm itself is supported by Mirantis through 2030).
 - **Sentinel is a metrics side-car, not full observability.** CPU/RAM/disk/network only. No log aggregation, no tracing, no APM. Add Grafana+Prometheus or external APM for real observability.
 - **"Zero-downtime" deploys have conditions** — single-container only (not docker-compose), no host port bindings, working healthcheck, volumes attachable to multiple containers. When conditions fail, Coolify falls back to recreate strategy (brief downtime).
@@ -29,11 +29,16 @@ Coolify is a self-hosted Heroku/Netlify alternative with its own patterns for Do
 | `coolify-infrastructure` | Multi-server, Docker Swarm (experimental, with bug notes), build servers |
 | `coolify-observability` | Sentinel (honest scope: metrics side-car only), notification channels, log drains (Axiom, Loki, New Relic, FluentBit), Uptime Kuma |
 | `coolify-troubleshoot` | 502/504 diagnosis, Traefik routing, container failures, deployment errors, SSL issues |
-| `coolify-actions` | MCP-based operational actions against a live Coolify instance — uses the bundled `@radoriginllc/coolify-mcp` (27 tools) |
+| `coolify-actions` | MCP-based operational actions against a live Coolify instance — uses the bundled `@radoriginllc/coolify-mcp` (36 tools) |
+| `coolify-status` | One-shot read-only "is everything up" dashboard — health, version, servers, resources, in-flight deployments |
 
 | Agent | Purpose |
 |---|---|
-| `coolify-reviewer` | Reviews Coolify configs, Dockerfiles, compose, env, and CI/CD. **2.0: runs 4 Python validators first (mechanism), then applies LLM judgment to what scripts can't see.** Opus 4.7 default. |
+| `coolify-reviewer` | Reviews Coolify configs, Dockerfiles, compose, env, and CI/CD. **2.0: runs 4 Python validators first (mechanism), then applies LLM judgment to what scripts can't see.** Opus default. |
+
+| Hook | Purpose |
+|---|---|
+| `post-edit-lint` (PostToolUse) | After Claude edits a Dockerfile or compose file, the matching linter runs automatically and surfaces CRITICAL/WARNING findings immediately — guardrails without invoking the reviewer. Silent on clean/non-Docker files, never blocks. |
 
 | Script | Purpose |
 |---|---|
@@ -43,6 +48,15 @@ Coolify is a self-hosted Heroku/Netlify alternative with its own patterns for Do
 | `scripts/audit-cicd.py` | CI/CD validator — curl without `--fail`, hardcoded webhook URLs/tokens, `:latest` tags, missing test gate, missing post-deploy status check |
 
 All scripts are pure Python 3.8+ stdlib. No `pip install` required.
+
+## What's NEW in 2.1
+
+- **MCP server expanded to 36 tools** (was 27): update/delete env vars, cancel deployment, list running deployments, service start/stop/restart, scheduled-backup configs + execution history. Closes the gaps where `coolify-actions` workflows promised intents the MCP couldn't perform.
+- **Two endpoint fixes in the MCP**: env vars now use the spec path `/applications/{uuid}/envs` (was `/environment-variables`, not in the OpenAPI spec); healthcheck tries `/health` with `/healthcheck` fallback for older instances.
+- **New `coolify-status` skill** — one-shot read-only dashboard (health → version → servers → resources → in-flight deploys), grounding version-specific advice on `coolify_version` instead of doc snapshots.
+- **New PostToolUse hook** — editing a Dockerfile/compose file auto-runs the matching linter and surfaces findings immediately.
+- **coolify-reviewer fixed and cross-platform**: validator invocation now uses `${CLAUDE_PLUGIN_ROOT}` (the previous `${plugin_root}` variable didn't exist, so Step 0 silently never ran), resolves `python3`/`python` portably, and no longer depends on `/tmp`.
+- **Env var guidance corrected**: changes take effect on the next *deploy* — a restart reuses the old container env.
 
 ## What's NEW in 2.0
 
@@ -67,7 +81,7 @@ The `coolify-reviewer` agent now runs four scripts as Step 0 before LLM judgment
 - **Old container accumulation in Swarm rolling updates** (Issue #8299, Feb 2026) — bug noted in `swarm-guide.md`.
 
 ### Platform pass
-- `coolify-reviewer` agent: **Opus 4.7 default** with Sonnet 4.6 fallback note
+- `coolify-reviewer` agent: **Opus default** with Sonnet fallback note
 - Mechanism-first execution model documented
 - JSON output mode for skill consumption alongside markdown for human reading
 
@@ -86,9 +100,9 @@ The `coolify-reviewer` agent now runs four scripts as Step 0 before LLM judgment
 claude plugins add ./RAD-Claude-Skills/plugins/rad-coolify-orchestrator
 ```
 
-### Bundled MCP server (verified — 27 tools)
+### Bundled MCP server (36 tools)
 
-This plugin bundles [`@radoriginllc/coolify-mcp`](https://www.npmjs.com/package/@radoriginllc/coolify-mcp) — published on npm at v1.0.0, 27 verified tools across health/version, servers, projects, applications, deployments, env vars, databases, services, and resources. Set two environment variables and the MCP auto-configures when you install the plugin:
+This plugin bundles [`@radoriginllc/coolify-mcp`](https://www.npmjs.com/package/@radoriginllc/coolify-mcp) — v1.1.0, 36 tools across health/version, servers, projects, applications, deployments (incl. cancel + running list), env vars (full CRUD), databases (incl. backup configs + execution history), services (incl. lifecycle), and resources. All endpoints verified against Coolify's OpenAPI spec. Set two environment variables and the MCP auto-configures when you install the plugin:
 
 ```bash
 export COOLIFY_URL=https://your-coolify-instance.example.com
@@ -99,6 +113,7 @@ export COOLIFY_API_TOKEN=your-api-token
 
 ```
 Review my Coolify deployment config         # → coolify-reviewer agent (runs scripts + LLM judgment)
+Is everything up on Coolify?                # → coolify-status (read-only dashboard)
 Why is my deployment failing?               # → coolify-troubleshoot
 Set up CI/CD for Coolify                    # → coolify-cicd
 Is my Dockerfile ready for Coolify?         # → coolify-reviewer (lint-dockerfile.py + judgment)

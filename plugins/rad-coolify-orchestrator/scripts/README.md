@@ -90,6 +90,10 @@ python3 scripts/audit-cicd.py <path> --json
 
 **Exit codes:** `0` clean, `1` issues found, `2` script error.
 
+## When the hook runs these (new in 2.1)
+
+The `post-edit-lint` PostToolUse hook (`hooks/post-edit-lint.py`) runs `lint-dockerfile.py` or `lint-compose.py` automatically whenever Claude edits a `Dockerfile*` or `*compose*.yml/.yaml` file in any project, and surfaces CRITICAL/WARNING findings as context immediately. SUGGESTION-level findings are excluded from hook output to keep the signal high — run the agent for the full report. The hook is silent on clean files and non-Docker files, and never blocks.
+
 ## When the agent runs these
 
 The `coolify-reviewer` agent is updated in 2.0 to invoke these scripts as Step 0 (before LLM-based passes), then apply LLM judgment only to what scripts can't see (e.g., is the healthcheck endpoint actually checking dependencies, is the Traefik routing semantically correct, etc.). Same pattern as rad-planner's risk-assessor:

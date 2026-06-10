@@ -1,6 +1,6 @@
 {
   "name": "@radoriginllc/coolify-mcp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MCP server wrapping the Coolify REST API — manage deployments, applications, databases, services, and infrastructure from Claude Code or any MCP client",
   "type": "module",
   "main": "index.js",

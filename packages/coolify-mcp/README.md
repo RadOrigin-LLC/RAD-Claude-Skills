@@ -72,12 +72,18 @@ COOLIFY_URL=https://coolify.example.com COOLIFY_API_TOKEN=your-token npx @radori
 | `coolify_deploy` | Trigger a deployment by UUID or tag |
 | `coolify_get_deployment` | Get deployment status and logs |
 | `coolify_list_deployments` | List recent deployments for an application |
+| `coolify_cancel_deployment` | Cancel a queued or in-progress deployment |
+| `coolify_list_running_deployments` | List all currently running deployments |
 
 ### Environment Variables
 | Tool | Description |
 |------|-------------|
 | `coolify_list_env_vars` | List environment variables for an application |
 | `coolify_create_env_var` | Create a new environment variable |
+| `coolify_update_env_var` | Update an existing environment variable (by key) |
+| `coolify_delete_env_var` | Delete an environment variable (by env var UUID) |
+
+Env var changes take effect on the next deploy (`coolify_deploy`), not on restart.
 
 ### Databases
 | Tool | Description |
@@ -87,12 +93,17 @@ COOLIFY_URL=https://coolify.example.com COOLIFY_API_TOKEN=your-token npx @radori
 | `coolify_start_database` | Start a stopped database |
 | `coolify_stop_database` | Stop a running database |
 | `coolify_restart_database` | Restart a database |
+| `coolify_list_database_backups` | List scheduled backup configurations |
+| `coolify_list_backup_executions` | List execution history for a scheduled backup |
 
 ### Services
 | Tool | Description |
 |------|-------------|
 | `coolify_list_services` | List all one-click services |
 | `coolify_get_service` | Get service details |
+| `coolify_start_service` | Start a stopped service |
+| `coolify_stop_service` | Stop a running service |
+| `coolify_restart_service` | Restart a service |
 
 ### Resources
 | Tool | Description |
