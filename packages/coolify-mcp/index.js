@@ -2,6 +2,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import { createRequire } from "node:module";
+
+const { version: PKG_VERSION } = createRequire(import.meta.url)("./package.json");
 
 const COOLIFY_URL = process.env.COOLIFY_URL;
 const COOLIFY_API_TOKEN = process.env.COOLIFY_API_TOKEN;
@@ -76,7 +79,7 @@ function err(e) {
 
 const server = new McpServer({
   name: "coolify",
-  version: "1.0.0",
+  version: PKG_VERSION,
 });
 
 // --- Health & Version ---
