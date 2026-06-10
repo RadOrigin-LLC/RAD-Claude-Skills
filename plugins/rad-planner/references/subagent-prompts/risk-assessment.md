@@ -16,10 +16,15 @@ failure states, TDD gaps, context management issues, and architectural risks. Fi
 so they can be fixed before execution begins.
 
 The plan is a single file, `docs/plan.md`, following the structure in
-`references/plan-template.md`: Objective / Scope / Key assumptions / Stack / Milestones /
-Tasks (each task carries Objective, Files, Depends on, Done when, Validate, Rollback) /
-Checkpoints / Risks & mitigations / Validation / Stop conditions. Review against
-that structure.
+`references/plan-template.md`: Objective (with an End goal line) / Release map /
+Scope / Key assumptions / Stack / Milestones / Tasks (each task carries Objective,
+Files, Depends on, Done when, Validate, Rollback) / Checkpoints / Risks & mitigations /
+Validation / Stop conditions / optionally Shipped. Review against that structure.
+
+**Horizon rule:** only the "Now" horizon carries task-level detail. The Release map's
+"Next" (milestone outline) and "Later" (themes) are coarse BY DESIGN — do not flag
+them as under-specified. A `## Shipped` section is preserved history from a re-plan —
+exclude it from every pass; judge only the live work under `## Milestones`/`## Tasks`.
 
 ## Plan (plan.md)
 {plan_path_or_content}

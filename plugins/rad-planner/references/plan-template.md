@@ -1,6 +1,6 @@
 # Plan Output Template — single-file `plan.md`
 
-rad-planner emits **one** plan file: `docs/plan.md` (created if absent; updated in place if a plan already exists there or at a detected legacy path). Everything the planning conversation produces — objective, scope, assumptions, stack, milestones, tasks, checkpoints, risks — folds into this one file as sections. No separate `tasks.md`, no strategic-doc tree.
+rad-planner emits **one** plan file: `docs/plan.md` (created if absent; updated in place if a plan already exists there or at a detected legacy path). Everything the planning conversation produces — objective, end goal, release map, scope, assumptions, stack, milestones, tasks, checkpoints, risks — folds into this one file as sections. No separate `tasks.md`, no strategic-doc tree. It is written for two readers at once: the plain-language layer (How-to-read note, Release map, *After this ships* lines) for the human; the six-field task blocks for the coding agent.
 
 A second file, `docs/[date]-update-prompt.md`, is written **only when** the conversation surfaces a change that belongs in a durable doc the planner does not own (PRD / product contract, decision log, architecture). See "Update-prompt template" below.
 
@@ -18,10 +18,31 @@ A second file, `docs/[date]-update-prompt.md`, is written **only when** the conv
 <!-- Add the next line ONLY when an update-prompt was written this session: -->
 **Pending durable-doc updates:** see `[YYYY-MM-DD]-update-prompt.md`
 
+> **How to read this plan:** the Release map says where this effort fits on the road
+> to the end goal. Milestones are the chunks of work, each with an *After this ships*
+> line saying what you can do once it lands. The task blocks underneath are precise
+> instructions for the coding agent — you don't need to parse every field. Stop
+> conditions are where the agent must halt and ask you instead of guessing.
+
 ## Objective
 
 [1–2 sentences: what this builds and why now. The "why now" separates a real
 project from a someday-maybe.]
+
+**End goal:** [One sentence — the truly-done state from Discovery, beyond this
+plan's MVP. Anchors the Release map's "Later".]
+
+## Release map
+
+[Detail decays with distance — by design. Only "Now" gets milestones and tasks
+below; speccing distant versions in task detail is fake precision. Pulling "Next"
+into detail is a /rad-planner:replan event when "Now" ships.]
+
+- **Now — [MVP/Beta name] (this plan):** [one sentence — what ships and for whom]
+- **Next — V1:** [milestone-level outline, 3–6 bullets; no task specs]
+  - [outline bullet]
+- **Later — the end goal:** [theme bullets anchored to the End goal line]
+  - [theme bullet]
 
 ## Scope
 
@@ -57,6 +78,8 @@ aim for 2–3 tasks per milestone; a milestone over 5 tasks is a split candidate
 ## Tasks
 
 ### M1 — [theme]
+
+*After this ships: [plain English — what the user can do or see once M1 lands.]*
 
 - **T1 — [title]**
   - **Objective:** [1–2 sentences]
@@ -104,14 +127,17 @@ Every task in `## Tasks` MUST carry all six fields: **Objective, Files, Depends 
 3. **`Rollback` must restore a known-good state.** Judgment — `risk-assessor` checks quality.
 4. **A checkpoint follows every milestone**, with its own gate / validate / rollback (the failure-state triple from `references/failure-state-template.md`). Placement judged by `risk-assessor`.
 5. **Assumption invalidations use strikethrough**, never deletion.
+6. **Task-level detail exists only for the "Now" horizon.** "Next" stays a milestone outline; "Later" stays themes. `/rad-planner:replan` pulls the next horizon into detail when "Now" ships.
+7. **Shipped work is preserved, never deleted.** At re-plan, shipped task blocks move to a `## Shipped` section (outside `## Tasks`, so the linter doesn't re-validate history). Remaining tasks that depended on a shipped task get `Depends on: none — predecessor shipped` (do not keep the old task ID in the field; the linter would read it as a phantom dependency).
 
 | Rule | Enforced by |
 |---|---|
-| Required sections present | `plan-lint.py` |
+| Required sections present (incl. Release map) | `plan-lint.py` |
 | Per-task field presence | `plan-lint.py` |
 | Dependency resolution + no cycles | `plan-lint.py` |
 | Vague-language detection | `plan-lint.py` |
 | Rollback correctness, checkpoint placement, anti-pattern coverage | `risk-assessor` agent (judgment) |
+| Horizon detail-decay, shipped-history preservation | skill procedure (`plan` / `replan`) |
 
 ---
 

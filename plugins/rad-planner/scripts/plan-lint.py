@@ -38,8 +38,11 @@ from pathlib import Path
 
 # Required H2 sections per references/plan-template.md. "Stack" is conditional
 # (only when a stack evaluation ran), so it is recommended, not required.
+# "Shipped" (re-plan history) is optional and deliberately NOT linted — its task
+# blocks live outside ## Tasks so history is never re-validated.
 REQUIRED_SECTIONS = (
     "Objective",
+    "Release map",
     "Scope",
     "Key assumptions",
     "Milestones",

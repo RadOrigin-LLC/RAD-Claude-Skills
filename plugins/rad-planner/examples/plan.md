@@ -4,11 +4,32 @@
 **Updated:** 2026-06-06
 **Pending durable-doc updates:** see `2026-06-06-update-prompt.md`
 
+> **How to read this plan:** the Release map says where this effort fits on the road
+> to the end goal. Milestones are the chunks of work, each with an *After this ships*
+> line saying what you can do once it lands. The task blocks underneath are precise
+> instructions for the coding agent — you don't need to parse every field. Stop
+> conditions are where the agent must halt and ask instead of guessing.
+
 ## Objective
 
 Ship a single-tenant URL shortener with idempotent shortening and an atomic click
 counter, deployable as one container. Worth doing now because an internal tool needs
 short links this sprint and no shared service exists yet.
+
+**End goal:** The team's default link service — short links with click analytics that
+internal tools call via API instead of each building their own.
+
+## Release map
+
+- **Now — MVP (this plan):** shorten + redirect with a click counter, in one
+  container, for a single internal consumer.
+- **Next — V1:** milestone outline only
+  - Vanity/custom short codes
+  - A minimal click-stats endpoint (counts per code, no dashboard)
+  - Auth token so a second team can consume the API safely
+- **Later — the end goal:**
+  - Analytics dashboard
+  - Multi-tenant isolation when a second heavy consumer appears
 
 ## Scope
 
@@ -47,6 +68,9 @@ spike, before the dependent core service in M2.
 
 ### M1 — Idempotency spike
 
+*After this ships: nothing user-visible yet — we've proven the trickiest part (the
+same URL always gets the same code, even under load) before building on it.*
+
 - **T1 — Validate idempotent insert under concurrency**
   - **Objective:** Prove `ON CONFLICT (url_hash) DO NOTHING ... RETURNING` returns a stable code under parallel inserts of the same URL.
   - **Files:** `src/db/schema.ts`, `test/spike/idempotency.test.ts`
@@ -56,6 +80,9 @@ spike, before the dependent core service in M2.
   - **Rollback:** `git restore src/db/schema.ts test/spike/`
 
 ### M2 — Core service
+
+*After this ships: you can shorten a URL and the short link redirects — the product
+works on your machine.*
 
 - **T2 — Shorten endpoint**
   - **Objective:** `POST /shorten` returns a short code, idempotent per the M1 approach.
@@ -73,6 +100,9 @@ spike, before the dependent core service in M2.
   - **Rollback:** `git restore src/routes/redirect.ts`
 
 ### M3 — Deploy
+
+*After this ships: the shortener runs as a real service others can use, and CI proves
+every change still boots.*
 
 - **T4 — Container + smoke CI**
   - **Objective:** Build a runnable image and a CI job that boots it and hits `/health`.

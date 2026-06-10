@@ -1,6 +1,6 @@
 # rad-planner scripts
 
-Mechanical validators that complement the skill prompts with deterministic checks an LLM can miss. Both are pure Python 3.8+ stdlib — no `pip install` required.
+Mechanical validators that complement the skill prompts with deterministic checks an LLM can miss. Both are pure Python 3.8+ stdlib — no `pip install` required. Run with `python3` (or `python` on Windows).
 
 ## plan-lint.py
 
@@ -13,14 +13,14 @@ python3 scripts/plan-lint.py docs/plan.md --json   # machine-readable
 
 **What it catches:**
 
-- **Missing required sections** — Objective, Scope, Key assumptions, Milestones, Tasks, Checkpoints, Risks & mitigations, Validation, Stop conditions. (`Stack` is recommended, not required — flagged LOW when absent.) Empty or placeholder-only required sections are flagged too.
+- **Missing required sections** — Objective, Release map, Scope, Key assumptions, Milestones, Tasks, Checkpoints, Risks & mitigations, Validation, Stop conditions. (`Stack` is recommended, not required — flagged LOW when absent; `Shipped` is optional re-plan history and deliberately not linted.) Empty or placeholder-only required sections are flagged too.
 - **Per-task field presence** — every task in `## Tasks` must carry all six fields: Objective, Files, Depends on, Done when, Validate, Rollback. A missing or placeholder field is HIGH.
 - **Dependency integrity** — `Depends on` references must resolve to a task that exists in the file (no phantoms), no task may depend on itself, and the dependency graph must be acyclic. A cycle is CRITICAL.
 - **Vague language** — phrases like "verify it works", "should work", "tbd", "looks right" in a task's `Done when` or `Validate` field are HIGH; those fields must be concrete and runnable.
 
 **Exit codes:** `0` clean (or only LOW warnings), `1` CRITICAL or HIGH issues present, `2` script error.
 
-Invoked from `/plan` Phase 4 (mechanical validation before the risk-assessor) and Phase 6 (final check), from `/review-plan` Step 2, and by the `risk-assessor` agent's Pass 0. Run it standalone for spot-checks during development.
+Invoked from `/plan` Phase 4 (mechanical validation before the risk-assessor) and Phase 6 (final check), from `/replan` and `/rescue` after every restructure, from `/review-plan` Step 2, and by the `risk-assessor` agent's Pass 0. Run it standalone for spot-checks during development.
 
 ## validate-json.py
 

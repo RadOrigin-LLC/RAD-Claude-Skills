@@ -35,6 +35,8 @@ If none exists, report that there's no plan to review and recommend `/rad-planne
 
 ### 2. Mechanical lint
 
+Use `python3`, or `python` on Windows:
+
 ```bash
 python3 ${plugin_root}/scripts/plan-lint.py <plan-path> --json
 ```
@@ -98,6 +100,11 @@ Re-prompt once on schema failure, then fall back to markdown parsing per
 Apply production-grade standards by default: every task needs both Validate and
 Rollback; auth/payment/data tasks need a security checkpoint; external integrations need
 error handling in the task spec. Treat gaps in these as blocking.
+
+**Horizon rule:** task-level detail is required only for the "Now" horizon. A Release
+map whose "Next"/"Later" entries are outlines and themes is **correct by design** — do
+not flag them as under-specified. A `## Shipped` section is history — out of review
+scope entirely.
 
 ### 5. Offer fixes (only when authorized)
 
