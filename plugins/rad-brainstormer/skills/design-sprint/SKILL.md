@@ -27,7 +27,7 @@ Do NOT write any code, scaffold any project, or invoke any implementation tool u
 
 This skill honors two mode flags when passed in the invocation:
 
-- `--non-interactive` — Skip user-approval gates. Produce a best-effort design doc, commit it, and emit a trailing JSON block listing `awaiting_user_review` items. For agent/CI callers that deadlock on interactive menus.
+- `--non-interactive` — Skip user-approval gates. Produce a best-effort design doc, write it to the default in-project path (no commit), and emit a trailing JSON block listing `awaiting_user_review` items. For agent/CI callers that deadlock on interactive menus.
 - `--resume <run-id>` — Load checkpoint state from `.brainstorm/state/<run-id>.json` and continue from the last saved step.
 
 ## Checkpoint & Resume
@@ -48,12 +48,11 @@ On `--resume <run-id>`, load the file, announce the step you're resuming from, a
 
 Complete these steps in order:
 
-1. **Explore project context** — Check files, docs, recent commits
+1. **Explore project context** — Check files, docs, recent commits (including `docs/design.md` if present — that file is the project's brand / UI/UX design direction; honor it as a constraint, never write to it)
 2. **Confirm scope** — Verify the chosen approach with the user. If they haven't chosen, route them back to brainstorm-session.
-3. **Offer visual companion** (if UI work involved) — own message only
-4. **Ask clarifying questions** — One at a time, focused on technical design decisions
-5. **Design for isolation** — Break into units with clear boundaries and interfaces
-6. **Present design sections** — One section at a time, get approval after each:
+3. **Ask clarifying questions** — One at a time, focused on technical design decisions
+4. **Design for isolation** — Break into units with clear boundaries and interfaces
+5. **Present design sections** — One section at a time, get approval after each:
    - Architecture overview
    - Component breakdown
    - Data model / flow
@@ -61,10 +60,10 @@ Complete these steps in order:
    - Error handling strategy
    - Testing strategy
    - Migration / deployment considerations (if applicable)
-7. **Write design doc** — Save to `docs/plans/YYYY-MM-DD-<topic>-design.md` (user preferences override)
-8. **Spec review loop** — Dispatch spec-reviewer agent; fix issues and re-dispatch until approved (max 5 iterations)
-9. **User reviews spec** — "Spec written and committed. Please review and let me know about any changes."
-10. **Transition** — Hand off to `/rad-planner:plan` for implementation planning (see "After the Design" below)
+6. **Write design doc** — Deliver as one self-contained file; ask where (see "Delivering the spec" below)
+7. **Spec review loop** — Dispatch spec-reviewer agent; fix issues and re-dispatch until approved (max 5 iterations)
+8. **User reviews spec** — "Spec written to `<path>`. Please review and let me know about any changes."
+9. **Transition** — Hand off to `/rad-planner:plan` for implementation planning (see "After the Design" below)
 
 ## Design Principles
 
@@ -104,9 +103,20 @@ Complete these steps in order:
 
 ## After the Design
 
-### Write the spec document
-- Save to `docs/plans/YYYY-MM-DD-<topic>-design.md`
-- Use clear, concise language
+### Delivering the spec
+One self-contained markdown file — ask the user where, with two sensible options:
+
+- **Into the project** (the usual choice): a dated doc under `docs/` (suggest
+  `docs/YYYY-MM-DD-<topic>-spec.md`), with a header marking it **transient**:
+  *"Design spec — consumed by `/rad-planner:plan`; archive after planning."* The
+  repo's doc-hygiene tooling (rad-repo-manager) will later flag it for archiving —
+  that's the designed lifecycle. **Never** write to `docs/design.md`: that file is
+  the project's brand / UI/UX design direction, not a technical spec.
+- **Personal folder** (pre-repo projects): suggest
+  `~/Documents/Brainstorms/YYYY-MM-DD-<topic>-spec.md`; on Claude Desktop / Cowork,
+  also surface the file so it can be saved or downloaded directly.
+
+Use clear, concise language. Never auto-commit — the user commits via their normal flow.
 
 ### Spec Review Loop
 
@@ -114,24 +124,16 @@ Dispatch the `spec-reviewer` agent with the substituted `references/subagent-pro
 
 - `status: approved` → proceed to user review gate
 - `status: issues_found` and `iteration < max_iterations` → fix the blocking issues, increment iteration, re-dispatch
-- `escalation_required: true` (or `iteration >= max_iterations` with issues remaining) → **stop looping**. Surface the `unresolved_issues` JSON to the user with: "Spec review hit iteration cap with unresolved issues. Please decide: (a) accept these as known gaps, (b) rewrite the affected sections yourself, or (c) drop back to Step 6 to redesign." In `--non-interactive` mode, commit the current spec and add the unresolved issues to `awaiting_user_review`.
+- `escalation_required: true` (or `iteration >= max_iterations` with issues remaining) → **stop looping**. Surface the `unresolved_issues` JSON to the user with: "Spec review hit iteration cap with unresolved issues. Please decide: (a) accept these as known gaps, (b) rewrite the affected sections yourself, or (c) drop back to Step 5 to redesign." In `--non-interactive` mode, keep the current spec on disk and add the unresolved issues to `awaiting_user_review`.
 
 Markdown fallback is accepted from the agent — parse best-effort if JSON is missing.
 
 ### User Review Gate
-> "Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start the implementation plan."
+> "Spec written to `<path>`. Please review it and let me know if you want to make any changes before we start the implementation plan."
 
 Wait for user response. If changes requested, make them and re-run spec review.
 
 ### Transition
-Hand off to `/rad-planner:plan` to turn the approved spec into a dependency-aware implementation plan with risk review. If `rad-planner` is not installed, surface this to the user and suggest installing it, or let the user invoke their preferred implementation-planning workflow.
+Hand off to `/rad-planner:plan` to turn the approved spec into a release-map implementation plan with risk review — its discovery interview pre-fills from the spec, so the user won't be re-asked what the spec already answers. If `rad-planner` is not installed, surface this to the user and suggest installing it, or let the user invoke their preferred implementation-planning workflow.
 
 Do NOT invoke frontend-design, mcp-builder, or any other implementation skill directly from design-sprint — implementation planning is a separate, reviewable phase.
-
-## Visual Companion
-
-For questions that involve visual decisions (UI layouts, architecture diagrams), use the visual companion:
-- Read the guide at `scripts/` directory for the server infrastructure
-- Decide per-question whether browser or terminal is better
-- Use browser for: mockups, wireframes, layouts, diagrams
-- Use terminal for: technical decisions, tradeoffs, scope questions

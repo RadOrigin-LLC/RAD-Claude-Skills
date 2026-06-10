@@ -2,9 +2,14 @@
 name: brainstorm-session
 description: >
   Let's brainstorm, I need ideas, help me think through, brainstorm with me, what
-  should I build, how should I approach this — open-ended exploration of possibilities.
-  Handles blank slate to refining an existing concept.
-argument-hint: "[topic or problem]"
+  should I build, how should I approach this, generate ideas, give me alternatives,
+  I'm stuck, I don't know where to start, SCAMPER, six thinking hats, reverse
+  brainstorm, how might we, creative unblock — open-ended exploration of
+  possibilities on any topic (software, business, content, travel, creative,
+  personal). Handles blank slate to refining an existing concept. A specific
+  technique can be requested by name as a mode (e.g. "scamper", "six-hats",
+  "reverse", "hmw", "unblock") and runs inside the session frame.
+argument-hint: "[topic or problem] [technique: scamper|six-hats|reverse|hmw|starburst|unblock]"
 ---
 
 # Brainstorming Ideas Into Reality
@@ -30,10 +35,30 @@ Opus 4.7 and Sonnet 4.6 handle parallel batching well; Haiku 4.5 may prefer seri
 
 This skill honors two mode flags when passed in the invocation (`/rad-brainstormer:brainstorm-session --non-interactive`, etc.):
 
-- `--non-interactive` — Skip all user-approval gates. Produce a best-effort output, commit the artifact, and emit a trailing JSON block listing `awaiting_user_review` items (e.g., unconfirmed scope, unvalidated top pick, unresolved spec-review escalations). For agent/CI callers that deadlock on interactive menus.
+- `--non-interactive` — Skip all user-approval gates. Produce a best-effort output, write it to the default delivery path (no commit), and emit a trailing JSON block listing `awaiting_user_review` items (e.g., unconfirmed scope, unvalidated top pick, unresolved spec-review escalations). For agent/CI callers that deadlock on interactive menus.
 - `--resume <run-id>` — Load checkpoint state from `.brainstorm/state/<run-id>.json` and continue from the last saved phase. See "Checkpoint & Resume" below.
 
 If neither flag is present, run interactively as documented.
+
+## Technique Modes
+
+The standalone technique skills were folded into this session (v3.0). When the user
+names a technique — in the invocation argument or in conversation ("run a SCAMPER on
+this", "let's do six hats") — run that technique as the divergent phase, inside the
+normal session frame (anti-anchoring first, convergent phase after). Techniques and
+their instructions live in `references/methodology-catalog.md`:
+
+| Mode | Technique |
+|---|---|
+| `scamper` | SCAMPER — Substitute, Combine, Adapt, Modify, Put to other use, Eliminate, Reverse |
+| `six-hats` | Six Thinking Hats — Blue/White/Green/Yellow/Black/Red perspectives |
+| `reverse` | Reverse brainstorming — "how could we make it worse?", then invert |
+| `hmw` | How Might We — reframe problems as opportunity questions |
+| `starburst` | Starbursting — generate the questions before the answers |
+| `unblock` | Creative unblocking — warm-ups and provocations (`references/creative-unblocking.md`) |
+
+A named technique narrows the divergent phase; it never skips anti-anchoring or
+convergence. (Root-cause analysis is different — that's `/rad-brainstormer:five-whys`.)
 
 ## Checkpoint & Resume
 
@@ -80,15 +105,14 @@ Complete these steps in order:
 2. **Explore context** — Check project files, docs, recent commits (if software-related)
 3. **Anti-anchoring check** — Draw out the user's existing thinking BEFORE offering yours
 4. **Domain orientation** — Does this need domain research? If yes, dispatch domain-researcher agent
-5. **Offer visual companion** (if topic involves visual decisions) — own message, not combined with questions
-6. **Divergent ideation** — Select and apply appropriate techniques based on starting state
-7. **Convergent evaluation** — Filter and prioritize using appropriate framework
-8. **Propose 2-3 approaches** — With trade-offs and a recommendation
-9. **Present design/output** — Scaled to domain (spec for software, strategy doc for business, etc.)
-10. **Write output document** — Save to appropriate location, commit
-11. **Spec review loop** (if software) — Dispatch spec-reviewer agent, fix issues, repeat until approved
-12. **User reviews output** — Get explicit approval
-13. **Transition** — Route to appropriate next step based on domain
+5. **Divergent ideation** — Select and apply appropriate techniques based on starting state (or the requested technique mode)
+6. **Convergent evaluation** — Filter and prioritize using appropriate framework
+7. **Propose 2-3 approaches** — With trade-offs and a recommendation
+8. **Present design/output** — Scaled to domain (spec for software, strategy doc for business, etc.)
+9. **Deliver the output** — One self-contained markdown file; ask where (see "Delivering the output")
+10. **Spec review loop** (if software) — Dispatch spec-reviewer agent, fix issues, repeat until approved
+11. **User reviews output** — Get explicit approval
+12. **Transition** — Route to appropriate next step based on domain
 
 ## Process Flow
 
@@ -101,11 +125,8 @@ Explore Context ──► Anti-Anchoring: Draw out user ideas first
        ▼
 Domain Research Needed? ──yes──► Dispatch domain-researcher agent
        │ no                              │
-       ▼                                 ▼
-Visual Questions Ahead? ──yes──► Offer Visual Companion (own message)
-       │ no                              │
        ▼◄───────────────────────────────┘
-SELECT METHODOLOGY (based on starting state)
+SELECT METHODOLOGY (based on starting state, or the requested technique mode)
        │
        ▼
 ┌──────────────────────────────────────┐
@@ -135,11 +156,11 @@ Propose 2-3 Approaches (with trade-offs + recommendation)
 Present Design/Output (section by section, get approval after each)
                │
                ▼
-Write Output Document + Commit
+Deliver Output (one file — ask where; no auto-commit)
                │
                ▼
 Domain-Specific Routing:
-  Software → spec review loop → writing-plans skill
+  Software → spec review loop → /rad-planner:plan
   Business → business model canvas → action plan
   Content  → content strategy doc → editorial calendar
   Research → research plan → methodology outline
@@ -245,15 +266,37 @@ Reference `references/evaluation-frameworks.md` for detailed framework instructi
 
 ## Phase 7: Design & Output
 
+### Delivering the output — one file, the user picks where
+
+Brainstorming usually happens *before* a repo exists, and even inside one, scattered
+brainstorm files become doc drift. So: every output is **one self-contained markdown
+file**, and you **ask where to deliver it** (AskUserQuestion or a plain question) with
+three options:
+
+1. **Personal folder** (default for non-project and pre-repo topics) — suggest
+   `~/Documents/Brainstorms/YYYY-MM-DD-<topic>.md` (Windows:
+   `%USERPROFILE%\Documents\Brainstorms\`); the user can name any path. On Claude
+   Desktop / Cowork / claude.ai, also surface the file itself so it can be saved or
+   downloaded directly.
+2. **Into the current project** (only when the topic IS that project) — a dated doc
+   under `docs/`, with a header marking it **transient**: *"Brainstorm output —
+   consumed by `/rad-planner:plan`; archive after planning."* The repo's doc-hygiene
+   tooling (rad-repo-manager) will later flag it for archiving — that is the designed
+   lifecycle, not drift. **Never** write to `docs/design.md` (that file is brand /
+   UI/UX design direction, not brainstorm output).
+3. **No file** — keep the output in the conversation only.
+
+Never auto-commit. If the file landed in a repo, the user commits via their normal flow.
+
 Adapt the output format to the domain:
 
 ### Software Projects
 - Present design section by section, get approval after each (in `--non-interactive` mode, skip approvals and mark unconfirmed sections in `awaiting_user_review`)
 - Cover: architecture, components, data flow, error handling, testing
-- Write spec to `docs/plans/YYYY-MM-DD-<topic>-design.md` (user preferences override)
+- Deliver the spec per the rule above (in-project option 2 is the usual choice — `/rad-planner:plan` reads it from there)
 - Run `spec-reviewer` agent (max 5 iterations — see escalation below)
 - User reviews spec
-- Transition: hand off to `/rad-planner:plan` for implementation planning. If `rad-planner` is not installed, surface this to the user and suggest installing it.
+- Transition: hand off to `/rad-planner:plan` for implementation planning — its discovery interview pre-fills from the spec, so the user won't be re-asked what the spec already answers. If `rad-planner` is not installed, surface this to the user and suggest installing it.
 
 #### Spec Review Loop (Phase 11)
 
@@ -261,47 +304,31 @@ Dispatch `spec-reviewer` with the substituted `references/subagent-prompts/spec-
 
 - `status: approved` → proceed to user review
 - `status: issues_found` and `iteration < max_iterations` → fix blocking issues, increment iteration, re-dispatch
-- `escalation_required: true` (or `iteration >= max_iterations` with issues remaining) → stop looping. Surface the `unresolved_issues` JSON to the user with: "Spec review hit iteration cap with unresolved issues. Please decide: (a) accept these as known gaps, (b) rewrite the affected sections yourself, or (c) drop back to design phase." In `--non-interactive` mode, commit the current spec and add the unresolved issues to `awaiting_user_review`.
+- `escalation_required: true` (or `iteration >= max_iterations` with issues remaining) → stop looping. Surface the `unresolved_issues` JSON to the user with: "Spec review hit iteration cap with unresolved issues. Please decide: (a) accept these as known gaps, (b) rewrite the affected sections yourself, or (c) drop back to design phase." In `--non-interactive` mode, keep the current spec on disk and add the unresolved issues to `awaiting_user_review`.
 
 ### Business/Strategy
 - Present as a strategic brief
 - Cover: value proposition, target audience, competitive positioning, key risks, next steps
-- Write to `docs/brainstorm/YYYY-MM-DD-<topic>-strategy.md`
+- Deliver per the rule above (suggest `YYYY-MM-DD-<topic>-strategy.md`)
 - Transition: action plan with concrete next steps
 
 ### Product Discovery
 - Present as Opportunity Solution Tree or lean canvas
 - Cover: target outcome, opportunities, solution candidates, experiments to run
-- Write to `docs/brainstorm/YYYY-MM-DD-<topic>-discovery.md`
+- Deliver per the rule above (suggest `YYYY-MM-DD-<topic>-discovery.md`)
 - Transition: experiment plan
 
 ### Content/Marketing
 - Present as content strategy
 - Cover: audience, topics, channels, differentiation, content calendar
-- Write to `docs/brainstorm/YYYY-MM-DD-<topic>-content.md`
+- Deliver per the rule above (suggest `YYYY-MM-DD-<topic>-content.md`)
 - Transition: editorial plan
 
 ### General Problem-Solving
 - Present as action plan
 - Cover: root cause, solution approach, steps, risks, success criteria
-- Write to `docs/brainstorm/YYYY-MM-DD-<topic>-plan.md`
+- Deliver per the rule above (suggest `YYYY-MM-DD-<topic>-plan.md`)
 - Transition: next steps with owners and timelines
-
-## Visual Companion
-
-A browser-based companion for showing mockups, diagrams, and visual options. Available as a tool — not a mode.
-
-**Offering**: When upcoming questions involve visual content, offer once:
-> "Some of what we're working on might be easier to explain if I can show it in a browser. I can put together mockups, diagrams, and comparisons as we go. Want to try it?"
-
-**This offer MUST be its own message.** Don't combine with questions.
-
-**Per-question decision**: Even after acceptance, decide FOR EACH QUESTION whether to use browser or terminal.
-- **Browser**: mockups, wireframes, layout comparisons, architecture diagrams, side-by-side designs
-- **Terminal**: requirements questions, conceptual choices, tradeoff lists, scope decisions
-
-If accepted, read the visual companion guide:
-`scripts/` directory contains the visual companion server (start-server.sh, stop-server.sh, frame-template.html, helper.js, server.js)
 
 ## Key Principles
 
