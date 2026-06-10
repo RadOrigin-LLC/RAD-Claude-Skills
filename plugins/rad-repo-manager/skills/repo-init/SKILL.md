@@ -75,8 +75,9 @@ loose root-level handoff/status/audit docs, or folder-specific
 ## 4. Fill only what's mechanical
 
 Set the remote URL line in `AGENTS.md` from `git remote get-url origin` if available.
-Leave every `<PLACEHOLDER>` section for the user. Do not invent goals, roadmap,
-architecture, decisions, or validation promises.
+Stamp each scaffolded doc's `**Updated:** <YYYY-MM-DD>` with today's date (the
+freshness scans key off it). Leave every other `<PLACEHOLDER>` section for the user.
+Do not invent goals, roadmap, architecture, decisions, or validation promises.
 
 ## 5. Hand off
 

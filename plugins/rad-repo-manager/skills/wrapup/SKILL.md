@@ -5,14 +5,15 @@ description: >
   session", "save state", "handoff", "leave a clean stopping point", "I'm done for
   now", or "before I close". Writes a short, evidence-grounded docs/handoff.md
   (overwrite, not append) from git evidence — not chat memory — then reconciles
-  the active core docs with this session's changes: offers scoped updates to the
-  docs it owns (docs/plan.md, AGENTS.md operational sections) and surfaces stale
-  user-owned docs (prd/design/decision-log) for the user to apply. Scoped to recent
-  changes, not a deep audit. No status/roadmap/implementation-plan files, no
-  auto-commit or push.
+  the active core docs with this session's changes: applies scoped updates to the
+  docs it owns (docs/plan.md, AGENTS.md operational sections) on a single OK, and
+  for stale user-owned docs (prd/design/decision-log) drafts the exact edit and
+  applies it only on explicit per-edit confirmation. Scoped to recent changes, not
+  a deep audit. No status/roadmap/implementation-plan files, no auto-commit or
+  push.
 argument-hint: ""
 user-invocable: true
-allowed-tools: Read Glob Grep Bash Write Edit
+allowed-tools: Read Glob Grep Bash Write Edit AskUserQuestion
 ---
 
 # Wrapup — leave a clean handoff
@@ -52,8 +53,10 @@ git log --oneline -10
 
 Determine what changed from the working tree, staged files, and recent commits — not
 from a chat summary. For the Validation line, report only what *already* ran this
-session (read it from the conversation — do **not** re-run): if tests/build/lint ran,
-record the command and its result; if not, write "Not run this session." If nothing
+session (do **not** re-run): take it from the conversation, or — after compaction —
+from what the compaction summary preserved (the plugin's PreCompact hook instructs
+the summary to keep validation commands and results verbatim). If neither source has
+it, write "Not recorded this session" — never invent or assume a result. If nothing
 changed at all this session, still write the handoff — it snapshots the current
 resting state.
 
@@ -62,8 +65,8 @@ resting state.
 Overwrite `docs/handoff.md` from `${CLAUDE_PLUGIN_ROOT}/templates/handoff.md` (create
 the `docs/` folder first if it doesn't exist). This is the deliverable — write it; do
 not let the Validation line or anything else crowd it out. Keep it ~10–25 lines. Stamp
-`**Updated:**` with today's date (ask the user for the date if you don't have it — do
-not call a clock). The shape:
+`**Updated:**` with today's date (it's in your context; failing that, use the latest
+commit date from `git log -1 --format=%cs` — don't ask the user). The shape:
 
 - **Last completed** — 1–3 bullets grounded in the diff / commits / test output.
 - **Current focus** — the current milestone or active task from `docs/plan.md`.
@@ -83,16 +86,38 @@ compare each against what the session did. Then split by ownership:
   and apply it on the user's OK. Typical `plan.md` updates: a milestone shipped or
   changed status, the current milestone advanced, allowed/forbidden scope shifted, or a
   validation gate / stop condition changed. Keep every edit minimal and within the
-  session's scope — never rewrite beyond what changed.
+  session's scope — never rewrite beyond what changed. **If the divergence is
+  structural** — milestones obsolete, scope materially shifted, the plan's "Now"
+  horizon essentially shipped — don't restructure here: make the one-line status
+  touches and recommend `/rad-planner:replan` for the rebuild.
 
 - **Docs the user owns — `docs/prd.md`, `docs/design.md`,
-  `docs/reference/decision-log.md`.** Do **not** edit these. Surface the change in plain
-  language: name the file, point to the stale spot, and state what should change and why
-  — for the user to apply. Product and decisions stay theirs.
+  `docs/reference/decision-log.md`.** The user owns the *decision*, not the typing.
+  Don't just describe the staleness — **draft the exact edit** (the precise wording,
+  shown as old → new) and ask per doc via AskUserQuestion: **apply / skip / let me
+  reword**. Apply only on an explicit "apply" for that specific edit — never bundle
+  user-owned edits into a blanket OK, and never touch these docs without that
+  per-edit confirmation. A skipped edit is restated in one line at the end so it
+  isn't silently lost.
+
+When you edit any core doc that carries an `**Updated:**` stamp (or when `plan.md`
+changes), refresh the stamp to today — the freshness scans key off it.
 
 If nothing the session touched made a core doc stale, say so and change nothing here.
 
-## 4. Commit
+## 4. Hygiene pulse — one line, no audit
+
+Run the cheap mechanical scan (use `python3`, or `python` on Windows):
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/repo-scan.py . --json --no-record
+```
+
+If it's green, say nothing. If loose ends exist, add **one line** to your closing
+summary naming them and pointing at `/rad-repo-manager:repo-align` — do not file,
+move, or fix anything here. (Skip silently if Python is unavailable.)
+
+## 5. Commit
 
 Do **not** auto-commit or push. Tell the user the handoff is written and they can
 commit via their normal flow (e.g. GitHub Desktop). If they explicitly ask, commit on
@@ -102,7 +127,7 @@ the current branch with a short message — otherwise leave it.
 
 - No whole-repo audit, contradiction/redundancy scan, or doc filing — that's `repo-align`. The core-doc reconcile in step 3 is scoped to this session's changes only.
 - Does not run tests, builds, linters, or validators — it only records validation that already ran.
-- Does not edit `docs/prd.md`, `docs/design.md`, or `docs/reference/decision-log.md` — those are surfaced for the user, never written.
+- Does not edit `docs/prd.md`, `docs/design.md`, or `docs/reference/decision-log.md` without an explicit per-edit "apply" from the user — it drafts the exact edit, asks, and a "skip" means hands off.
 - Does not create `docs/status.md`, `docs/roadmap.md`, `docs/implementation-plan.md`,
   loose root-level handoff/status/audit docs, or folder-specific agent files.
 - No writing of product content; no appending to the handoff; no auto-commit or push.

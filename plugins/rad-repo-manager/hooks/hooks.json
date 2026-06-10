@@ -1,0 +1,41 @@
+{
+  "description": "Ambient doc-health for the compact doc model: a session-start health line when docs are stale or loose, compaction-survival instructions for handoff evidence, and a once-per-session wrapup nudge. All hooks are silent in repos that don't use the doc model (no AGENTS.md + docs/).",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.py\" || python \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.py\"",
+            "timeout": 25
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-compact.py\" || python \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-compact.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/stop-nudge.py\" || python \"${CLAUDE_PLUGIN_ROOT}/hooks/stop-nudge.py\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -41,10 +41,12 @@ instruction authority.
 ## 1. Run the mechanical scans
 
 These are the drift signals — pure-stdlib, advisory. Capture each JSON; they surface
-**candidates**, not verdicts. Your judgment decides which are real.
+**candidates**, not verdicts. Your judgment decides which are real. (Use `python3`,
+or `python` on Windows.)
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/repo-scan.py . --json --no-record      # floating/misplaced docs, active-set growth, AGENTS.md bloat
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/doc-freshness.py . --json              # stale handoff; prd/plan unchanged while code churned
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/doc-contradiction.py . --json          # plan builds something the PRD lists as a non-goal (scope-creep)
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/doc-redundancy.py . --json             # the same fact stated in two active docs
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/audit-user-content.py . --json         # AGENTS.md orphan terms + dead paths
@@ -122,18 +124,20 @@ Rules:
 - **Keep `CLAUDE.md`/`GEMINI.md` as thin `@AGENTS.md` pointers** — if one has grown its own content, propose folding that content into `AGENTS.md` and restoring the shim.
 - After approved moves, **update the active pointers** so the default read path is still the four core docs.
 
-## 5. Surface durable changes — don't write them
+## 5. Durable changes — draft the edit, apply only on explicit confirmation
 
 When a finding implies a change to a durable doc the manager doesn't own — `docs/prd.md`
-(product behavior) or `docs/reference/decision-log.md` (a decision) — do **not** edit
-those files. Describe the change in plain language and name the target file for the
-user to apply (in Claude or Codex). The manager files and flags; the user owns product
-and decisions.
+(product behavior) or `docs/reference/decision-log.md` (a decision) — the user owns the
+*decision*, not the typing. Draft the exact edit (precise wording, old → new) and ask
+per doc via AskUserQuestion: **apply / skip / let me reword**. Apply only on an explicit
+"apply" for that specific edit; a skip means hands off, restated in one line at the end.
+Never bundle user-owned edits into a blanket OK. The manager drafts and flags; the user
+owns product and decisions.
 
 ## What this skill does NOT do
 
 - Does not auto-apply judgment calls — every move/merge/delete/archive is user-confirmed.
-- Does not write `docs/prd.md` or the decision log — surfaces the change instead.
+- Does not write `docs/prd.md` or the decision log without an explicit per-edit "apply" — it drafts the exact edit and asks.
 - Does not create `docs/status.md`, `docs/roadmap.md`, `docs/implementation-plan.md`,
   loose root status/handoff/audit docs, or folder-specific agent files.
 - Does not run on every session — it's the opt-in deep pass.

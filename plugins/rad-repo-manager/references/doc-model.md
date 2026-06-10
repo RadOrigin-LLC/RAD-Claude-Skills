@@ -41,9 +41,10 @@ status/roadmap docs.
 ## Who writes what
 
 - **rad-repo-manager writes:** `AGENTS.md` operational sections (never user-authored content), the shims, `docs/handoff.md`. Scaffolds `prd.md`/`plan.md` skeletons once at `repo-init`. At `wrapup`, offers scoped updates to `docs/plan.md` and `AGENTS.md` operational sections when the session made them stale.
-- **rad-planner writes:** `docs/plan.md` content (roadmap / milestones / scope / gates).
-- **the user owns:** `docs/prd.md`, `docs/design.md`, `docs/reference/decision-log.md`, reference docs.
-- **surfaced, never written by the manager:** a change to `prd.md` / `design.md` / `decision-log.md` is described for the user to apply — including at `wrapup` when the session made one stale. The manager flags; the user owns product and decisions.
+- **rad-planner writes:** `docs/plan.md` content (release map / roadmap / milestones / scope / gates). It may also **birth** `docs/prd.md` — drafted from the user's own discovery-interview answers, applied per-section on explicit confirmation — when none exists or only the skeleton does. After birth, the PRD is the user's; the planner never edits an existing PRD.
+- **the user owns:** `docs/prd.md` (once it exists), `docs/design.md`, `docs/reference/decision-log.md`, reference docs.
+- **drafted, applied only on explicit per-edit confirmation:** a change to `prd.md` / `design.md` / `decision-log.md` is drafted as the exact edit (old → new) and applied only when the user says "apply" for that specific edit — at `wrapup` (session-scoped) and `repo-align` (whole-repo). The user owns the decision; the manager does the typing. A skip means hands off.
+- **freshness stamps:** `docs/prd.md`, `docs/plan.md`, and `docs/handoff.md` carry an `**Updated:**` date (templates include it; `AGENTS.md` deliberately doesn't — staying unchanged is normal for it). Whoever edits a stamped doc refreshes the stamp — the freshness scan keys off it.
 
 ## Reference catalog (closed)
 
@@ -63,25 +64,40 @@ Visual / UI design direction lives at top-level `docs/design.md` (conditional), 
 the catalog. Reference docs are **scaffolded by none** — each appears only when a
 project needs it. The catalog is the menu, not the starter set.
 
-## Drift signals (mechanical, for repo-align)
+## Drift signals (mechanical)
 
-Cheap, high-precision, mechanical checks — `scripts/repo-scan.py` plus three deeper
-validators — surface **candidates** for `/rad-repo-manager:repo-align`:
+Cheap, high-precision, mechanical checks — `scripts/repo-scan.py` and
+`scripts/doc-freshness.py` plus three deeper validators — surface **candidates**:
 
-1. active set grew beyond the declared four
-2. a `.md` is floating (outside any tier) or sitting loose at the root / under `docs/`
-3. `AGENTS.md` past a soft size cap (bloating)
-4. an active doc unchanged while code churned (possibly stale)
-5. plan ↔ PRD contradiction (scope-creep), cross-doc redundancy, AGENTS.md orphan terms / dead paths
+1. active set grew beyond the declared four (`repo-scan`)
+2. a `.md` is floating (outside any tier) or sitting loose at the root / under `docs/` (`repo-scan`)
+3. `AGENTS.md` past a soft size cap (bloating) (`repo-scan`)
+4. an active doc unchanged while code churned — stale handoff, untouched prd/plan (`doc-freshness`)
+5. plan ↔ PRD contradiction (scope-creep), cross-doc redundancy, AGENTS.md orphan terms / dead paths (`doc-contradiction`, `doc-redundancy`, `audit-user-content`)
 
-These feed **judgment**, not auto-action — `startup` stays read-only; `wrapup` only
-reconciles the core docs against the current session (offering owned-doc edits,
-surfacing user-owned ones). These whole-repo mechanical signals are read and
-dispositioned in `repo-align`, always with your confirmation.
+These feed **judgment**, not auto-action. The two cheap scans (1–4) run every session:
+`startup` reads them for the briefing (still read-only), `wrapup` runs the hygiene
+pulse, and the SessionStart hook surfaces a one-liner ambiently. The deeper validators
+(5) and all dispositions live in `repo-align`, always with your confirmation.
+
+## The ambient layer (hooks)
+
+Skills only run when invoked — the hooks catch what habit misses, and all three are
+silent in repos that don't use this model:
+
+- **SessionStart** — runs the two cheap scans; injects a one-line doc-health note
+  *only* when something is stale or loose. Says nothing on green.
+- **PreCompact** — instructs the compaction summary to preserve the handoff's raw
+  material verbatim (validation commands + results, files changed, current task, next
+  action) so a post-compaction `wrapup` isn't writing from amnesia.
+- **Stop** — at most one reminder per session, only when real work is uncommitted and
+  the handoff isn't being kept fresh: a nudge that `wrapup` exists. Never blocks.
 
 ## Non-goals
 
 No status/roadmap/implementation-plan/per-feature docs. No `docs/inbox/` staging tier.
-No writing durable content (surfaced only). No whole-repo audit in startup/wrapup (wrapup's core reconcile is session-scoped). No
-auto-action on judgment calls. No doc-type classifier. No folder-specific agent files.
-Not a correctness guarantee — a drift early-warning, honestly scoped.
+No writing durable content without an explicit per-edit confirmation. No whole-repo
+audit in startup/wrapup (the cheap scans are signals, not an audit; wrapup's core
+reconcile is session-scoped). No auto-action on judgment calls. No blocking hooks and
+no hook noise on green. No doc-type classifier. No folder-specific agent files. Not a
+correctness guarantee — a drift early-warning, honestly scoped.

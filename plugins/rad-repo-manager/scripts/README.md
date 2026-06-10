@@ -1,15 +1,17 @@
 # rad-repo-manager scripts
 
 Pure-stdlib Python 3.8+ (no `pip install`). Each emits human text by default and a
-single JSON object with `--json`. `/rad-repo-manager:repo-align` runs these as drift
-signals; you can also run them standalone. They surface **candidates** — judgment
-decides which are real, and nothing is auto-fixed.
+single JSON object with `--json`. Run with `python3` (or `python` on Windows). The two
+cheap scans (`repo-scan`, `doc-freshness`) run at `startup` and via the SessionStart
+hook; `wrapup` ends with a `repo-scan` hygiene pulse; all five run in
+`/rad-repo-manager:repo-align`. They surface **candidates** — judgment decides which
+are real, and nothing is auto-fixed.
 
-## repo-scan.py — mechanical drift signals (for repo-align)
+## repo-scan.py — mechanical drift signals (every session)
 
 High-precision, mechanical signals only — so the count is trustworthy and never cries
-wolf. `repo-align` reads its `--json`; fuzzy checks (contradiction, redundancy) have
-their own scripts below.
+wolf. `startup`/`repo-align` read its `--json`; fuzzy checks (contradiction,
+redundancy) have their own scripts below.
 
 ```bash
 python3 repo-scan.py <project-dir> --json --no-record
@@ -20,6 +22,20 @@ Signals (each a loose end): active-set growth (AGENTS.md read path > 4), floatin
 scoped shallow so component READMEs never false-flag), legacy inbox items
 (`docs/inbox/*.md` — a retired tier, flagged so its contents get filed out), AGENTS.md
 bloat (past a soft line cap). Severity: 0 green, 1–4 yellow, ≥5 red. Exit 0 always.
+
+## doc-freshness.py — stale active docs (every session)
+
+The "active doc unchanged while code churned" signal, from pure git evidence. Per core
+doc: last commit date and how many *code-touching* commits (excludes all `.md` churn)
+landed since. Flags a stale `docs/handoff.md` (MEDIUM when any code commit is newer
+than it, HIGH at ≥5 commits or ≥7 days — suppressed while an uncommitted handoff edit
+is in flight) and an untouched `prd.md`/`plan.md` (LOW/MEDIUM at soft commit
+thresholds: prd 15/30, plan 10/20). Missing/untracked docs and no-history repos are
+INFO, never stale. Exit 0 always.
+
+```bash
+python3 doc-freshness.py <project-dir> --json
+```
 
 ## doc-contradiction.py — prd vs plan (deep, in repo-align)
 

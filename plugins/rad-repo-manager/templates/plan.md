@@ -1,5 +1,6 @@
 # Plan: <PROJECT_NAME>
 
+**Updated:** <YYYY-MM-DD>
 **Status:** No plan yet.
 
 This file is the home for the project plan (scope, milestones, tasks). It is owned
