@@ -81,6 +81,6 @@ Before 2.1, `/a11y-review` did all this work as LLM regex passes. That's slow, n
 - Makes the deterministic part deterministic.
 - Lets the LLM focus on what it's good at — `[HEURISTIC]` judgment about alt-text meaningfulness, ARIA logic in complex widgets, reading order.
 - Gives the user something they can run themselves, in CI, without invoking Claude.
-- Aligns rad-a11y with the validator pattern other rad-* plugins follow (rad-coolify-orchestrator's 4 lint scripts, rad-supabase's 3 Splinter validators, rad-planner's DAG/checklist validators).
+- Aligns rad-a11y with the validator pattern other rad-* plugins follow (rad-coolify-orchestrator's 4 lint scripts, rad-planner's DAG/checklist validators).
 
 The honesty constraint from rad-a11y 2.0 stays in force: every finding still carries a confidence tag, the report still produces no Pass/Fail verdict, and `[NEEDS-MANUAL]` flags are still surfaced for things only a browser, screen reader, or human can verify.

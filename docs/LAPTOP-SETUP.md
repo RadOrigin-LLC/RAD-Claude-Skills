@@ -185,13 +185,13 @@ claude
 
 ### Enable plugins (matches your desktop enabled list)
 
-Inside Claude Code, run `/plugin` and enable each. Or edit `C:\Users\RAD\.claude\settings.json` directly — easier to just copy the `enabledPlugins` block from your desktop. Currently 22 plugins (7 official + 15 rad-claude-skills):
+Inside Claude Code, run `/plugin` and enable each. Or edit `C:\Users\RAD\.claude\settings.json` directly — easier to just copy the `enabledPlugins` block from your desktop. Currently 19 plugins (7 official + 12 rad-claude-skills):
 
 **From `claude-plugins-official`:** `frontend-design`, `skill-creator`, `claude-code-setup`, `plugin-dev`, `microsoft-docs`, `remember`, `mcp-server-dev`
 
-**From `rad-claude-skills`:** `rad-a11y`, `rad-1password`, `rad-brainstormer`, `rad-chrome-extension`, `rad-code-review`, `rad-context-prompter`, `rad-coolify-orchestrator`, `rad-explain`, `rad-gws-core`, `rad-para-second-brain`, `rad-planner`, `rad-seo-optimizer`, `rad-session`, `rad-supabase`
+**From `rad-claude-skills`:** `rad-a11y`, `rad-1password`, `rad-brainstormer`, `rad-chrome-extension`, `rad-code-review`, `rad-context-prompter`, `rad-coolify-orchestrator`, `rad-explain`, `rad-para-second-brain`, `rad-planner`, `rad-repo-manager`, `rad-seo-optimizer`
 
-> Archived plugins (`rad-astro`, `rad-fastify`, `rad-google-workspace`, `rad-nextjs`, `rad-react`, `rad-stack-guide`, `rad-stripe-fastify-webhooks`, `rad-typescript`, `rad-zod`) are preserved under [`archive/`](../archive/) but are no longer in the marketplace. Remove them from your laptop's `enabledPlugins` if they were there from a prior install.
+> Archived plugins (`rad-astro`, `rad-fastify`, `rad-google-workspace`, `rad-nextjs`, `rad-react`, `rad-stack-guide`, `rad-stripe-fastify-webhooks`, `rad-typescript`, `rad-zod`) are preserved under [`archive/`](../archive/) but are no longer in the marketplace. `rad-session` (replaced by `rad-repo-manager`), `rad-gws-core`, and `rad-supabase` were removed in June 2026. Remove any of these from your laptop's `enabledPlugins` if they were there from a prior install.
 
 Fastest path — copy `C:\Users\RAD\.claude\settings.json` from desktop to laptop after Claude Code is installed. Also copy `C:\Users\RAD\.gitignore_global` if you have one.
 
