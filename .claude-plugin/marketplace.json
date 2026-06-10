@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Curated marketplace of Claude Code plugins for developer frameworks, productivity, accessibility, SEO, and DevOps. Each plugin is built for a specific job — code review, project planning, accessibility audits, secret management, Coolify ops, and so on — with explicit honesty about what each does and doesn't do. Pair them where it makes sense; use them standalone where it doesn't. Version history lives in CHANGELOG.md.",
-    "version": "1.23.0",
+    "version": "1.24.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -53,7 +53,7 @@
     {
       "name": "rad-brainstormer",
       "source": "./plugins/rad-brainstormer",
-      "description": "Collaborative ideation using proven methodologies (SCAMPER, Six Hats, Reverse Brainstorming, 5 Whys, HMW), domain research, structured evaluation, and design sprints.",
+      "description": "The brainstormer that doesn't anchor you. Most AI brainstorming dumps fifteen ideas at you immediately — and research on human–AI ideation shows you then anchor on them, producing fewer, less varied, less original ideas of your own. rad-brainstormer draws out YOUR thinking first, every time, then builds on it with proven facilitation methods under enforced divergent/convergent discipline (idea generation and evaluation are never mixed). It brainstorms anything — software, business strategy, content, travel, creative projects, life decisions — not just code.\n\nFour skills (v3.0 consolidated from ten — the standalone technique skills are now modes of the session):\n- `brainstorm-session` — the facilitated session: anti-anchoring first, divergent → convergent, live domain research when useful. Techniques selectable by name: scamper, six-hats, reverse, hmw, starburst, unblock.\n- `idea-evaluation` — you already have the ideas; structured prioritization (Impact/Effort, Assumption Mapping, Pre-Mortem, JTBD, Dot Voting).\n- `five-whys` — root-cause analysis (a different job than ideation, kept separate).\n- `design-sprint` — post-decision: chosen software approach → reviewable spec → hand-off to /rad-planner:plan, whose discovery interview pre-fills from the spec.\n\nThree agents: domain-researcher (live web research woven into the questions, not dumped as a report), idea-challenger (pre-mortem stress-test of top candidates), spec-reviewer (iterative completeness review, capped).\n\nOutput is one self-contained markdown file and the skill asks where to deliver it: a personal folder (default for non-project topics; surfaced for download on Desktop/Cowork/claude.ai), into the current project as an explicitly transient doc (consumed by the planner, archived after — never docs/design.md, which is your brand/UI design direction), or no file at all. Never auto-committed.\n\nPairs with rad-planner (ideation → design → plan); works standalone on any topic.",
       "category": "productivity",
       "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-brainstormer",
       "license": "Apache-2.0"
