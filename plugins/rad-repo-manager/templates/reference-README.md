@@ -13,7 +13,8 @@ doc that matches a slot is filed here; anything off-catalog is itself a loose en
 | `lessons-learned.md` | known traps and their fixes |
 | `testing.md` | test strategy / coverage |
 
-Visual / UI design direction lives at top-level `docs/design.md`, not here.
+Brand / UI/UX / visual design direction lives at top-level `docs/design.md`, not here
+— and technical/system design lives in `architecture.md`, never in `design.md`.
 
 Each reference doc appears only when the project needs it — this catalog is the menu,
 not the starter set. Create a slot's file when you first have real content for it;

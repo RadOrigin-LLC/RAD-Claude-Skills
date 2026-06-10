@@ -60,8 +60,9 @@ filed; anything off-catalog is itself a loose end.
 | `lessons-learned.md` | known traps and their fixes |
 | `testing.md` | test strategy / coverage |
 
-Visual / UI design direction lives at top-level `docs/design.md` (conditional), not in
-the catalog. Reference docs are **scaffolded by none** — each appears only when a
+Brand / UI/UX / visual design direction lives at top-level `docs/design.md`
+(conditional), not in the catalog — technical/system design belongs in
+`architecture.md` above, never in `design.md`. Reference docs are **scaffolded by none** — each appears only when a
 project needs it. The catalog is the menu, not the starter set.
 
 ## Drift signals (mechanical)

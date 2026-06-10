@@ -20,7 +20,8 @@ Conditional references (read only when the task touches the area):
 
 - Decision conflict or active-rule lookup: `docs/reference/decision-log.md`.
 - Architecture task: `docs/reference/architecture.md`, if present.
-- Design task: `docs/design.md`, if present.
+- Brand / UI/UX / visual design task: `docs/design.md`, if present. (Technical/system
+  design lives in `docs/reference/architecture.md`, not here.)
 - API/AI route task: `docs/reference/api-contracts.md`, if present.
 - Build/release/deployment task: `docs/reference/commands.md`, if present.
 - Known trap/task pattern: `docs/reference/lessons-learned.md`, if present.
