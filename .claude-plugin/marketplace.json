@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Curated marketplace of Claude Code plugins for developer frameworks, productivity, accessibility, SEO, and DevOps. Each plugin is built for a specific job — code review, project planning, accessibility audits, secret management, Coolify ops, and so on — with explicit honesty about what each does and doesn't do. Pair them where it makes sense; use them standalone where it doesn't. Version history lives in CHANGELOG.md.",
-    "version": "1.26.0",
+    "version": "1.27.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -69,7 +69,7 @@
     {
       "name": "rad-context-prompter",
       "source": "./plugins/rad-context-prompter",
-      "description": "Production-grade prompt engineering toolkit — systematic tool-specific routing across 30+ AI platforms, anti-pattern diagnostics, technique selection matrix, prompt decompilation, autonomous debugging, context engineering for agentic systems, and reusable templates.",
+      "description": "Production-grade prompt engineering toolkit — systematic tool-specific routing across 30+ AI platforms (incl. Claude Code and OpenAI Codex/AGENTS.md), loop & goal engineering (loop prompts, /goal and Goal Mode conditions, long-horizon scaffolds, anti-reward-hacking linting), anti-pattern diagnostics, prompt decompilation, autonomous debugging, and context engineering for agentic systems.",
       "category": "productivity",
       "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-context-prompter",
       "license": "Apache-2.0"
