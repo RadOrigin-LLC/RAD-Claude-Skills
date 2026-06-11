@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Curated marketplace of Claude Code plugins for developer frameworks, productivity, accessibility, SEO, and DevOps. Each plugin is built for a specific job — code review, project planning, accessibility audits, secret management, Coolify ops, and so on — with explicit honesty about what each does and doesn't do. Pair them where it makes sense; use them standalone where it doesn't. Version history lives in CHANGELOG.md.",
-    "version": "1.27.0",
+    "version": "1.28.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -61,7 +61,7 @@
     {
       "name": "rad-seo-optimizer",
       "source": "./plugins/rad-seo-optimizer",
-      "description": "Comprehensive SEO auditing, AEO/GEO optimization, competitor intelligence, keyword discovery, link building, content strategy, schema markup, and E-E-A-T optimization.",
+      "description": "Honest codebase-scoped SEO + AEO tooling: site audits, AI-extractability content linting, keyword ideation, competitor observation, link-building playbooks, schema generation, technical SEO, and E-E-A-T — with every measurement gap declared (no fabricated CWV numbers, keyword volumes, backlink counts, or AI citation rates; Path B MCP unlocks documented in references/CAPABILITIES.md). Four pure-stdlib Python validators: audit-ai-access.py, validate-jsonld.py, audit-meta-tags.py, check-broken-links.py.\n\nv2.2: the AI-crawl-access release. New audit-ai-access.py — per-AI-bot robots.txt matrix classed training (GPTBot, ClaudeBot, Google-Extended, CCBot…) vs citation (OAI-SearchBot, ChatGPT-User, Claude-SearchBot/User, PerplexityBot/User, Bingbot, Googlebot), llms.txt existence/format check (recommended per Lighthouse Agentic Browsing, honestly framed as a non-ranking factor), Content-Signal/RSL/noai detection, JS-dependence heuristic (no AI crawler executes JS), optional CDN-block UA probe (Cloudflare default-blocks AI crawlers since July 2025). aeo-optimizer gained a Phase 0 crawl-access gate; technical-seo gained the AI-crawler matrix. Schema deprecation pass (FAQ rich results retired May 2026, HowTo 2023 — now framed as AI-parsing aids). validate-jsonld 1.1.0 genuinely handles framework JSON-LD (dangerouslySetInnerHTML / set:html / template literals; dynamic blocks get honest dynamic_jsonld findings instead of silent skips). De-versioned model references.",
       "category": "productivity",
       "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-seo-optimizer",
       "license": "Apache-2.0"
