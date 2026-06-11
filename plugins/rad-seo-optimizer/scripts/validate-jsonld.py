@@ -6,6 +6,16 @@ Extracts `<script type="application/ld+json">` blocks from HTML/JSX/Astro/Svelte
 source files (or accepts raw .json files) and validates against an embedded
 subset of schema.org type definitions. Pure-stdlib Python 3.8+.
 
+Framework handling (JSX/TSX/Astro/Svelte/Vue):
+  - Literal JSON in template-literal form is unwrapped and validated:
+    `<script type="application/ld+json">{`...`}</script>` and
+    `dangerouslySetInnerHTML={{ __html: `...` }}` (self-closing or paired).
+  - Astro `set:html={...}` is recognized the same way.
+  - Dynamically built JSON-LD (JSON.stringify(expr), variable refs, `${}`
+    interpolation) CANNOT be statically validated — those blocks are reported
+    as info `dynamic_jsonld` rather than silently skipped or falsely failed.
+    Validate the rendered HTML output for those pages instead.
+
 Checks per block:
 
   - Valid JSON (parse error → critical)
@@ -45,10 +55,17 @@ from typing import Iterable
 
 
 SCAN_EXTENSIONS = {".html", ".htm", ".jsx", ".tsx", ".astro", ".svelte", ".vue", ".json"}
-JSONLD_BLOCK_RE = re.compile(
-    r"""<script[^>]*\btype\s*=\s*["']application/ld\+json["'][^>]*>(.*?)</script>""",
+FRAMEWORK_EXTENSIONS = {".jsx", ".tsx", ".astro", ".svelte", ".vue"}
+
+# Matches the opening (or self-closing) ld+json script tag; group(1) is "/" when
+# self-closing. Attribute values containing ">" are not supported (rare in JSON-LD).
+SCRIPT_TAG_RE = re.compile(
+    r"""<script\b[^>]*?\btype\s*=\s*["']application/ld\+json["'][^>]*?(/?)>""",
     re.IGNORECASE | re.DOTALL,
 )
+SCRIPT_CLOSE_RE = re.compile(r"</script\s*>", re.IGNORECASE)
+# Start of an injected-content attribute: JSX dangerouslySetInnerHTML or Astro set:html.
+HTML_ATTR_START_RE = re.compile(r"""(?:__html\s*:\s*|\bset:html\s*=\s*\{\s*)""")
 
 DEFAULT_EXCLUDES = {
     "node_modules", ".venv", ".env", "dist", "build", ".next", ".output",
@@ -180,10 +197,87 @@ def iter_files(root: Path, files: list[Path] | None) -> Iterable[Path]:
             yield p
 
 
-def extract_blocks(text: str, file_suffix: str) -> list[str]:
+def _scan_delimited(rest: str, quote: str) -> str | None:
+    """Return the content of a `quote`-delimited literal at the start of rest, or None."""
+    end = rest.find(quote, 1)
+    while end != -1 and rest[end - 1] == "\\":
+        end = rest.find(quote, end + 1)
+    if end == -1:
+        return None
+    return rest[1:end]
+
+
+def _classify_attr_expr(tag_text: str) -> tuple[str, str] | None:
+    """Inspect an ld+json script tag for injected content (dangerouslySetInnerHTML /
+    set:html). Returns ('json', payload) for a literal, ('dynamic', snippet) for a
+    JS expression, or None if no such attribute is present."""
+    m = HTML_ATTR_START_RE.search(tag_text)
+    if m is None:
+        return None
+    rest = tag_text[m.end():].lstrip()
+    if not rest:
+        return ("dynamic", "")
+    snippet = rest.splitlines()[0][:60]
+    if rest[0] in "`\"'":
+        literal = _scan_delimited(rest, rest[0])
+        if literal is None:
+            return ("dynamic", snippet)
+        if rest[0] == "`" and "${" in literal:
+            return ("dynamic", literal.splitlines()[0][:60])
+        return ("json", literal)
+    return ("dynamic", snippet)
+
+
+def _unwrap_framework_body(body: str) -> tuple[str, str]:
+    """Classify a JSX/Astro/Svelte/Vue script body that did not parse as raw JSON."""
+    m = re.match(r"^\{\s*`(.*)`\s*\}$", body, re.DOTALL)
+    if m:
+        inner = m.group(1)
+        if "${" in inner:
+            return ("dynamic", inner[:60])
+        return ("json", inner)
+    if re.match(r"^\{.*\}$", body, re.DOTALL):
+        # {JSON.stringify(...)} / {expr} — or literal JSON that failed to parse;
+        # either way it can't be verified statically.
+        return ("dynamic", body[:60])
+    return ("json", body)  # genuinely malformed — validator reports invalid_json
+
+
+def extract_blocks(text: str, file_suffix: str) -> list[tuple[str, str]]:
+    """Return a list of (kind, payload): kind 'json' = validate payload as JSON,
+    kind 'dynamic' = JS-generated content that static analysis cannot verify."""
     if file_suffix == ".json":
-        return [text]
-    return [m.group(1) for m in JSONLD_BLOCK_RE.finditer(text)]
+        return [("json", text)]
+    blocks: list[tuple[str, str]] = []
+    for m in SCRIPT_TAG_RE.finditer(text):
+        tag_text = m.group(0)
+        self_closing = m.group(1) == "/"
+        attr_block = _classify_attr_expr(tag_text)
+        if attr_block is not None:
+            blocks.append(attr_block)
+            continue
+        if self_closing:
+            # ld+json script with no readable content (e.g. spread props)
+            blocks.append(("dynamic", tag_text[:60]))
+            continue
+        close = SCRIPT_CLOSE_RE.search(text, m.end())
+        if close is None:
+            continue
+        body = text[m.end():close.start()].strip()
+        if not body:
+            blocks.append(("empty", ""))
+            continue
+        try:
+            json.loads(body)
+            blocks.append(("json", body))
+            continue
+        except ValueError:
+            pass
+        if file_suffix in FRAMEWORK_EXTENSIONS:
+            blocks.append(_unwrap_framework_body(body))
+        else:
+            blocks.append(("json", body))  # validator reports invalid_json
+    return blocks
 
 
 def validate_value_type(value, field: str) -> str | None:
@@ -393,14 +487,31 @@ def main(argv: list[str]) -> int:
         except OSError:
             continue
         blocks = extract_blocks(text, path.suffix)
-        for idx, block in enumerate(blocks):
+        for idx, (kind, payload) in enumerate(blocks):
             blocks_scanned += 1
-            validate_block(block, path, idx, findings)
+            if kind == "dynamic":
+                findings.append(Finding(
+                    severity="info", category="dynamic", code="dynamic_jsonld",
+                    file=str(path), block_index=idx,
+                    message=f"JSON-LD content is generated by a JS expression ('{payload}…') — "
+                            "static validation cannot verify it. Validate the rendered HTML "
+                            "output for this page, or inline literal JSON.",
+                ))
+                continue
+            if kind == "empty":
+                findings.append(Finding(
+                    severity="warning", category="parse", code="empty_jsonld",
+                    file=str(path), block_index=idx,
+                    message="Empty application/ld+json script block.",
+                    fix="Remove the block or add the JSON-LD payload.",
+                ))
+                continue
+            validate_block(payload, path, idx, findings)
 
     if args.json:
         out = {
             "validator": "validate-jsonld",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "path": str(root),
             "files_scanned": files_scanned,
             "blocks_scanned": blocks_scanned,

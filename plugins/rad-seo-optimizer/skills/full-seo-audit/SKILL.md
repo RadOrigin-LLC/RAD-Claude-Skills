@@ -22,7 +22,7 @@ Every recommendation must explain WHY it matters in business terms, not just wha
 
 ## Cross-model note
 
-Works identically on Opus 4.7 / Sonnet 4.6 / Haiku 4.5. Opus/Sonnet batch codebase reads, URL fetches, and reference loads in parallel. Haiku may follow sequentially if parallel batching misbehaves.
+Works identically on current Opus / Sonnet / Haiku models. Opus/Sonnet batch codebase reads, URL fetches, and reference loads in parallel. Haiku may follow sequentially if parallel batching misbehaves.
 
 ## Execution: parallel-first
 
@@ -180,14 +180,19 @@ By business type:
 - **All sites**: Organization, WebSite, BreadcrumbList, SiteNavigationElement
 - **E-commerce**: Product, Offer, AggregateRating, Review
 - **Local business**: LocalBusiness, OpeningHoursSpecification, GeoCoordinates
-- **Publishers/blogs**: Article, BlogPosting, Author, FAQ
-- **Service businesses**: Service, HowTo, FAQ
+- **Publishers/blogs**: Article, BlogPosting, Author (FAQPage only as an AI-parsing aid)
+- **Service businesses**: Service (HowTo/FAQPage only as AI-parsing aids)
 - **Events**: Event with proper date and location markup
 
 ### Rich Snippet Potential
-Flag pages close to qualifying for rich results but missing one or two properties. FAQ pages without FAQPage schema are almost always a quick win.
+Flag pages close to qualifying for rich results but missing one or two properties —
+**checking deprecations first** (`references/schema-types-guide.md`): FAQ and HowTo rich
+results no longer exist (HowTo retired 2023, FAQ retired May 2026), so never list them as
+rich-result opportunities. Live opportunities: Product/Review stars, Article, Event,
+Recipe, VideoObject, Breadcrumb, JobPosting.
 
-Why schema matters: Structured data does not directly boost rankings, but earns rich snippets that increase click-through rates.
+Why schema matters: Structured data does not directly boost rankings, but live rich-result
+types increase click-through rates, and clean entity markup aids AI parsing.
 
 For detailed schema implementation, delegate to **schema-architect**.
 

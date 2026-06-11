@@ -15,7 +15,7 @@ Google AI Overviews pull from top-ranking search results and structured data.
 | Signal | Action |
 |--------|--------|
 | Search ranking | The site must rank in top 10 for target queries (traditional SEO still matters) |
-| Structured data | Implement FAQ, HowTo, Product, Review, and Organization schema |
+| Structured data | Implement Product, Review, and Organization schema (Google: no special schema is *required* for AI features; FAQPage/HowTo are parsing aids only — their rich results are retired) |
 | Content freshness | Update key pages quarterly with current data |
 | E-E-A-T signals | Author bios, credentials, cited sources, methodology |
 | Direct answers | First paragraph must answer the query in 1-2 sentences |

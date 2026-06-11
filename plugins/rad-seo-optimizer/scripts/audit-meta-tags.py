@@ -280,7 +280,7 @@ def audit_file(path: Path, findings: list[Finding]) -> FileReport:
             ))
 
     # Twitter Card
-    required_tw = ["card", "title", "description"]
+    required_tw = ["card", "title", "description", "image"]
     for prop in required_tw:
         if prop not in report.twitter:
             findings.append(Finding(

@@ -15,7 +15,7 @@ Analyze and optimize individual pages for search visibility, content quality, an
 
 ## Cross-model note
 
-Works identically on Opus 4.7 / Sonnet 4.6 / Haiku 4.5. Per-page rewrites are independent; batch across pages in parallel when auditing multiple pages.
+Works identically on current Opus / Sonnet / Haiku models. Per-page rewrites are independent; batch across pages in parallel when auditing multiple pages.
 
 ## Execution: parallel-first
 

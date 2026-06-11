@@ -18,7 +18,7 @@ Work through every phase in order. Present findings and recommendations in struc
 
 ## Cross-model note
 
-Works identically on Opus 4.7 / Sonnet 4.6 / Haiku 4.5. Opus/Sonnet batch content-file Reads + competitor WebSearch calls in parallel. Haiku may prefer sequential for large content inventories.
+Works identically on current Opus / Sonnet / Haiku models. Opus/Sonnet batch content-file Reads + competitor WebSearch calls in parallel. Haiku may prefer sequential for large content inventories.
 
 ## Execution: parallel-first
 
@@ -226,7 +226,7 @@ INTERNAL LINKING PLAN
 - Link FROM:  [list existing pages that should add links to this content]
 
 SCHEMA MARKUP
-- Recommended types: [Article, FAQ, HowTo, etc.]
+- Recommended types: [Article, Organization, Product, etc. — FAQPage/HowTo as AI-parsing aids only; no rich results since 2023/2026]
 
 AEO FORMATTING REQUIREMENTS
 - Use question-format H2/H3 headings where appropriate
@@ -289,7 +289,7 @@ For each candidate:
    any sections or subtopics they cover that yours does not.
 3. **Improve formatting** — Add table of contents, comparison tables, key
    takeaway boxes, and better visual hierarchy.
-4. **Add schema markup** — Implement Article, FAQ, or HowTo structured data.
+4. **Add schema markup** — Implement Article structured data; FAQPage/HowTo where the content fits (AI-parsing aids — no Google rich results).
 5. **Optimize for AEO** — Add question headings, direct answer leads, and
    quotable statistics.
 6. **Update the published date** — Signal freshness to search engines.

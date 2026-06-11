@@ -18,7 +18,7 @@ Traditional SEO gets a site ranked on Google. AEO gets the brand recommended by 
 
 ## Cross-model note
 
-Works identically on Opus 4.7 / Sonnet 4.6 / Haiku 4.5. Opus/Sonnet should batch reference loads + multi-page content Reads + parallel WebSearch for consistency checks into parallel bursts. Haiku may follow phase order sequentially if parallel batching misbehaves.
+Works identically on current Opus / Sonnet / Haiku models. Opus/Sonnet should batch reference loads + multi-page content Reads + parallel WebSearch for consistency checks into parallel bursts. Haiku may follow phase order sequentially if parallel batching misbehaves.
 
 ## Execution: parallel-first
 
@@ -41,7 +41,7 @@ Read `references/CAPABILITIES.md` before running. Core facts:
 
 ## Checkpoint & Resume
 
-Save state to `.seo/state/<run-id>.json` at these transitions: after Phase 1 (structure audit), after Phase 3 (consistency audit), after Phase 4 (content conversion), after Phase 5 (co-citation map), after output plan.
+Save state to `.seo/state/<run-id>.json` at these transitions: after Phase 0 (crawl access gate), after Phase 1 (structure audit), after Phase 3 (consistency audit), after Phase 4 (content conversion), after Phase 5 (co-citation map), after output plan.
 
 Checkpoint schema (shared with other rad-seo multi-phase skills):
 ```json
@@ -58,6 +58,30 @@ Checkpoint schema (shared with other rad-seo multi-phase skills):
   "awaiting_user_review": ["string"]
 }
 ```
+
+---
+
+## Phase 0: AI Crawl Access Gate
+
+Before optimizing content for AI extraction, verify AI systems can fetch it at all.
+Run the deterministic check (knowledge in `references/ai-crawl-access.md`):
+
+```bash
+python scripts/audit-ai-access.py --origin https://example.com --check-fetch --json
+```
+
+Gate logic:
+- **Citation-class bot blocked** (OAI-SearchBot, ChatGPT-User, Claude-SearchBot/User,
+  PerplexityBot/User, Bingbot, Googlebot) — via robots.txt or CDN — every later phase is
+  moot for that engine. Fix access first.
+- **CSR-only content** (JS-dependence finding) — AI crawlers execute zero JavaScript;
+  content that only exists after hydration cannot be extracted no matter how well it's
+  structured. SSR/prerender before reformatting.
+- **Training-class blocks** (GPTBot, ClaudeBot, Google-Extended, CCBot) — report as a
+  licensing choice; do NOT treat as an AEO problem.
+- **llms.txt** — recommend with the both-truths framing from the reference: Lighthouse's
+  Agentic Browsing audits recommend it and browsing agents may use it; it does not affect
+  rankings or AI citations. Never promise gains from it.
 
 ---
 
@@ -81,7 +105,7 @@ Score each page on a 0-10 scale:
 | 1 | **Question-Format Headings** | Ratio of H2s phrased as questions / total H2s |
 | 2 | **Direct-Answer Leads** | First 1-2 sentences after each heading directly answer the implied question |
 | 3 | **Quotable Stats / Bolded Data** | Presence of specific numbers + bold formatting or `<strong>` on key claims |
-| 4 | **FAQ Schema Presence** | Valid FAQPage JSON-LD on pages with Q&A structure |
+| 4 | **FAQ Schema Presence** | Valid FAQPage JSON-LD on pages with Q&A structure (an AI-parsing aid only — Google retired FAQ rich results entirely in May 2026; never promise rich-result appearance) |
 | 5 | **Comparison / Structured Data** | Tables, feature matrices, pro/con lists |
 | 6 | **Semantic Chunking** | Short paragraphs (2-4 sentences), logical subsection density, not wall-of-text |
 
@@ -114,6 +138,13 @@ For each page, identify:
 - Paragraphs over 5 sentences that should be broken up
 
 These findings become the Phase 4 conversion queue.
+
+**Evidence basis:** the strongest published result on generative-engine visibility
+(Princeton GEO study, KDD 2024, ~10k queries) found that adding **statistics,
+quotations, and source citations** lifted visibility ~30-40%, while keyword stuffing did
+nothing — which is why dimensions 2-3 weight direct answers and quotable data. Industry
+citation studies converge on the same signals plus freshness and self-contained chunks
+(AI Mode retrieves at passage level via query fan-out, not page level).
 
 ---
 
@@ -322,6 +353,7 @@ For detailed distribution tactics and platform-specific strategies, consult `ref
 After completing all phases, generate a prioritized action plan organized by time horizon.
 
 ### Quick Wins (Week 1-2)
+0. **Unblock AI access** (Phase 0) — allow citation-class bots in robots.txt and the CDN's bot settings; SSR any CSR-only key pages
 1. **Fix consistency issues** (Phase 3) — update all profiles to match canonical information
 2. **Add FAQ schema** to existing high-traffic pages
 3. **Reformat top 5 pages** using Phase 4 conversion rules

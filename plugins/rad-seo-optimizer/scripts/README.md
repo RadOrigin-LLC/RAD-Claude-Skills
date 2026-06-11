@@ -1,6 +1,8 @@
 # rad-seo-optimizer scripts
 
-Three pure-stdlib Python 3.8+ validators that turn the plugin's "static SEO analysis" claims from LLM eyeballing into deterministic checks. No `pip install` required.
+Four pure-stdlib Python 3.8+ validators that turn the plugin's "static SEO analysis" claims from LLM eyeballing into deterministic checks. No `pip install` required.
+
+> Windows note: the examples use `python3`; on Windows use `python` (or `py`).
 
 ## validate-jsonld.py
 
@@ -24,6 +26,13 @@ python3 scripts/validate-jsonld.py <root> --json
 **Bundled type set** (SEO-impactful subset; ~20 types): Article, NewsArticle, BlogPosting, Product, Offer, Organization, Person, WebSite, WebPage, BreadcrumbList, FAQPage, Question, Answer, HowTo, Recipe, Event, LocalBusiness, SoftwareApplication, VideoObject. For other types the validator parses-only and emits an `info`.
 
 **Supports `@graph` form** and arrays of objects at top level.
+
+**Framework handling (JSX/TSX/Astro/Svelte/Vue):** literal JSON is unwrapped and
+validated from `dangerouslySetInnerHTML={{ __html: `...` }}` (including self-closing
+tags), Astro `set:html={...}`, and JSX-children `{`...`}` forms. Dynamically built
+JSON-LD (`JSON.stringify(expr)`, variable refs, `${}` interpolation) cannot be verified
+statically — those blocks emit an `info`-severity `dynamic_jsonld` finding telling you to
+validate the rendered HTML, rather than being silently skipped or falsely failed.
 
 **Exit codes:** `0` clean, `1` warnings/critical, `2` script error.
 
@@ -58,7 +67,7 @@ Works on JSX/Astro/Svelte even though they aren't strict HTML — extracts `<hea
 Parallel HTTP HEAD scanner for 4xx / 5xx / network errors. Pure stdlib (urllib + concurrent.futures).
 
 ```bash
-python3 scripts/check-broken-links.py --urls a.com,b.com,c.com
+python3 scripts/check-broken-links.py --urls https://a.com,https://b.com
 python3 scripts/check-broken-links.py --url-list urls.txt
 python3 scripts/check-broken-links.py --sitemap https://example.com/sitemap.xml
 python3 scripts/check-broken-links.py --html-root ./public
@@ -68,7 +77,7 @@ python3 scripts/check-broken-links.py --html-root ./public --json
 
 **Input modes:**
 
-- `--urls <list>` — inline comma-separated
+- `--urls <list>` — inline comma-separated (full URLs with `https://` scheme required)
 - `--url-list <file>` — one URL per line
 - `--sitemap <url-or-file>` — parses `<loc>` entries from XML sitemap (URL or local file)
 - `--html-root <dir>` — scans `.html`/`.htm` files for absolute `href`/`src` attributes
@@ -90,11 +99,46 @@ Combine any of the above; URLs are deduped across sources.
 
 **Honest scope:** runs at the time of invocation only. Not a continuous monitor. For ongoing link health, schedule via cron / GitHub Actions.
 
+## audit-ai-access.py
+
+Audits the AI-crawl access layer: robots.txt AI-bot policy, llms.txt, Content Signals,
+RSL, noai meta, and JS-dependence. Knowledge reference: `references/ai-crawl-access.md`.
+
+```bash
+python3 scripts/audit-ai-access.py --origin https://example.com
+python3 scripts/audit-ai-access.py --origin https://example.com --check-fetch
+python3 scripts/audit-ai-access.py --robots ./public/robots.txt --html-root ./public
+python3 scripts/audit-ai-access.py --origin https://example.com --json
+```
+
+**Checks:**
+
+- **Per-AI-bot robots.txt matrix** — 16 known AI user-agents, classed *citation/search*
+  (blocking removes you from AI answers: OAI-SearchBot, ChatGPT-User,
+  Claude-SearchBot/User, PerplexityBot/User, Bingbot, Googlebot) vs *training*
+  (licensing choice, no AEO impact: GPTBot, ClaudeBot, Google-Extended, CCBot, …).
+  Citation-bot full blocks → warning; Googlebot/Bingbot blocks → critical; training
+  blocks → info. Includes the Google-Extended scope explainer (it does NOT control AI
+  Overviews).
+- **llms.txt** — existence (absence = info only; it is not a ranking/citation factor but
+  Lighthouse's Agentic Browsing audits recommend it), spec-shape check (H1 + Markdown
+  links), 5xx → warning (mirrors Lighthouse).
+- **Content-Signal / RSL `License:` lines** in robots.txt — informational.
+- **noai/noimageai meta** in local HTML — informational.
+- **JS-dependence heuristic** — near-empty visible text + scripts + SPA shell markers →
+  warning (no major AI crawler executes JavaScript).
+- **`--check-fetch`** — probes the origin with AI user-agent strings vs a browser
+  baseline to catch CDN/WAF-level blocking that contradicts robots.txt. Indicative only
+  (some WAFs verify crawler IPs).
+
+**Exit codes:** `0` clean, `1` warnings/critical, `2` script error.
+
 ## When these run
 
 | Caller | When |
 |---|---|
-| `/rad-seo-optimizer:technical-seo` | The skill invokes `validate-jsonld.py` and `audit-meta-tags.py` over the templates it scans. |
+| `/rad-seo-optimizer:technical-seo` | The skill invokes `validate-jsonld.py`, `audit-meta-tags.py`, and `audit-ai-access.py` over the templates/origin it scans. |
+| `/rad-seo-optimizer:aeo-optimizer` | Phase 0 (AI Crawl Access Gate) runs `audit-ai-access.py` before content work. |
 | `/rad-seo-optimizer:broken-link-fixer` | Wraps `check-broken-links.py` for the discover-and-fix flow. |
 | User direct | Standalone via `python3 plugins/rad-seo-optimizer/scripts/<validator>.py` |
 | CI | Same, with `--json` and selective inputs for sitemap or URL-list mode |

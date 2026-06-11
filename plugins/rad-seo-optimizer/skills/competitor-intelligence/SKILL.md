@@ -17,7 +17,7 @@ Perform a competitor SEO analysis via observable signals. Every finding includes
 
 ## Cross-model note
 
-Works identically on Opus 4.7 / Sonnet 4.6 / Haiku 4.5. Opus/Sonnet batch WebFetch calls + WebSearch queries in parallel. Haiku may prefer sequential for large competitor sets.
+Works identically on current Opus / Sonnet / Haiku models. Opus/Sonnet batch WebFetch calls + WebSearch queries in parallel. Haiku may prefer sequential for large competitor sets.
 
 ## Execution: parallel-first
 
@@ -218,7 +218,7 @@ Note whether a featured snippet appears + who holds it. Record format (paragraph
 
 ### 5B — Rich Results
 
-Check for: FAQ accordions, HowTo steps, review stars, product cards, video carousels, image packs. Map which competitors own each type for which keywords.
+Check for: review stars, product cards, video carousels, image packs, event listings, recipe cards. Map which competitors own each type for which keywords. (FAQ accordions and HowTo steps no longer exist in Google SERPs — FAQ retired May 2026, HowTo 2023; if observed, that's a different engine or a stale cache.)
 
 ### 5C — People Also Ask
 
@@ -233,7 +233,7 @@ Check whether any competitor has a knowledge panel. If user doesn't, note steps 
 | Keyword | Feature | Current Owner | User Eligible? | Action to Win |
 |---------|---------|--------------|----------------|---------------|
 | best crm | Featured snippet (list) | comp1.com | Yes | Add H2 list format |
-| crm pricing | FAQ rich result | comp2.com | Yes | Add FAQPage schema |
+| crm pricing | PAA presence | comp2.com | Yes | Publish direct-answer pricing section |
 
 ---
 

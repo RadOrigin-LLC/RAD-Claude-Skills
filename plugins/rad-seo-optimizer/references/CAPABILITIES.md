@@ -14,7 +14,9 @@ It does NOT replace measurement-dependent SEO platforms (Ahrefs, Semrush, Scream
 | Content rewriting for AEO | Converts H2s to question format, leads sections with direct answers, bolds quotable stats, adds FAQ schema — real file transforms |
 | Broken-link audit over repo | Parses `href` references, verifies targets exist in the codebase, flags 404s and redirect chains in config |
 | Internal-linking graph | Builds the link graph from templates + content, identifies orphans, over-linked pages, hub/spoke gaps |
-| SERP feature observation | WebSearch returns who owns featured snippets, FAQ rich results, PAA, image/video thumbnails for specified keywords |
+| SERP feature observation | WebSearch returns who owns featured snippets, PAA, image/video thumbnails, AI Overview citations (when surfaced) for specified keywords |
+| AI crawl access audit | `scripts/audit-ai-access.py` — robots.txt per-AI-bot matrix (training vs citation class), llms.txt existence/format, Content-Signal/RSL/noai detection, JS-dependence heuristic, optional CDN-block UA probe |
+| Agent-readiness review | Static checks aligned with Lighthouse's experimental Agentic Browsing category (llms.txt, accessibility-tree quality, layout-shift risk, WebMCP presence) — see `references/agent-readiness.md` |
 | Keyword ideation + intent classification | Generates keyword candidates, classifies search intent (informational/navigational/transactional/commercial), clusters semantically |
 | Competitor content gap analysis | WebFetch of competitor pages + observation of their content patterns, topics, formats |
 | Content audit + scoring | Scores the user's own content on quality + E-E-A-T + AI-extractability structure |

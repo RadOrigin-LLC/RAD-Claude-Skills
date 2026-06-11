@@ -16,7 +16,7 @@ Fix the specified SEO issue by identifying all instances, explaining the impact,
 
 ## Cross-model note
 
-Works identically on Opus 4.7 / Sonnet 4.6 / Haiku 4.5. Fix application is primarily code transforms + verification; all three models handle reliably.
+Works identically on current Opus / Sonnet / Haiku models. Fix application is primarily code transforms + verification; all three models handle reliably.
 
 ## Execution: parallel-first
 

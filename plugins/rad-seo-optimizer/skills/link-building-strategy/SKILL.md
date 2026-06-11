@@ -17,7 +17,7 @@ Generate a complete link acquisition tactics playbook and a 12-week action plan.
 
 ## Cross-model note
 
-Works identically on Opus 4.7 / Sonnet 4.6 / Haiku 4.5. Most of this skill is reasoning + planning; WebSearch calls in Phase 2 parallelize cleanly across competitors.
+Works identically on current Opus / Sonnet / Haiku models. Most of this skill is reasoning + planning; WebSearch calls in Phase 2 parallelize cleanly across competitors.
 
 ## Execution: parallel-first
 

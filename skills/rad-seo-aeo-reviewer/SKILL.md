@@ -101,16 +101,27 @@ Execute all six phases. Do not skip phases.
 
 **Crawlability & Indexation**
 - Analyze `robots.txt` — accidental blocks on important paths
+- **AI crawler access**: check robots.txt for the citation-class AI bots (OAI-SearchBot,
+  ChatGPT-User, Claude-SearchBot/User, PerplexityBot/User, Bingbot, Googlebot — blocking
+  these removes the site from AI answers) vs training-class bots (GPTBot, ClaudeBot,
+  Google-Extended, CCBot — a licensing choice with no AEO impact; note Google-Extended
+  does NOT control AI Overviews, Googlebot does)
+- **llms.txt**: fetch `/llms.txt` — absence is informational only (not a ranking or
+  citation factor, but Lighthouse's Agentic Browsing audits recommend one); if present,
+  check H1 + Markdown-link format
 - Validate XML sitemaps (exist, return 200, referenced in robots.txt, URLs live)
 - Check for `noindex` on pages that should be indexed
 - Verify canonical tags present and self-referencing
 - Check for orphan pages not in sitemap
 
-**Core Web Vitals & Performance**
+**Core Web Vitals & Performance — risk factors only, never numbers**
 - Large uncompressed images, render-blocking scripts, excessive third-party scripts
 - Missing lazy loading on below-fold images
 - CLS-causing patterns: images without width/height, dynamically injected above-fold content
-- Targets: LCP < 2.5s | INP < 200ms | CLS < 0.1
+- HONESTY RULE: you cannot measure LCP/INP/CLS from fetched HTML — report *code-level
+  risk factors* and state the gap explicitly. For real numbers, point the user at
+  PageSpeed Insights (free). Context thresholds if the user supplies measurements:
+  LCP < 2.5s | INP < 200ms | CLS < 0.1.
 
 **Mobile Readiness**
 - Viewport meta tag, fixed-width elements, tap target sizing
@@ -155,7 +166,7 @@ Parse all JSON-LD/Microdata/RDFa. Reference `schema-types-guide.md` for the comp
 | E-commerce | Product, Offer, AggregateRating, Review |
 | Local business | LocalBusiness, OpeningHoursSpecification, GeoCoordinates |
 | Publishers/blogs | Article, BlogPosting, Author (Person), FAQ |
-| Service businesses | Service, HowTo, FAQ |
+| Service businesses | Service (HowTo/FAQPage as AI-parsing aids only — no rich results) |
 
 #### Phase 5: Internal Linking & Site Architecture (10% of score)
 
@@ -254,7 +265,7 @@ Fetch homepage + key landing page from each competitor. Compare page speed, mobi
 
 #### Phase 3: SERP Feature Ownership
 
-For each target keyword: featured snippets (who, what format), FAQ rich results, People Also Ask questions, review stars, video carousels, knowledge panels.
+For each target keyword: featured snippets (who, what format), People Also Ask questions, review stars, video carousels, knowledge panels, observable AI Overview citations. (FAQ and HowTo rich results no longer exist — retired May 2026 / 2023.)
 
 Build an opportunity map: which features can be captured, with specific strategies.
 
@@ -276,7 +287,7 @@ Synthesize into max 15 actions ranked by impact/effort. Group: quick wins (1-2 w
 
 ### Step 4: Produce the Report
 
-Generate the **Competitor Intelligence Report** as an artifact with: executive summary, competitor overview table, content gaps (top 10), 10x opportunities (top 3), technical comparison, SERP feature opportunities, link opportunities (top 10), AI visibility comparison, and prioritized action plan.
+Generate the **Competitor Intelligence Report** as an artifact with: executive summary, competitor overview table, content gaps (top 10), 10x opportunities (top 3), technical comparison, SERP feature opportunities, link opportunities (top 10), AI citation pattern observations (what content patterns earn competitors AI citations — never invented citation rates), and prioritized action plan.
 
 ### Step 5: Offer Next Workflow
 
@@ -352,20 +363,28 @@ Based on user request, take the most direct path:
 
 ### Part A: AI Visibility Audit & Optimization
 
-#### Phase 1: AI Visibility Scorecard
+#### Phase 1: AI-Extractability Content Linter
 
-Score across six dimensions (0-10 each, composite 0-60):
+**Honesty rule:** web search returns search results, NOT what ChatGPT/Perplexity/Gemini
+actually answer — so never score "brand presence in AI responses"; that requires
+querying those platforms directly. What you CAN score is the brand's *own content
+structure* on signals that tend to earn AI citations. Score each page across six
+structural dimensions (0-10 each, composite 0-60):
 
-| Dimension | What It Measures |
-|-----------|-----------------|
-| Presence | Is the brand mentioned in AI responses for target keywords? |
-| Accuracy | Is the information factually correct and current? |
-| Sentiment | Positive, neutral, or negative tone? |
-| Position | Mentioned first, or buried among alternatives? |
-| Completeness | Does AI capture the full value proposition? |
-| Consistency | Do different AI platforms agree? |
+| Dimension | Observable Signal |
+|-----------|-------------------|
+| Question-Format Headings | Ratio of H2s phrased as questions |
+| Direct-Answer Leads | First 1-2 sentences after each heading answer it directly |
+| Quotable Stats / Bolded Data | Specific numbers with bold/strong emphasis |
+| FAQ Schema Presence | Valid FAQPage JSON-LD (an AI-parsing aid — Google retired FAQ rich results May 2026) |
+| Comparison / Structured Data | Tables, feature matrices, pro/con lists |
+| Semantic Chunking | 2-4 sentence paragraphs, self-contained sections |
 
-**Audit method:** Search major AI platforms with 10+ brand-relevant queries. Rating scale: Invisible (0-12), Emerging (13-24), Visible (25-36), Strong (37-48), Dominant (49-60).
+Rating scale (structural readiness, NOT actual AI visibility): Illegible to AI (0-12),
+Partially extractable (13-24), Extractable (25-36), Highly extractable (37-48),
+AI-native (49-60). State in the artifact that this measures readiness to be cited, not
+citation rates — actual citation measurement requires the AI platforms' own interfaces
+(Bing Webmaster Tools' AI Performance report is the only free telemetry).
 
 Produce scorecard as an **artifact**.
 
@@ -439,14 +458,17 @@ Produce as **artifact**:
 4. Validation checklist
 5. AEO-critical schema recommendations
 
-**AEO-Critical Types:** FAQPage (highest citation rate), HowTo (highly citable), Organization (entity definition), Product (AI recommendations), Speakable (voice/AI), Review/AggregateRating (trust signals).
+**AEO-Critical Types** (AI-parsing aids — FAQ/HowTo earn no Google rich results anymore): FAQPage (clean Q&A extraction), HowTo (step extraction), Organization (entity definition), Product (AI recommendations), Speakable (voice/AI), Review/AggregateRating (trust signals).
 
-Recommend validation via Google Rich Results Test and Schema.org Validator.
+Recommend validation via Google Rich Results Test (note: FAQ support removed June 2026) and Schema.org Validator.
 
 ### Measurement
 
-Monthly: Run 10 test queries across platforms. Track presence, position, accuracy, sentiment.
-Quarterly: Full visibility audit. Compare composite scores.
+Monthly: Re-run the extractability linter on new/updated pages; track the structural
+score trend. Point the user at Bing Webmaster Tools' AI Performance report and Search
+Console's generative-AI reports for actual citation telemetry — this skill cannot query
+AI platforms and never invents presence/sentiment/position numbers.
+Quarterly: Full structural re-audit. Compare composite scores.
 
 ---
 

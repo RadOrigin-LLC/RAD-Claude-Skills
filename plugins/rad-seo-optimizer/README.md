@@ -5,12 +5,13 @@ This plugin does real work on the surface area where Claude Code has edge — st
 ## What You Can Actually Do With This
 
 - **Lint your codebase for SEO issues** — find missing meta, bad H1 hierarchies, absent alt text, invalid canonicals, broken JSON-LD, robots.txt misconfigurations
-- **Generate valid JSON-LD schema** — from observable page content, any schema.org type
+- **Audit your AI crawl access** — per-AI-bot robots.txt matrix (training vs citation bots), CDN-level block detection, llms.txt check, Content-Signals/RSL detection, JS-dependence heuristic (`scripts/audit-ai-access.py`)
+- **Generate valid JSON-LD schema** — from observable page content, any schema.org type (with current rich-result deprecation awareness — FAQ/HowTo rich results are gone)
 - **Score your content on AI-extractability** — structural readiness to be cited by ChatGPT/Perplexity/Gemini (NOT actual citation rates, which need Path B)
 - **Rewrite content for AEO** — convert H2s to question format, lead with direct answers, add FAQ schema, add comparison tables
 - **Fix broken links** — crawl your repo, verify targets, patch 404s and redirect chains
 - **Audit internal linking** — orphan pages, over/under-linked pages, hub-and-spoke gaps
-- **Observe SERP features** — who owns featured snippets, FAQ rich results, PAA for your target keywords
+- **Observe SERP features** — who owns featured snippets, PAA, and observable AI Overview citations for your target keywords
 - **Ideate keywords** — seed expansion, intent classification, semantic clustering (qualitative competitiveness signals, NOT numerical volume/difficulty)
 - **Research competitor content** — topics they cover, content patterns they use, SERP feature ownership
 - **Plan content strategy** — topical authority mapping, gap analysis, 12-week editorial calendar
@@ -39,7 +40,7 @@ When you ask a question requiring any of the above, the plugin will observe what
 | `content-strategist` | Topical authority mapping, content gap analysis, 12-week editorial calendar |
 | `link-building-strategy` | Linkable assets, tactic selection, 12-week outreach playbook with templates |
 | `schema-architect` | JSON-LD generation + validation (one of the plugin's strongest capabilities) |
-| `technical-seo` | Crawlability, canonicals, redirects, page-speed CODE-LEVEL risk factors (NOT numerical CWV) |
+| `technical-seo` | Crawlability, AI-crawler access matrix, canonicals, redirects, page-speed CODE-LEVEL risk factors (NOT numerical CWV) |
 | `aeo-optimizer` | AI-extractability content linter + seeding strategy + consistency audit + content conversion |
 | `fix-seo` | Issue router + remediation (applies fixes, doesn't just diagnose) |
 | `broken-link-fixer` | Crawl repo for hrefs, verify targets, fix 404s and redirect chains |
@@ -53,7 +54,18 @@ When you ask a question requiring any of the above, the plugin will observe what
 | `competitor-spy` | Autonomous observable competitor research |
 | `content-auditor` | Autonomous content quality + AI-extractability audit over user's own content |
 
-All three agents default to **Opus 4.7** (Sonnet 4.6 is a first-class fallback; Haiku 4.5 for narrow-scope). All emit **JSON-first output** per the schemas in `references/subagent-prompts/` for reliable cross-model parsing.
+All three agents default to **Opus** (Sonnet is a first-class fallback; Haiku for narrow-scope). All emit **JSON-first output** per the schemas in `references/subagent-prompts/` for reliable cross-model parsing.
+
+## What's New in 2.2
+
+The AI-crawl-access release. Research-grounded against the 2026 landscape (Lighthouse Agentic Browsing, AI Mode query fan-out, the May 2026 FAQ rich-result retirement).
+
+- **New validator: `scripts/audit-ai-access.py`** — robots.txt per-AI-bot allow/block matrix classed *training* (GPTBot, ClaudeBot, Google-Extended, CCBot…) vs *citation* (OAI-SearchBot, ChatGPT-User, Claude-SearchBot/User, PerplexityBot/User, Bingbot, Googlebot), llms.txt existence + format check, Content-Signal/RSL/noai detection, JS-dependence heuristic (no AI crawler executes JS), and an optional `--check-fetch` probe for CDN-level blocking (Cloudflare blocks AI crawlers by default on new domains since July 2025).
+- **llms.txt handled with both truths**: not a Search ranking/citation factor (Google's stated position + crawl-log evidence), but recommended by Chrome Lighthouse's experimental Agentic Browsing audits — so the plugin recommends it without overpromising. New `references/ai-crawl-access.md` and `references/agent-readiness.md`.
+- **aeo-optimizer gained Phase 0 (AI Crawl Access Gate)** — content extractability is moot if citation bots are blocked or content is CSR-only; technical-seo gained §1.7 (AI Crawler Access).
+- **Schema deprecation pass**: FAQ rich results retired by Google May 2026 (HowTo in 2023; Book Actions/Course Info/ClaimReview/etc. June 2025) — every skill/reference now frames FAQPage/HowTo as AI-parsing aids, never rich-result opportunities.
+- **validate-jsonld.py 1.1.0**: now genuinely handles framework JSON-LD — unwraps `dangerouslySetInnerHTML`/`set:html`/JSX template-literal forms and validates them; dynamic `JSON.stringify(expr)` blocks get an honest `dynamic_jsonld` info finding instead of being silently skipped or falsely failed. audit-meta-tags now checks `twitter:image`. Doc fixes in check-broken-links.
+- **De-versioned model references** (Opus/Sonnet/Haiku without point versions) to end the per-release review tax.
 
 ## What's New in 2.0
 
@@ -67,8 +79,8 @@ This is a major revision. The previous 1.x version marketed itself as a full SEO
 - **Added `references/CAPABILITIES.md`** — explicit statement of what the plugin can and cannot measure, with the Path B MCP that would unlock each gap.
 - **Every agent + skill surfaces `measurement_gaps[]`** in its JSON output — gaps are declared, not papered over.
 
-**4.7 platform pass (applied to the honest surface):**
-- Opus-default on all three agents, Sonnet 4.6 documented as first-class fallback
+**Platform pass (applied to the honest surface):**
+- Opus-default on all three agents, Sonnet documented as first-class fallback
 - JSON-first subagent output contracts at plugin-level `references/subagent-prompts/{site-audit,competitor-research,content-audit}.md`
 - Flattened agent layout: `agents/<name>/AGENT.md` → `agents/<name>.md`
 - Fixed broken hex color codes — runtime doesn't recognize them. Switched to named colors (orange, teal, purple).
@@ -96,7 +108,7 @@ Each integration is additive — skills detect presence and use real measurement
 claude plugins add ./RAD-Claude-Skills/plugins/rad-seo-optimizer
 ```
 
-> **Using Claude.ai instead of CLI?** See [`skills/rad-seo-aeo-reviewer/`](../../skills/rad-seo-aeo-reviewer/) for the Claude.ai skill version — a single ZIP with consolidated workflows, URL fetching, web search, and artifact output. No CLI required. (Note: the Claude.ai version will be refreshed to match 2.0's honesty pass in a follow-up release.)
+> **Using Claude.ai instead of CLI?** See [`skills/rad-seo-aeo-reviewer/`](../../skills/rad-seo-aeo-reviewer/) for the Claude.ai skill version — a single ZIP with consolidated workflows, URL fetching, web search, and artifact output. No CLI required. (Refreshed in 2.2 to match the honesty pass: extractability linter instead of the retired AI-visibility scorecard, CWV risk-factor framing, AI-crawler access checks, and current schema deprecations.)
 
 Then ask:
 

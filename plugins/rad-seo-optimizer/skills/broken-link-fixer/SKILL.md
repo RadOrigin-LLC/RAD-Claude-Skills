@@ -14,7 +14,7 @@ Find every broken link on the target site, trace redirect chains, uncover link r
 
 ## Cross-model note
 
-Works identically on Opus 4.7 / Sonnet 4.6 / Haiku 4.5. Link verification is primarily tool-call orchestration; all three models handle the batch coordination reliably.
+Works identically on current Opus / Sonnet / Haiku models. Link verification is primarily tool-call orchestration; all three models handle the batch coordination reliably.
 
 ## Execution: parallel-first
 

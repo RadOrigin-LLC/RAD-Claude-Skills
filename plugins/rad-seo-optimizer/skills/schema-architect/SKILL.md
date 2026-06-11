@@ -17,7 +17,7 @@ Generate valid, comprehensive JSON-LD structured data that earns rich results an
 
 ## Cross-model note
 
-Works identically on Opus 4.7 / Sonnet 4.6 / Haiku 4.5. Schema generation is a well-defined structured output task all three models handle reliably.
+Works identically on current Opus / Sonnet / Haiku models. Schema generation is a well-defined structured output task all three models handle reliably.
 
 ## Execution: parallel-first
 
@@ -150,10 +150,14 @@ matters for rich results.
 After generating schema for the current page, identify **additional** schema
 types that could unlock rich result features the page is not yet using.
 
+**Deprecation check first** (see `references/schema-types-guide.md`): Google retired
+HowTo rich results (2023) and FAQ rich results entirely (May 2026), plus Book Actions,
+Course Info, ClaimReview, Estimated Salary, Learning Video, Special Announcement, and
+Vehicle Listing (June 2025). Still recommend `FAQPage`/`HowTo` markup where the content
+fits — as AI-parsing aids — but never present them as rich-result opportunities.
+
 | Rich Result Feature | Schema Required | Visual Benefit |
 |---|---|---|
-| FAQ accordion | `FAQPage` | Expandable Q&A directly in SERP |
-| How-to steps | `HowTo` | Numbered steps with images |
 | Review stars | `Review` / `AggregateRating` | Star rating in snippet |
 | Price & availability | `Product` + `Offer` | Price badge in results |
 | Event dates | `Event` | Date/time + location in SERP |
@@ -192,7 +196,9 @@ Run every generated schema block through these checks before delivering it.
 Recommend the user paste the final markup into:
 
 1. **Google Rich Results Test** -- https://search.google.com/test/rich-results
+   (note: no longer reports FAQ — support removed June 2026)
 2. **Schema.org Validator** -- https://validator.schema.org/
+   (also run the bundled `scripts/validate-jsonld.py` for a deterministic local check)
 3. **Google Search Console** -- monitor the Enhancements report after
    deployment for errors or warnings.
 

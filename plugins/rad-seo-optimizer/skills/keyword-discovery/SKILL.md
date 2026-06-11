@@ -17,7 +17,7 @@ Walk the user through a complete keyword research pipeline, producing a prioriti
 
 ## Cross-model note
 
-Works identically on Opus 4.7 / Sonnet 4.6 / Haiku 4.5. Expansion + intent classification + clustering all benefit from batch parallelism where per-keyword work is independent.
+Works identically on current Opus / Sonnet / Haiku models. Expansion + intent classification + clustering all benefit from batch parallelism where per-keyword work is independent.
 
 ## Execution: parallel-first
 

@@ -1,6 +1,24 @@
 # Schema Types Guide
 
-Complete reference for all Google-supported structured data types. Use JSON-LD format (Google's strong recommendation over Microdata/RDFa).
+Complete reference for SEO-relevant structured data types. Use JSON-LD format (Google's strong recommendation over Microdata/RDFa).
+
+## Deprecation Status — read before recommending (current as of mid-2026)
+
+Google has been steadily retiring rich result types. Recommending these for *rich
+results* is stale advice; the markup remains valid schema.org and can still aid AI/LLM
+parsing, but never promise SERP features from it:
+
+- **HowTo** — rich results removed (Sept 2023)
+- **FAQPage** — restricted to gov/health sites (2023), then dropped entirely (May 2026);
+  Rich Results Test support removed June 2026
+- **June 2025 retirements:** Book Actions, Course Info, ClaimReview (fact-check label),
+  Estimated Salary, Learning Video, Special Announcement, Vehicle Listing
+
+Still earning rich results and worth implementing: Organization, LocalBusiness, Product
+/ Offer / Review / AggregateRating, Article, Event, Recipe, JobPosting, BreadcrumbList,
+VideoObject. Google's official position on AI features: **no special schema is required**
+for AI Overviews/AI Mode — standard indexability governs inclusion; schema's AI value is
+entity disambiguation and clean parsing, not eligibility.
 
 ## Implementation Rules
 
@@ -24,8 +42,8 @@ Complete reference for all Google-supported structured data types. Use JSON-LD f
 |------|----------|---------------|-------------|
 | Article | News/blog posts | headline, author, datePublished, image | Top Stories |
 | BlogPosting | Blog content | Same as Article + blog-specific | Article rich result |
-| HowTo | Step-by-step guides | step[], totalTime, tool[], supply[] | How-to rich result |
-| FAQPage | FAQ sections | mainEntity[Question > acceptedAnswer] | FAQ accordion |
+| HowTo | Step-by-step guides | step[], totalTime, tool[], supply[] | None (retired 2023) — AI-parsing aid only |
+| FAQPage | FAQ sections | mainEntity[Question > acceptedAnswer] | None (retired May 2026) — AI-parsing aid only |
 | QAPage | Single Q&A | mainEntity[Question > acceptedAnswer] | Q&A rich result |
 
 ### E-Commerce
@@ -49,7 +67,7 @@ Complete reference for all Google-supported structured data types. Use JSON-LD f
 | Type | Use When | Key Properties | Rich Result |
 |------|----------|---------------|-------------|
 | Event | Events/conferences | startDate, location, offers, performer | Event listing |
-| Course | Educational content | name, provider, hasCourseInstance | Course listing |
+| Course | Educational content | name, provider, hasCourseInstance | Course Info retired June 2025 |
 | CourseInstance | Specific offerings | courseMode, instructor, courseSchedule | Enhanced course |
 
 ### Media
@@ -59,7 +77,7 @@ Complete reference for all Google-supported structured data types. Use JSON-LD f
 | Clip | Video segments | name, startOffset, endOffset | Key moments |
 | BroadcastEvent | Live streams | isLiveBroadcast, startDate | LIVE badge |
 | Movie | Film pages | name, director, dateCreated | Movie panel |
-| Book | Book pages | name, author, isbn, workExample | Book panel |
+| Book | Book pages | name, author, isbn, workExample | Book Actions retired June 2025 |
 | Recipe | Recipes | recipeIngredient, recipeInstructions, nutrition | Recipe card |
 
 ### Navigation & Structure
@@ -80,7 +98,7 @@ Complete reference for all Google-supported structured data types. Use JSON-LD f
 |------|----------|---------------|-------------|
 | SoftwareApplication | Software/app pages | name, operatingSystem, offers, rating | App snippet |
 | MathSolver | Math tools | potentialAction[SolveMathAction] | Math solver |
-| ClaimReview | Fact checks | claimReviewed, reviewRating | Fact check label |
+| ClaimReview | Fact checks | claimReviewed, reviewRating | Retired June 2025 |
 | Speakable (BETA) | Voice/AI-ready content | cssSelector or xpath | Voice assistant |
 | VacationRental | Rental listings | address, geo, numberOfRooms | Rental listing |
 
@@ -116,7 +134,8 @@ Inject JSON-LD via Custom HTML tags — useful for sites where you can't modify 
 
 ## AEO-Critical Schema Types
 
-These schema types are particularly important for AI search visibility:
+These schema types are particularly important for AI search visibility (as parsing aids —
+none of this is a Google rich-result promise; FAQPage and HowTo earn no rich results anymore):
 1. **FAQPage** — LLMs extract Q&A pairs directly
 2. **HowTo** — Step-by-step content is highly citable
 3. **Organization** — Defines your brand entity for AI

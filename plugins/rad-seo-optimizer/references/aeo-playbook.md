@@ -79,7 +79,9 @@ Format subheadings as actual customer questions:
 - "When should you use [method]?" with clear use-case scenarios
 
 ### Schema Markup for AI
-Implement structured data that explicitly tells AI what your content means:
+Implement structured data that explicitly tells AI what your content means (parsing
+aids — Google requires no special schema for AI features, and FAQ/HowTo rich results
+are retired):
 - FAQ schema on question-answering pages
 - HowTo schema on tutorial/guide pages
 - Product schema with complete specifications
@@ -89,9 +91,11 @@ Implement structured data that explicitly tells AI what your content means:
 ## Platform-Specific Optimization
 
 ### Google AI Overviews
-- Already uses your indexed content — focus on being in top 10 results
-- Structured data heavily influences AI Overview inclusion
-- FAQ and HowTo schema are particularly powerful
+- Already uses your indexed content — focus on being in top 10 results (~75% of AI
+  Overview citations overlap with top-10 rankings per industry studies)
+- Google's official guidance: NO special markup or schema is required for AI features —
+  standard indexability governs inclusion; AI Mode retrieves passage-level chunks via
+  query fan-out, so self-contained answer-first sections matter most
 - "Speakable" schema marks content as suitable for voice/AI reading
 
 ### ChatGPT / OpenAI

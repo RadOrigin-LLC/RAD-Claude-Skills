@@ -15,7 +15,7 @@ Aggregate findings from every other skill in the RAD SEO Optimizer plugin and pr
 
 ## Cross-model note
 
-Works identically on Opus 4.7 / Sonnet 4.6 / Haiku 4.5. This is primarily a synthesis/formatting task; parallel batching matters only when reading many input artifacts.
+Works identically on current Opus / Sonnet / Haiku models. This is primarily a synthesis/formatting task; parallel batching matters only when reading many input artifacts.
 
 ## Execution: parallel-first
 
@@ -276,7 +276,9 @@ It does NOT measure actual citation rates. See Measurement Gaps for details.
 
 ## AEO Action Plan
 
-1. **Structured Data Expansion** — Add FAQ, HowTo, and Article schema to key pages
+1. **Structured Data Expansion** — Add Article, Organization, and Product schema to key
+   pages; FAQPage/HowTo only as AI-parsing aids (their Google rich results are retired —
+   HowTo 2023, FAQ May 2026; see `references/schema-types-guide.md`)
    ```
    claude "Add FAQ schema markup to [page] based on top questions about [topic]"
    ```

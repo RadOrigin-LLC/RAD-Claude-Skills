@@ -80,8 +80,8 @@ Format subheadings as actual customer questions:
 
 ### Schema Markup for AI
 Implement structured data that explicitly tells AI what your content means:
-- FAQ schema on question-answering pages
-- HowTo schema on tutorial/guide pages
+- FAQ schema on question-answering pages (AI-parsing aid — FAQ rich results retired May 2026)
+- HowTo schema on tutorial/guide pages (AI-parsing aid — HowTo rich results retired 2023)
 - Product schema with complete specifications
 - Organization schema with full business details
 - Review/Rating schema with aggregate data
@@ -89,9 +89,11 @@ Implement structured data that explicitly tells AI what your content means:
 ## Platform-Specific Optimization
 
 ### Google AI Overviews
-- Already uses your indexed content — focus on being in top 10 results
-- Structured data heavily influences AI Overview inclusion
-- FAQ and HowTo schema are particularly powerful
+- Already uses your indexed content — focus on being in top 10 results (~75% of AI
+  Overview citations overlap with top-10 rankings per industry studies)
+- Google's official guidance: NO special markup or schema is required for AI features;
+  AI Mode retrieves passage-level chunks via query fan-out, so self-contained
+  answer-first sections matter most
 - "Speakable" schema marks content as suitable for voice/AI reading
 
 ### ChatGPT / OpenAI
@@ -146,19 +148,22 @@ AI models increasingly use image processing (CLIP) to understand visuals:
 - [ ] Video content with accurate transcripts
 
 ### Monitoring & Measurement
-- [ ] Regularly query AI platforms with your target keywords to check citations
-- [ ] Track brand mention frequency across AI responses
-- [ ] Compare AI visibility against top 3 competitors
-- [ ] Monitor Google Search Console for AI Overview impressions
-- [ ] Track referral traffic from AI platforms (Perplexity, ChatGPT browse)
 
-## AEO Scoring Dimensions
+Honest scope: this skill cannot query ChatGPT/Perplexity/Gemini programmatically, so it
+never reports citation rates. What the USER can track themselves:
+- [ ] Manually spot-check AI platforms with target queries (the user runs these, not the skill)
+- [ ] Bing Webmaster Tools → AI Performance report (free Copilot citation telemetry, public preview Feb 2026)
+- [ ] Google Search Console generative-AI performance reports (rolling out from June 2026)
+- [ ] Referral traffic from AI platforms (Perplexity, ChatGPT browse) in analytics
 
-Score brand AI visibility across 6 dimensions (0-10 each):
+## AEO Scoring Dimensions (content structure — not AI responses)
 
-1. **Presence**: Is the brand mentioned at all in AI responses?
-2. **Accuracy**: Is the information AI shares about you correct?
-3. **Sentiment**: Is the tone positive, neutral, or negative?
-4. **Position**: Where does your brand appear (first mentioned, or buried)?
-5. **Completeness**: Does AI capture your full value proposition?
-6. **Consistency**: Do different AI platforms say the same thing about you?
+Score each page's structural readiness to be cited, 0-10 each (the skill can verify all
+six from the page itself):
+
+1. **Question-Format Headings**: H2s phrased as the questions users ask
+2. **Direct-Answer Leads**: first 1-2 sentences after each heading answer it
+3. **Quotable Stats**: specific, bolded, verifiable numbers
+4. **FAQ Schema**: valid FAQPage JSON-LD (AI-parsing aid; no Google rich results since May 2026)
+5. **Comparison Structure**: tables, matrices, pro/con lists
+6. **Semantic Chunking**: 2-4 sentence self-contained paragraphs

@@ -1,8 +1,9 @@
 ---
 name: technical-seo
 description: >
-  Code-level technical SEO audit: crawlability, robots.txt, sitemap issues, indexation,
-  redirects, canonicals, JS rendering, security headers, URL structure, and page-speed
+  Code-level technical SEO audit: crawlability, robots.txt (including the AI-bot
+  allow/block matrix and llms.txt), sitemap issues, indexation, redirects, canonicals,
+  JS rendering, security headers, URL structure, and page-speed
   code-level risk factors. Does NOT measure numerical Core Web Vitals (LCP/CLS/INP) —
   those require a Lighthouse/PSI MCP (Path B). Does NOT crawl whole sites — operates on
   the user's codebase plus a provided URL list.
@@ -16,7 +17,7 @@ Run a comprehensive technical SEO audit over the user's codebase and a provided 
 
 ## Cross-model note
 
-Works identically on Opus 4.7 / Sonnet 4.6 / Haiku 4.5. Opus/Sonnet batch config Reads, template Globs, and URL fetches in parallel. Haiku may follow sequentially if parallel batching misbehaves.
+Works identically on current Opus / Sonnet / Haiku models. Opus/Sonnet batch config Reads, template Globs, and URL fetches in parallel. Haiku may follow sequentially if parallel batching misbehaves.
 
 ## Execution: parallel-first
 
@@ -115,6 +116,37 @@ Check for crawl-budget drains visible in code/config:
 - Duplicate content accessible at multiple paths
 
 **Expected impact:** Medium-High on sites with 10,000+ pages; negligible on small sites.
+
+### 1.7 AI Crawler Access (deterministic — `scripts/audit-ai-access.py`)
+
+Run the bundled validator; knowledge in `references/ai-crawl-access.md`:
+
+```
+python scripts/audit-ai-access.py --origin https://example.com --check-fetch --json
+python scripts/audit-ai-access.py --robots ./public/robots.txt --html-root ./public --json
+```
+
+It reports:
+- **Per-AI-bot robots.txt matrix**, classed *citation/search* (OAI-SearchBot,
+  ChatGPT-User, Claude-SearchBot/User, PerplexityBot/User, Bingbot, Googlebot — blocking
+  these removes the site from AI answers) vs *training* (GPTBot, ClaudeBot,
+  Google-Extended, CCBot, … — blocking is a licensing choice with no AEO impact)
+- **Google-Extended scope note** — it controls Gemini training only; AI Overviews/AI Mode
+  run off Googlebot. Never imply otherwise.
+- **CDN-level blocking probe** (`--check-fetch`) — Cloudflare blocks AI crawlers by
+  default on new domains since July 2025; robots.txt Allow + WAF 403 is a common silent
+  misconfiguration. Probe results are indicative (some WAFs verify crawler IPs).
+- **llms.txt** existence + format shape — *info only*: not a ranking/citation factor, but
+  recommended by Lighthouse's Agentic Browsing audits (see `references/agent-readiness.md`)
+- **Content-Signal / RSL / noai** declarations — informational
+- **JS-dependence heuristic** — see §6.1; CSR content is invisible to AI crawlers
+
+**Why it matters:** A site that wants AI citations while blocking the citation-class bots
+(or letting its CDN do so) is invisible to ChatGPT/Claude/Perplexity regardless of
+content quality.
+
+**Expected impact:** High for AI answer visibility; zero ranking impact from the
+training-class choices.
 
 ---
 
@@ -256,9 +288,13 @@ Fetch each key URL without JS (WebFetch returns raw HTML). Flag:
 - Title, meta description, headings, body text missing from initial HTML
 - Internal links as elements other than `<a href>`
 
-**Why it matters:** Googlebot queues JS pages for rendering, delaying indexation.
+**Why it matters:** Googlebot queues JS pages for rendering, delaying indexation — and
+**no other major crawler renders JS at all**: AI crawlers (GPTBot, ClaudeBot,
+PerplexityBot, OAI-SearchBot) execute zero JavaScript, so CSR-only content is invisible
+to ChatGPT, Claude, and Perplexity even when those bots are allowed.
 
-**Expected impact:** Critical. Client-side-only rendering can delay indexation by days.
+**Expected impact:** Critical. Client-side-only rendering delays Google indexation by
+days and excludes the content from AI answers entirely.
 
 **Note:** Full SPA analysis requires a browser MCP (Path B). This skill detects the symptom; diagnosing specific hydration issues needs a browser runtime.
 
@@ -307,6 +343,7 @@ Detect circular redirects. Flag any redirect that doesn't terminate in a 200 wit
 | Category | Score | Method | Critical | Warnings | Passed |
 |----------|-------|--------|----------|----------|--------|
 | Crawlability & Indexation | A-F | static-analysis | count | count | count |
+| AI Crawler Access | A-F | audit-ai-access.py | count | count | count |
 | Page-Speed Risk Factors | A-F | static-analysis | count | count | count |
 | Page-Speed CWV (numerical) | N/A | not-measured (Path B: Lighthouse MCP) | — | — | — |
 | Mobile-First | A-F | static-analysis | count | count | count |

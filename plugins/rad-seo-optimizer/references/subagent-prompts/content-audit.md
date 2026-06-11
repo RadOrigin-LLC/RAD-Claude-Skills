@@ -2,7 +2,7 @@
 
 Template for dispatching the `content-auditor` agent from a skill. Substitute the `{placeholder}` tokens before passing to the `Agent` tool.
 
-**Cross-model note.** Neutral across Opus 4.7 / Sonnet 4.6 / Haiku 4.5. The agent is defined with `model: opus` because scoring across 6 dimensions per page at scale rewards careful reasoning. Sonnet is a first-class fallback. Output is JSON-first for programmatic processing of large scorecards.
+**Cross-model note.** Neutral across current Opus / Sonnet / Haiku models. The agent is defined with `model: opus` because scoring across 6 dimensions per page at scale rewards careful reasoning. Sonnet is a first-class fallback. Output is JSON-first for programmatic processing of large scorecards.
 
 ---
 

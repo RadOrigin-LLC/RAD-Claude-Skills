@@ -2,9 +2,10 @@
 r"""
 check-broken-links.py — Parallel HTTP HEAD scanner for 4xx/5xx links.
 
-Two input modes:
+Input modes:
 
-  1. URL list file: one URL per line (or `--urls a,b,c` for inline).
+  1. URL list file: one URL per line (or `--urls https://a.com,https://b.com`
+     inline — full URLs with scheme required).
   2. Sitemap: parses <loc> entries from an XML sitemap (URL or local file).
   3. HTML source: extracts <a href>, <link href>, <script src>, <img src> from
      HTML files in a directory and checks the absolute URLs.
@@ -16,8 +17,8 @@ to avoid downloading the body. Parallelized via threading; default 10 workers.
 Categorization:
   ok          — 2xx
   redirect    — 3xx (reported but not flagged unless redirect chain is broken)
-  client_err  — 4xx (flagged warning, or critical if 410/451)
-  server_err  — 5xx (flagged warning)
+  client_err  — 4xx (flagged)
+  server_err  — 5xx (flagged)
   network_err — connection failure / timeout / DNS / SSL
   bad_url     — URL doesn't parse
 

@@ -2,7 +2,7 @@
 
 Template for dispatching the `competitor-spy` agent from a skill. Substitute the `{placeholder}` tokens before passing to the `Agent` tool.
 
-**Cross-model note.** Neutral across Opus 4.7 / Sonnet 4.6 / Haiku 4.5. The agent is defined with `model: opus` because synthesis across multiple competitors + SERP features + content patterns rewards careful reasoning. Sonnet is a first-class fallback. Output is JSON-first.
+**Cross-model note.** Neutral across current Opus / Sonnet / Haiku models. The agent is defined with `model: opus` because synthesis across multiple competitors + SERP features + content patterns rewards careful reasoning. Sonnet is a first-class fallback. Output is JSON-first.
 
 ---
 
