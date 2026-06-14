@@ -9,7 +9,7 @@ Most PARA tools tell you about the methodology. rad-para-second-brain implements
 | Skill | **para-organize** | Core PARA setup, classification, diagnosis, review workflows |
 | Skill | **progressive-summarization** | Apply distillation layers (bold, highlight, executive summary) to raw notes |
 | Skill | **express-workflow** | Assemble Intermediate Packets into output via Archipelago of Ideas |
-| Skill | **hemingway-bridge** | PARA-aware session handoffs (integrates with rad-session) |
+| Skill | **hemingway-bridge** | PARA-aware session handoffs (integrates with rad-repo-manager) |
 | Skill | **twelve-favorite-problems** | Interactive workshop to create a personal capture filter |
 | Agent | **para-weekly-reviewer** | Scans PARA folders, finds stale projects, flags inbox overflow, generates review briefing |
 | Agent | **para-auditor** | Validates folder structure, detects anti-patterns, evaluates project health |
@@ -56,7 +56,7 @@ claude plugins add ./RAD-Claude-Skills/plugins/rad-para-second-brain
 
 ## Optional Integration
 
-- **rad-session**: The hemingway-bridge skill integrates with rad-session's `/wrapup` and `/startup` cycle for seamless session handoffs.
+- **rad-repo-manager**: The hemingway-bridge skill integrates with rad-repo-manager's `/wrapup` and `/startup` cycle for seamless session handoffs.
 
 ## License
 

@@ -34,7 +34,7 @@ Coolify is a self-hosted Heroku/Netlify alternative with its own patterns for Do
 
 | Agent | Purpose |
 |---|---|
-| `coolify-reviewer` | Reviews Coolify configs, Dockerfiles, compose, env, and CI/CD. **2.0: runs 4 Python validators first (mechanism), then applies LLM judgment to what scripts can't see.** Opus default. |
+| `coolify-reviewer` | Reviews Coolify configs, Dockerfiles, compose, env, and CI/CD. Runs 4 Python validators first (mechanism), then applies LLM judgment to what scripts can't see. Opus default. |
 
 | Hook | Purpose |
 |---|---|

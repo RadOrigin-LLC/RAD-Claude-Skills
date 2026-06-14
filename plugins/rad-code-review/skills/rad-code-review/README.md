@@ -2,17 +2,9 @@
 
 **3-role adversarial review with diff-aware scoping and AI slop detection — built specifically to catch what AI wrote badly, and to flag only what you changed.**
 
-## The Diff-Awareness Foundation (v2.0)
+## Diff-Aware by Default
 
-| Feature | v1.0 | v2.0 |
-|---------|------|------|
-| **Diff-aware scoping** | Reviews all files in scope, flags everything | Blame-aware by default for diff/commit scopes — only flags issues on changed lines |
-| **Incremental review** | `diff`, `commit`, `repo`, `tree` | + `--since <commit>` for reviewing changes across multiple commits |
-| **IDOR detection** | Conceptual checklist | Framework-specific grep-able heuristics for Next.js, Express, Fastify, Django, Rails, Go |
-| **Performance detection** | "Check for N+1 queries" | Concrete patterns: N+1 inside loops, re-render triggers, unbounded lists, sync blocking, bundle bloat |
-| **Accessibility** | WCAG checklist | + Dynamic ARIA state detection (hardcoded `aria-expanded`, `aria-selected`, etc.) |
-| **Adversarial pass** | Challenges findings | + Validates blame-scoping decisions (no false filtering) |
-| **Finding attribution** | All findings equal | Each finding tagged `introduced` vs `pre-existing-dependency` |
+For diff and commit scopes, the review is **blame-aware** — it only flags issues on lines you changed, tags each finding `introduced` vs `pre-existing-dependency`, and supports `--since <commit>` for multi-commit deltas. On top of that: framework-specific IDOR heuristics (Next.js, Express, Fastify, Django, Rails, Go), concrete performance patterns (N+1 inside loops, re-render triggers, unbounded lists, sync blocking, bundle bloat), and dynamic ARIA state detection. The adversarial pass also validates the blame-scoping decisions so nothing real gets filtered out. Use `--full-scan` to flag everything in scope instead.
 
 ## Why This Exists
 
@@ -20,7 +12,7 @@ AI-generated code compiles, passes basic tests, and looks correct at a glance. B
 
 RAD Code Review is the harsh reviewer that runs AFTER the build phase. It is intentionally adversarial — it assumes the code is wrong and looks for proof. When it finds nothing, that is a meaningful signal.
 
-**v2.0 adds diff-awareness** so it works naturally in PR workflows. You don't want 50 findings about pre-existing tech debt when you're reviewing a 3-file PR. You want to know: "Did I introduce any problems?"
+**Diff-awareness** makes it work naturally in PR workflows. You don't want 50 findings about pre-existing tech debt when you're reviewing a 3-file PR. You want to know: "Did I introduce any problems?"
 
 ## Quick Start
 
@@ -80,12 +72,12 @@ Review changes since last release
 
 ### Blame-Aware Mode
 
-When reviewing a diff or commit, v2.0 only flags issues on lines you changed. This means:
+When reviewing a diff or commit, it only flags issues on lines you changed. This means:
 
 - **Introduced issues**: Problems in your changed code. Always flagged.
 - **Pre-existing dependencies**: If your new code calls an existing function that has a vulnerability, it's flagged with `[PRE-EXISTING]` tag and explains the dependency chain.
 - **Suppressed**: Pre-existing code quality issues unrelated to your changes. Not flagged.
-- **Override**: Use `--full-scan` to see everything, like v1.0.
+- **Override**: Use `--full-scan` to see everything.
 
 ### Strictness Levels
 
@@ -102,7 +94,7 @@ When reviewing a diff or commit, v2.0 only flags issues on lines you changed. Th
 | Self-adversarial | default | The same model re-attacks its own findings — challenges, validates blame-scoping, hunts for misses. |
 | Cross-model | `--adversarial-model <name>` | A different model family runs the challenge pass — catches blind spots self-review can't. |
 
-(v5.0 removed the old `--engine claude|codex|both` flag — it implied Codex execution that was never implemented. `--adversarial-model` is the honest cross-model equivalent.)
+(The old `--engine claude|codex|both` flag was removed — it implied Codex execution that was never implemented. `--adversarial-model` is the honest cross-model equivalent.)
 
 ## What It Reviews
 
@@ -124,11 +116,11 @@ Web app, API/backend, Chrome extension, CLI tool, library/package, Electron app,
 
 ## Features
 
-- **Blame-aware diff scoping** (v2.0) — only flag issues you introduced, with dependency chain detection
-- **Incremental `--since` review** (v2.0) — review changes across multiple commits
-- **Framework-specific IDOR detection** (v2.0) — Next.js Server Actions, Express, Fastify, Django, Rails, Go
-- **Performance profiling heuristics** (v2.0) — N+1, re-renders, unbounded lists, sync blocking, bundle bloat
-- **Dynamic ARIA state detection** (v2.0) — hardcoded `aria-expanded`, `aria-selected`, `aria-checked`, `aria-pressed`
+- **Blame-aware diff scoping** — only flag issues you introduced, with dependency chain detection
+- **Incremental `--since` review** — review changes across multiple commits
+- **Framework-specific IDOR detection** — Next.js Server Actions, Express, Fastify, Django, Rails, Go
+- **Performance profiling heuristics** — N+1, re-renders, unbounded lists, sync blocking, bundle bloat
+- **Dynamic ARIA state detection** — hardcoded `aria-expanded`, `aria-selected`, `aria-checked`, `aria-pressed`
 - **14-pattern AI slop detection** — hallucinated imports, fake error handling, placeholder stubs, silent failures, cargo-cult patterns, fabricated comments, fake completeness
 - **3-role adversarial review** — bug finder, architecture reviewer, release gate
 - **Review-of-review calibration** — de-duplication, severity calibration, false positive removal
@@ -222,21 +214,21 @@ User triggers review
 
 ```
 rad-code-review/
-  SKILL.md                         # Orchestrator with v2.0 flags and blame-aware rules
+  SKILL.md                         # Orchestrator with blame-aware scoping rules
   README.md                        # This file
   ROADMAP.md                       # Version roadmap
-  LICENSE                          # MIT License
+  LICENSE                          # Apache-2.0 License
   references/
     ai-slop-patterns.md            # 14 AI slop detection patterns
-    security-checklist.md           # Security checklist + IDOR framework heuristics (v2.0)
-    ux-accessibility-checklist.md   # UX/a11y checklist + dynamic ARIA states (v2.0)
-    performance-heuristics.md       # Performance detection patterns (v2.0, new)
+    security-checklist.md           # Security checklist + IDOR framework heuristics
+    ux-accessibility-checklist.md   # UX/a11y checklist + dynamic ARIA states
+    performance-heuristics.md       # Performance detection patterns
     severity-model.md               # Severity classification
     trust-model.md                  # Trust boundaries
     adversarial-protocol.md         # Adversarial review protocol
     release-readiness.md            # Release readiness checklist
   workflows/
-    orchestrate-review.md           # Main workflow with blame-aware scoping (v2.0)
+    orchestrate-review.md           # Main workflow with blame-aware scoping
     report-generation.md            # Report generation
     offer-fixes.md                  # Fix application
   project-types/
@@ -251,10 +243,8 @@ rad-code-review/
     dep-audit.sh                    # Dependency vulnerability audit
     license-check.sh                # License compliance check
     secrets-scan.sh                 # Secrets detection
-  install.sh                        # Unix installer
-  install.ps1                       # Windows installer
 ```
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+Apache-2.0. See [LICENSE](LICENSE).

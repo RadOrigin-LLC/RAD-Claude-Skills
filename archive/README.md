@@ -4,15 +4,12 @@ These plugins are paused — they remain in the repository for reference and pot
 
 ## Why archived
 
-Several waves of archival:
+Plugins land here for a few recurring reasons:
 
-**Repo-manager reboot (June 2026).** `rad-session` is superseded by [`rad-repo-manager`](../plugins/rad-repo-manager). rad-session was built around a v4.x canonical doc tree (`docs/status.md`, `docs/planning/current.md`, plus vision / architecture / decisions) that became redundant and confused coding agents. rad-repo-manager rebuilds the session lifecycle (`/startup`, `/wrapup`) around a minimal four-doc core (`AGENTS.md`, `docs/prd.md`, `docs/plan.md`, `docs/handoff.md`) and adds `/analyze` for doc hygiene. The old skills don't carry forward — the doc model changed underneath them. Paired with rad-planner's 5.0 reboot to *strictly planning* (single `docs/plan.md`).
-
-**Single-framework reviewers (April 2026).** Modern frontier coding models (Opus 4.7+) have strong baseline knowledge of these frameworks and languages. The skills here mostly duplicated that baseline knowledge without adding meaningful uplift, and contributed noise to skill selection. Generic "best practices" and "anti-pattern" skills for popular frameworks were the lowest-leverage portion of the toolkit. Reviewer agents in these plugins were partially redundant with [`rad-code-review`](../plugins/rad-code-review), which orchestrates ship-readiness reviews using a stack-aware approach.
-
-**Wide-surface productivity wrappers (April 2026).** `rad-google-workspace` exposed 93 skills (44 services + 41 workflow recipes + 10 personas) — too wide a surface for routine use, and the workflow/persona skills duplicated what Opus 4.7 can compose on its own from the underlying service skills. Superseded by [`rad-gws-core`](../plugins/rad-gws-core), the focused 14-skill subset covering everyday productivity (Gmail send/read/reply/triage, Docs write, Sheets read/append, Slides, Drive, Calendar). Both depend on the same `gws` CLI binary, so anyone who needs the broader surface can still install from the archive.
-
-**Lifecycle consolidation (April 2026).** `rad-stack-guide` had two jobs: stack detection (one-time per project) and review orchestration (specialist-reviewer dispatch). Its stack-detection value duplicated rad-session's `/startup` Phase 2.5 Resource Discovery, and its review-orchestration value collapsed when the framework reviewers above were archived — there were no specialists left to orchestrate. Superseded by [`rad-session`](../plugins/rad-session) 3.0, which absorbed the per-project setup phase as `/init` so one plugin owns the whole lifecycle (`/init` → `/startup` → `/wrapup`). Existing CLAUDE.md content from the old `/detect-stack` skill stays valid; running `/rad-session:init` once re-establishes the `## Resources` section in the new format.
+- **Superseded by a successor.** `rad-session` was rebuilt as [`rad-repo-manager`](../plugins/rad-repo-manager) around a minimal four-doc core (`AGENTS.md`, `docs/prd.md`, `docs/plan.md`, `docs/handoff.md`). Its older canonical doc tree (`docs/status.md`, `docs/planning/current.md`, plus vision / architecture / decisions) had grown redundant and confused coding agents. The old skills don't carry forward — the doc model changed underneath them.
+- **Baseline now covered by the model.** The single-framework reviewer plugins (React, Next.js, Astro, Fastify, TypeScript, Zod, Stripe webhooks) mostly restated knowledge current frontier models already have, and added noise to skill selection. Ship-readiness review lives in [`rad-code-review`](../plugins/rad-code-review), which is stack-aware.
+- **Surface too wide for routine use.** `rad-google-workspace` exposed the full Google Workspace API surface — more than most projects need day to day, and its workflow/persona skills duplicated what the model can compose from the underlying service skills.
+- **Job absorbed elsewhere.** `rad-stack-guide` did stack detection and reviewer orchestration; stack detection folded into the session lifecycle, and reviewer orchestration had nothing left to orchestrate once the framework reviewers were archived.
 
 ## Archived plugins
 
@@ -20,11 +17,11 @@ Several waves of archival:
 | --- | --- |
 | `rad-astro` | Astro 5/6 standards, a11y, perf, security |
 | `rad-fastify` | Fastify encapsulation, hooks, schemas, testing |
-| `rad-google-workspace` | Full Google Workspace — 44 service skills + 41 workflow recipes + 10 role personas. Superseded by [`rad-gws-core`](../plugins/rad-gws-core) (14 essential skills). |
+| `rad-google-workspace` | Full Google Workspace integration — service skills, workflow recipes, and role personas. Requires the `gws` CLI. |
 | `rad-nextjs` | App Router, RSC, security, testing |
 | `rad-react` | React 19 patterns, hooks, security, perf |
-| `rad-session` | Session lifecycle (`/startup`, `/wrapup`, `/add-resource`) built on the v4.x canonical doc tree. Superseded by [`rad-repo-manager`](../plugins/rad-repo-manager) — minimal four-doc model + `/analyze`. |
-| `rad-stack-guide` | Stack detection + specialist reviewer orchestration. Superseded by [`rad-session`](../plugins/rad-session) 3.0 — stack detection moved into `/init`; review orchestration deprecated when framework reviewers were archived. |
+| `rad-session` | Session lifecycle (`/startup`, `/wrapup`, `/add-resource`) built on the older canonical doc tree. Superseded by [`rad-repo-manager`](../plugins/rad-repo-manager) — minimal four-doc model. |
+| `rad-stack-guide` | Stack detection + specialist reviewer orchestration. Stack detection folded into the session lifecycle; review orchestration retired when the framework reviewers were archived. |
 | `rad-stripe-fastify-webhooks` | Stripe webhook handling, idempotency, Zod contracts |
 | `rad-typescript` | Strict mode, type narrowing, API safety |
 | `rad-zod` | Zod v4 schemas, error handling, integrations |

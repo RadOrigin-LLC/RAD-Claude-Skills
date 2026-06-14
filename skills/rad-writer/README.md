@@ -2,7 +2,7 @@
 
 Domain-smart writing, AI pattern avoidance, voice profiling, and editorial review across 9 content types — email, blog, web copy, business reports, research, presentations, prose, technical docs, social media.
 
-> **Claude.ai-only distribution.** This is the standalone Claude.ai skill version. The matching Claude Code plugin was retired in marketplace v1.11.0 — its project-narrative use case is now covered by [rad-explain](https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-explain) (`narrate-project`, `ground-readme`) for any repo. This skill remains the multi-genre writing home for Claude.ai users.
+> **Claude.ai-only distribution.** This is the standalone Claude.ai skill version. The matching Claude Code plugin was retired — its project-narrative use case is now covered by [rad-explain](https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-explain) (`narrate-project`, `ground-readme`) for any repo. This skill remains the multi-genre writing home for Claude.ai users.
 
 ## What's Included
 
@@ -10,7 +10,7 @@ Import `rad-writer.zip` via **Settings > Customize > Skills** on Claude.ai.
 
 The skill includes a SKILL.md with 5 modes (write, improve, review, AI audit, voice analysis) plus 14 resource files:
 
-- AI writing patterns framework — organized by **durability tier** (T1 durable structural, T2 degrading stylistic, T3 deprecated lexical) per the 2.0 honesty pass
+- AI writing patterns framework — organized by **durability tier** (T1 durable structural, T2 degrading stylistic, T3 deprecated lexical) per the honesty pass
 - Wikipedia "Signs of AI Writing" relation note — anchors the framework to Wikipedia's [canonical 2025 reference](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)
 - Word blocklist (250+ lexical tells with replacement suggestions and severity)
 - Sentence craft guide (burstiness, transitions, paragraph techniques)

@@ -2,10 +2,6 @@
 
 Plan a project before you write code — and re-plan it as reality unfolds. rad-planner is built for solo developers who aren't formally trained engineers: it interrogates you until it actually understands what you're building, then produces a plan that a moderately experienced vibe coder can read **and** a coding agent can execute. It is **strictly a planner** — it never writes implementation code.
 
-> **v6.0 — the grilling and the ladder.** Discovery became a structured interview (eight coverage areas driven to settled-or-explicitly-unknown, a mirror step, proposed assumptions). Every plan now carries a release map — **Now** (MVP/Beta, fully specced) → **Next** (V1 outline) → **Later** (end goal) — so the first milestone connects to where you're actually going. Two new skills: `replan` (evidence-based plan updates that never delete history) and `rescue` (project archaeology + a fresh plan for a repo that got away from you). The planner can now also draft `docs/prd.md` from your own interview answers, per-section confirmed, when none exists.
->
-> *v5.0 had stripped the v4.x canonical doc tree, scope gates, and depth heuristics that buried the method under document machinery; v6.0 builds on that lean base.*
-
 ## What makes it more than a generic planner
 
 Claude can already write a plan. rad-planner's method is **interview-driven, risk-first, adversarially-reviewed, and mechanically-validated** — passes a single-shot plan doesn't get:

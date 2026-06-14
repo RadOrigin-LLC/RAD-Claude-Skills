@@ -1,11 +1,5 @@
 # rad-code-review — Catch what AI wrote wrong before it ships.
 
-> **v5.0 — current release. Shorter IDs, honest flags, wired validator.** Finding IDs are now **`CR-NNN`** (was `RADCR-NNN`) — config and state paths keep the `radcr` prefix, so nothing on disk breaks. The `check-hallucinated-imports.py` validator is now actually wired into the review (Step 5g, offline, lockfile-verified) — previously documented but never invoked. History comparison now matches findings across runs by **fingerprint** (category+file+title), never by per-run IDs, which silently produced false "already known" matches. The `--engine claude|codex|both` flag is removed — it implied Codex execution that was never implemented; `--adversarial-model <name>` provides the real cross-model challenge pass. Reports save to `.radcr/history/` only (no more loose root-level report file; root copy on request). Model references de-versioned (Opus/Sonnet/Haiku, no point versions).
->
-> **v4.x.** Naming changeover (`UCR-` heritage prefix → `RADCR-` on config/state dirs) plus surface tightening.
->
-> **v3.0 — Optimized for Claude Opus.** Opus default; parallel tool calls across discovery/stack-detection/automated-checks; JSON-first subagent output; compaction-safe checkpointing with `--resume <run-id>`; `--non-interactive` mode for agents and CI; externalized subagent prompt templates; accepted-risk expiry enforced.
-
 When you build with Claude, you move fast. Fast enough that subtle bugs, fake error handling, and hardcoded accessibility states slip through — and they look fine at a glance. rad-code-review is the adversarial reviewer that knows exactly which mistakes AI code generators make. It only flags what *you* changed, not the whole codebase. And it understands your framework well enough to catch the security holes that generic linters miss.
 
 ## What You Can Do With This
@@ -80,13 +74,13 @@ The agent always runs in non-interactive mode. The skill supports `--non-interac
 
 ## Naming
 
-Finding IDs are **`CR-NNN`** (v5.0) — short to type, reference in conversation ("fix CR-7"), and fit in commit messages (`fix(review): … [CR-001]`). The config file (`.radcrconfig.yml`) and the state/history directories (`.radcr/state/`, `.radcr/history/`) keep the longer `radcr` prefix: renaming them would break existing per-repo state and configs for zero readability gain — you type finding IDs, not paths.
+Finding IDs are **`CR-NNN`** — short to type, reference in conversation ("fix CR-7"), and fit in commit messages (`fix(review): … [CR-001]`). The config file (`.radcrconfig.yml`) and the state/history directories (`.radcr/state/`, `.radcr/history/`) keep the longer `radcr` prefix: renaming them would break existing per-repo state and configs for zero readability gain — you type finding IDs, not paths.
 
 **If you have an existing `.ucrconfig.yml`** from the oldest versions of this plugin: rename it to `.radcrconfig.yml`, and rename `.ucr/` (if present) to `.radcr/`. Existing history files remain readable after the rename. Reports written before v5.0 use `RADCR-NNN` IDs — the fingerprint-based history comparison handles them via title+file matching.
 
 ## Version
 
-**5.0.0** — Shorter IDs, honest flags, wired validator. See the release notes at the top of this README.
+**5.0.0** — Shorter `CR-NNN` finding IDs (config/state paths keep the `radcr` prefix, so nothing on disk breaks); `check-hallucinated-imports.py` wired into the review (Step 5g, offline, lockfile-verified); fingerprint-based history matching (category+file+title) replacing per-run IDs; `--engine` removed in favor of `--adversarial-model <name>`; reports save to `.radcr/history/` only; model references de-versioned.
 
 **History:** v4.x — `UCR-` → `RADCR-` naming changeover. v3.0 — Opus default, parallel tool calls, JSON-first subagent output, checkpoint/`--resume`, `--non-interactive`, externalized prompts, accepted-risk expiry, unified history filenames. v2.0 — blame-aware scoping, framework IDOR, performance heuristics, dynamic ARIA detection. Full detail in git log.
 

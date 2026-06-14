@@ -6,7 +6,7 @@ The principle: external-facing copy should be **grounded** and **honest**. ChatG
 
 ## Status
 
-v0.1.0 — initial release. Built as part of the rad-claude-skills marketplace audit, where the same "no sensational copy" guardrail was applied to the marketplace's own listings. rad-explain eats that dog food.
+Initial release. Built as part of the rad-claude-skills marketplace audit, where the same "no sensational copy" guardrail was applied to the marketplace's own listings. rad-explain eats that dog food.
 
 ## What's inside
 

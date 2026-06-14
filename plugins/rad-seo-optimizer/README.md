@@ -89,7 +89,7 @@ This is a major revision. The previous 1.x version marketed itself as a full SEO
 - `--non-interactive` mode on `full-seo-audit`, `aeo-optimizer`, `competitor-intelligence`, `content-strategist`, `evaluate-stack` equivalents
 - `--resume <run-id>` + shared checkpoint schema at `.seo/state/<run-id>.json`
 
-## Path B Roadmap (v3.0 direction)
+## Path B Roadmap
 
 When you want the measurement capabilities back, these are the highest-leverage MCP integrations in priority order:
 
@@ -108,7 +108,7 @@ Each integration is additive — skills detect presence and use real measurement
 claude plugins add ./RAD-Claude-Skills/plugins/rad-seo-optimizer
 ```
 
-> **Using Claude.ai instead of CLI?** See [`skills/rad-seo-aeo-reviewer/`](../../skills/rad-seo-aeo-reviewer/) for the Claude.ai skill version — a single ZIP with consolidated workflows, URL fetching, web search, and artifact output. No CLI required. (Refreshed in 2.2 to match the honesty pass: extractability linter instead of the retired AI-visibility scorecard, CWV risk-factor framing, AI-crawler access checks, and current schema deprecations.)
+> **Using Claude.ai instead of CLI?** See [`skills/rad-seo-aeo-reviewer/`](../../skills/rad-seo-aeo-reviewer/) for the Claude.ai skill version — a single ZIP with consolidated workflows, URL fetching, web search, and artifact output. No CLI required. (Refreshed to match the honesty pass: extractability linter instead of the retired AI-visibility scorecard, CWV risk-factor framing, AI-crawler access checks, and current schema deprecations.)
 
 Then ask:
 

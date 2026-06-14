@@ -14,7 +14,7 @@ It brainstorms **anything**, not just software: business strategy, content plans
 
 ## Skills
 
-Consolidated to four in v3.0 — the standalone technique skills (SCAMPER, six hats, reverse, HMW, idea-generation, creative-unblock) are now **modes of `brainstorm-session`**, invoked by naming the technique:
+Consolidated to four — the standalone technique skills (SCAMPER, six hats, reverse, HMW, idea-generation, creative-unblock) are now **modes of `brainstorm-session`**, invoked by naming the technique:
 
 | Skill | Purpose |
 |-------|---------|
