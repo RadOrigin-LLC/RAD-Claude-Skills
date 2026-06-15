@@ -59,7 +59,10 @@ class T(unittest.TestCase):
 
     def test_init_scaffolds_fresh_bundle(self):
         with tempfile.TemporaryDirectory() as d:
-            fresh = pathlib.Path(d)
+            # Point --bundle at a subdirectory that does NOT yet exist to reproduce
+            # the real onboarding path (user runs --init in a brand-new location).
+            fresh = pathlib.Path(d) / "new-bundle"
+            self.assertFalse(fresh.exists())
             proc = run("concepts/first.md", "--bundle", str(fresh), "--init",
                        "--name", "Brain", "--type", "Concept", "--title", "First",
                        "--timestamp", "2026-06-15T00:00:00Z", "--json")

@@ -59,6 +59,8 @@ def main(argv=None):
     model = om.build_model(root)
     backlinks = {}
     for cid, f in model["files"].items():
+        if f["reserved"]:
+            continue   # index/log are regenerated; skip to avoid redundant rewrite
         n = sum(1 for lk in f["links"] if lk["resolved"] and lk["dst"] == old_cid)
         if n:
             backlinks[cid] = (f["path"], n)

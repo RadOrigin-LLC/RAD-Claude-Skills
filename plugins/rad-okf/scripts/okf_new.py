@@ -98,6 +98,7 @@ def main(argv=None):
         return 0
 
     if args.init:
+        root.mkdir(parents=True, exist_ok=True)
         if not (root / "index.md").exists():
             oio.write(root / "index.md", "# %s\n" % name)
         if not (root / "log.md").exists():
