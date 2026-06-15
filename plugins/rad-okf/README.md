@@ -6,16 +6,20 @@ An OKF bundle is just a directory of markdown files with YAML frontmatter: human
 
 ## Status
 
-v0.1 — in active development.
-- **Available now:** `check` (validate), `map` (visualize).
-- **Landing next:** authoring (`start`, `new`, `add`, link-safe `move`) and ingestion (`convert`, `scan`, `find`), plus an always-on `okf` conventions skill.
+In active development.
+- **Available now:** `start` (guided onboarding), `new` (create concept/bundle), `add` (import existing markdown), `move` (link-safe rename/relocate), `check` (validate, with `--fix`), and `map` (visualize), plus an always-on `okf` conventions skill.
+- **Landing next:** ingestion (`convert`, `scan`, `find`).
 
 ## Commands
 
-- **`/rad-okf:check`** — validate a bundle: frontmatter + required `type`, broken cross-links, orphaned concepts, and staleness. Read-only.
+- **`/rad-okf:start`** — guided onboarding: short interview, teaches the capture filter, scaffolds the bundle, and walks through the first concepts.
+- **`/rad-okf:new`** — create a new concept file with validated frontmatter; supports `--init` to bootstrap a fresh bundle.
+- **`/rad-okf:add`** — import an existing markdown file into the bundle: fill in missing frontmatter, place it, and wire it into the index.
+- **`/rad-okf:move`** — rename or relocate a concept and rewrite all inbound links bundle-wide so nothing breaks.
+- **`/rad-okf:check`** — validate a bundle: frontmatter + required `type`, broken cross-links, orphaned concepts, and staleness. Supports `--fix` (preview-gated index/frontmatter repair).
 - **`/rad-okf:map`** — generate a self-contained HTML graph of the bundle (no dependencies, opens in a browser).
 
-> **Link syntax:** v0.1 checks standard markdown links (`[text](path.md)`), which is what OKF requires. Obsidian `[[wikilink]]` syntax isn't parsed yet — if you author in Obsidian, enable its **"Use [[Wikilinks]]" → off / Markdown links** setting so links stay OKF-conformant and `check` can see them.
+> **Link syntax:** rad-okf checks standard markdown links (`[text](path.md)`), which is what OKF requires. Obsidian `[[wikilink]]` syntax isn't parsed yet — if you author in Obsidian, enable its **"Use [[Wikilinks]]" → off / Markdown links** setting so links stay OKF-conformant and `check` can see them.
 
 ## Design principles
 

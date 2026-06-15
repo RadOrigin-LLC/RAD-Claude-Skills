@@ -4,8 +4,9 @@ description: >
   Scaffold a new concept in an OKF knowledge bundle from a plain-English
   description — pick the type, title, tags, and placement, then write a
   conformant file and wire it into the index. Use when the user says "add a
-  concept", "new OKF note", "create a knowledge file for", or "start a new
-  bundle". For importing existing markdown, use the `add` skill instead.
+  concept", "new OKF note", or "create a knowledge file for". To bootstrap a
+  brand-new bundle from scratch, use the `start` skill; for importing existing
+  markdown, use the `add` skill.
 argument-hint: "<what to capture> [in <bundle path>]"
 user-invocable: true
 allowed-tools: Bash Read
