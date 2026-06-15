@@ -1,0 +1,35 @@
+# plugins/rad-okf/scripts/okf_validate.py
+"""Validation rules over the normalized model. Returns findings; never mutates."""
+import okf_model as om
+
+def validate(root, max_age_days=180, now=None):
+    model = om.build_model(root)
+    findings = []
+
+    def add(severity, code, cid, message):
+        findings.append({"severity": severity, "code": code, "id": cid, "message": message})
+
+    for cid, f in model["files"].items():
+        if f["reserved"]:
+            continue
+        for e in f["errors"]:
+            add("error", "frontmatter", cid, e)
+        if not f["errors"] and not f["type"]:
+            add("error", "missing-type", cid, "frontmatter has no non-empty 'type'")
+
+    for lk in model["links"]:
+        if not lk["resolved"]:
+            add("warning", "broken-link", lk["src"],
+                "link to '%s' has no target concept" % lk["target"])
+
+    for cid in om.orphans(model):
+        add("info", "orphan", cid, "not reachable from any index or link")
+
+    for s in om.stale(model, max_age_days, now=now):
+        add("info", "stale", s["id"], s["reason"])
+
+    return {
+        "root": model["root"],
+        "findings": findings,
+        "counts": {"files": len(model["files"]), "links": len(model["links"])},
+    }
