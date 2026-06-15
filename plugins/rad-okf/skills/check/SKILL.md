@@ -1,0 +1,22 @@
+---
+name: check
+description: >
+  Validate an OKF knowledge bundle — conformance (frontmatter + required type),
+  broken cross-links, orphaned concepts, and staleness. Use when the user says
+  "check my OKF bundle", "validate my knowledge base", "what's broken in my
+  notes", or after importing or editing concepts.
+argument-hint: "<path-to-bundle>"
+user-invocable: true
+allowed-tools: Bash Read
+---
+
+# rad-okf: check
+
+Run the validator and report results in plain language.
+
+1. Determine the bundle path (argument, or the bundle the user is working in).
+2. Run: `python "${CLAUDE_PLUGIN_ROOT}/scripts/okf_check.py" <path> --json`
+3. Parse the JSON. Summarize findings grouped by severity (errors first), each as: `<id> — <message>`.
+4. End with the totals line and, if there are errors, a one-line "what to fix first" suggestion.
+
+Do not modify any files. `--fix` is not available yet (arrives in Plan 2).
