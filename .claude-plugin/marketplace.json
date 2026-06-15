@@ -105,6 +105,14 @@
       "category": "productivity",
       "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-repo-manager",
       "license": "Apache-2.0"
+    },
+    {
+      "name": "rad-okf",
+      "source": "./plugins/rad-okf",
+      "description": "Build and maintain Open Knowledge Format (OKF) knowledge bases — directories of markdown + YAML frontmatter readable by humans and any AI agent, with no SDK or server. Dependency-free stdlib Python 3 engine that never overwrites files without a preview. v0.1: `check` (validate frontmatter + required type, broken cross-links, orphaned and stale concepts) and `map` (self-contained zero-dependency HTML graph). Authoring (start/new/add/link-safe move) and ingestion (convert/scan/find) land in later releases. Sync-agnostic: manage the knowledge here, sync the folder however you like (git, cloud folder, Obsidian, Syncthing).",
+      "category": "productivity",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-okf",
+      "license": "Apache-2.0"
     }
   ]
 }

@@ -1,0 +1,13 @@
+{
+  "name": "rad-okf",
+  "version": "0.1.0",
+  "description": "Build and maintain an Open Knowledge Format (OKF) knowledge base from Claude Code — for developers consolidating a repo's knowledge and for non-technical knowledge workers building an AI-readable second brain. OKF bundles are plain directories of markdown files with YAML frontmatter: human-readable, git-friendly, and consumable by any AI agent without an SDK or server.\n\nThe plugin keeps a bundle healthy and hard to let rot, with a dependency-free stdlib Python 3 engine that never overwrites your files without a preview.\n\nv0.1 (available now): `check` validates conformance (frontmatter + required `type`, broken cross-links, orphaned and stale concepts); `map` generates a self-contained, zero-dependency HTML graph. Landing in subsequent releases: authoring (`start` guided onboarding, `new`, `add`, link-safe `move`) and ingestion (`convert` non-markdown, `scan` a repo or folder for importable knowledge, `find` search), plus an always-on `okf` conventions skill. Sync-agnostic — manage the knowledge here, sync the folder however you like (git, cloud folder, Obsidian, Syncthing).",
+  "author": {
+    "name": "RAD",
+    "url": "https://github.com/RadOrigin-LLC"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-okf",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
+  "keywords": ["okf", "open-knowledge-format", "knowledge-base", "knowledge-management", "markdown", "yaml-frontmatter", "second-brain", "vibe-coding", "obsidian", "ai-context"]
+}
