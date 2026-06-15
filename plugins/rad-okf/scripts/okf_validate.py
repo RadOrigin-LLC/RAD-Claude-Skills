@@ -1,6 +1,8 @@
 # plugins/rad-okf/scripts/okf_validate.py
 """Validation rules over the normalized model. Returns findings; never mutates."""
 import okf_model as om
+import okf_index as oi
+import okf_log as olog
 
 def validate(root, max_age_days=180, now=None):
     model = om.build_model(root)
@@ -27,6 +29,12 @@ def validate(root, max_age_days=180, now=None):
 
     for s in om.stale(model, max_age_days, now=now):
         add("info", "stale", s["id"], s["reason"])
+
+    findings.extend(oi.validate_index(model))
+
+    log = model["files"].get("log")
+    if log is not None:
+        findings.extend(olog.validate_log(log.get("body", "")))
 
     return {
         "root": model["root"],
