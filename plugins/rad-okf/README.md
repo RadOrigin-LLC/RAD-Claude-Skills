@@ -15,6 +15,8 @@ v0.1 — in active development.
 - **`/rad-okf:check`** — validate a bundle: frontmatter + required `type`, broken cross-links, orphaned concepts, and staleness. Read-only.
 - **`/rad-okf:map`** — generate a self-contained HTML graph of the bundle (no dependencies, opens in a browser).
 
+> **Link syntax:** v0.1 checks standard markdown links (`[text](path.md)`), which is what OKF requires. Obsidian `[[wikilink]]` syntax isn't parsed yet — if you author in Obsidian, enable its **"Use [[Wikilinks]]" → off / Markdown links** setting so links stay OKF-conformant and `check` can see them.
+
 ## Design principles
 
 - **Dependency-free:** stdlib Python 3 engine. No `pip`, no server, no SDK.

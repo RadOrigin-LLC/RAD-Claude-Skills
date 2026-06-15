@@ -16,7 +16,7 @@ Run the validator and report results in plain language.
 
 1. Determine the bundle path: use the argument if given, otherwise the bundle the user is working in. If neither is clear, the CLI defaults to the current directory (`.`) and walks up to the bundle root.
 2. Run: `python "${CLAUDE_PLUGIN_ROOT}/scripts/okf_check.py" <path> --json`
-3. Parse the JSON. Summarize findings grouped by severity (errors first), each as: `<id> — <message>`.
+3. Parse the JSON. Summarize findings grouped by severity (errors first), each as: `<code> (<id>) — <message>`. The `code` (e.g. `broken-link`, `missing-type`, `orphan`, `stale`) is the rule that fired and is the most useful part for the user; `id` is the concept it applies to.
 4. End with the totals line and, if there are errors, a one-line "what to fix first" suggestion.
 
 Do not modify any files. `--fix` is not available yet (arrives in Plan 2).
