@@ -10,7 +10,9 @@ def render_html(model, name="OKF Bundle"):
              for cid, f in model["files"].items()]
     edges = [{"src": l["src"], "dst": l["dst"], "resolved": l["resolved"]}
              for l in model["links"] if l.get("dst")]
-    data = json.dumps({"nodes": nodes, "edges": edges}, indent=2)
+    # Escape `</` so a concept id/type containing `</script>` can't break out of
+    # the inlined <script> block. `<\/` parses identically inside a JS string.
+    data = json.dumps({"nodes": nodes, "edges": edges}, indent=2).replace("</", "<\\/")
     title = html.escape(name)
     return """<!doctype html>
 <html><head><meta charset="utf-8"><title>%s</title>
@@ -34,7 +36,7 @@ const R = Math.min(W,H)/2 - 60, cx = W/2, cy = H/2;
 const pos = {};
 DATA.nodes.forEach((n,i)=>{const a=2*Math.PI*i/DATA.nodes.length;
   pos[n.id]=[cx+R*Math.cos(a), cy+R*Math.sin(a)];});
-const NS='http'+'://www.w3.org/2000/svg';
+const NS='http://www.w3.org/2000/svg';
 function line(x1,y1,x2,y2,ok){const l=document.createElementNS(NS,'line');
   l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
   l.setAttribute('stroke',ok?'#3b4252':'#bf616a');l.setAttribute('stroke-width',ok?1:1.5);svg.appendChild(l);}
