@@ -1,0 +1,13 @@
+{
+  "name": "rad-council",
+  "version": "0.1.0",
+  "description": "A council of cognitive-framework advisors that debates any decision — repo plans, website designs, product/codebase critiques, marketing plans, anything — then votes and returns one ranked, confidence-rated recommendation with dissent preserved and a single concrete next step.\n\nDiversity comes from incompatible *reasoning lenses* (The Contrarian, First Principles, The Vulcan, The Metric, The Storyteller, The Outsider, The Executor, The Orator, The Expansionist, The Growth Catalyst), not personas — research shows cognitive frameworks beat roleplay, and that perspective diversity (not debate depth) is the dominant driver of quality.\n\nOne skill, `convene`, with two modes: `standard` (independent drafts → one blind peer-review round + dot-vote → rigor-weighted synthesis) and `quick` (parallel critics → synthesis, no review round). A Blue Hat orchestrator auto-selects 3–5 seats for any topic by engineering natural tension between opposing lenses (hard cap 5). Synthesis weights by empirical rigor and logical consistency — never headcount — preserves genuine clashes, rates confidence 1–10, and commits to exactly one next step (disagree-and-commit).\n\nGuardrails are baked in against the documented failure modes of multi-agent debate: conformity drift (independent generation), sycophancy (framework constraints, not personas), false consensus (preserved dissent), and runaway cost (hard agent/round caps + effort scaling). Claude-only — no external API keys. Output is one self-contained markdown report, delivered where you choose, never auto-committed.\n\nPairs with rad-brainstormer (diverge → converge) and rad-planner (decide → sequence); recommends rad-code-review for deep code passes rather than duplicating it.",
+  "author": {
+    "name": "RAD",
+    "url": "https://github.com/RadOrigin-LLC"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-council",
+  "repository": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills",
+  "keywords": ["council", "debate", "multi-agent", "decision-making", "critique", "red-team", "cognitive-frameworks", "deliberation"]
+}

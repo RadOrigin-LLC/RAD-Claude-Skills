@@ -6,10 +6,18 @@
   },
   "metadata": {
     "description": "Curated marketplace of Claude Code plugins for developer frameworks, productivity, accessibility, SEO, and DevOps. Each plugin is built for a specific job — code review, project planning, accessibility audits, secret management, Coolify ops, and so on — with explicit honesty about what each does and doesn't do. Pair them where it makes sense; use them standalone where it doesn't. Version history lives in CHANGELOG.md.",
-    "version": "1.28.0",
+    "version": "1.29.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
+    {
+      "name": "rad-council",
+      "source": "./plugins/rad-council",
+      "description": "A council of cognitive-framework advisors that debates any decision — repo plans, website/UX designs, product or codebase critiques, marketing plans, strategy choices — then votes and returns one ranked, confidence-rated recommendation with dissent preserved and a single concrete next step. Diversity comes from incompatible *reasoning lenses* (The Contrarian, First Principles, The Vulcan, The Metric, The Storyteller, The Outsider, The Executor, The Orator, The Expansionist, The Growth Catalyst), not personas — research shows frameworks beat roleplay and that perspective diversity, not debate depth, drives quality.\n\nOne `convene` skill with two modes: standard (independent drafts → one blind peer-review round + dot-vote → rigor-weighted synthesis) and quick (parallel critics → synthesis). A Blue Hat orchestrator auto-selects 3–5 seats for any topic by engineering natural tension between opposing lenses (hard cap 5, scaled to stakes). Synthesis weights by empirical rigor and logical consistency — never headcount — preserves genuine clashes, rates confidence 1–10, and commits to exactly one next step (disagree-and-commit). Two agents: `council-advisor` (parametrized seat, JSON-first) and `council-chair` (fresh-context synthesizer).\n\nGuardrails are baked in against the documented failure modes of multi-agent debate: conformity drift (independent generation), sycophancy (framework constraints, not personas), false consensus (preserved dissent), and runaway cost (hard agent/round caps + effort scaling). Claude-only — no external API keys. Output is one self-contained markdown report, delivered where you choose, never auto-committed. Pairs with rad-brainstormer (diverge → converge) and rad-planner (decide → sequence); recommends rad-code-review for deep code passes rather than duplicating it.",
+      "category": "productivity",
+      "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-council",
+      "license": "Apache-2.0"
+    },
     {
       "name": "rad-code-review",
       "source": "./plugins/rad-code-review",
