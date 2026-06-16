@@ -141,7 +141,7 @@ def _err(msg, as_json):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Convert a non-markdown file into an OKF concept.")
-    ap.add_argument("src", help="source file (.txt/.html/.csv/.json)")
+    ap.add_argument("src", help="source file (.txt/.html/.htm/.csv/.json)")
     ap.add_argument("dest", help="destination .md path (relative to the bundle, or absolute)")
     ap.add_argument("--type", required=True)
     ap.add_argument("--title", required=True)
