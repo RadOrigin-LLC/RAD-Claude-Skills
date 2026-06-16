@@ -1,6 +1,6 @@
 # Handoff
 
-**Updated:** 2026-06-15
+**Updated:** 2026-06-16
 **Branch:** main
 **Working tree:** clean; `main` in sync with `origin/main`
 
@@ -9,23 +9,23 @@
 
 ## Last completed
 
-- rad-okf **Plan 2 shipped**: full write engine + authoring — `okf_io/fmwrite/linkedit/index/log/config/fix` modules, `new`/`add`/`move` CLIs, `check --fix`, and `new`/`add`/`move`/`start`/`okf` skills. Plugin **v0.2.0**, 85 tests green.
-- Merged `feat/rad-okf-plan-1` → `main` (merge `cc85f56`) and **pushed** to `origin/main`. Marketplace bumped to **v1.30.0 / 14 plugins** (rad-okf joined rad-council + 12).
+- rad-okf **Plan 3 shipped**: v2 ingestion — `convert` (non-markdown → concept: txt/html/csv/json native, binary via agent extraction), `find` (ranked in-memory search over the model — the SQLite/MCP seam), and `scan` (folder triage, relevance judgment in the skill, confirmation-gated) + their three skills. New pure modules `okf_convert`/`okf_search`/`okf_scan`; no new write primitives (composes the Plan 1/2 engine). Plugin **v0.3.0**.
+- Merged `feat/rad-okf-plan-3` → `main` (merge `cdc3170`, branch deleted). Marketplace bumped to **v1.31.0 / 14 plugins** and the rad-okf listing rewritten to current reality (all 9 commands). **Pushed** to `origin/main` (`5c682c9`).
 
 ## Current focus
 
-rad-okf is feature-complete for v1 (read + write). Next phase is v2 ingestion (Plan 3) — not started.
+rad-okf is now feature-complete for **v1 + v2** (read + write + ingestion). Per the design spec this is the deliberate **STOP point** — live with it before deciding on v3 productivity views / v4 companion MCP server.
 
 ## Next action
 
-Flesh out Plan 3 from the titles at the bottom of `C:\Dev\plans\2026-06-15-rad-okf-plan-2-write-engine.md` — `okf_convert` (non-markdown), `okf_find` (search), `okf_scan` (repo/PARA relevance triage) + their skills — then build task-by-task. Separately: the Codex mirror in `rad-codex-skills`.
+Nothing queued for rad-okf itself. The one open follow-up is the **Codex mirror** in `rad-codex-skills` (shared Python engine + `.codex-plugin` manifests) — deferred per the harness boundary (do not edit Codex files in this repo). v3/v4 stay parked until real-world use justifies them.
 
 ## Validation
 
-`cd plugins/rad-okf && python -m unittest discover -s tests` → **85 tests OK** (run repeatedly through the build; last run on merged `main`). Manual end-to-end on a throwaway copy of `R:\Dev\knowledge\radorigin-okf`: init → link → check (clean) → move → recheck (clean).
+Full suite on merged `main`: `cd plugins/rad-okf && python -m unittest discover -s tests` → **114 tests OK**. End-to-end integration smoke (init → convert CSV → find → scan → check) clean on a throwaway temp bundle. `marketplace.json` JSON-validated (14 plugins, v1.31.0). Built subagent-driven: each task got a spec-compliance + code-quality review, plus a final whole-branch review (READY TO MERGE).
 
 ## Watchouts
 
-- rad-okf design/plan docs are local & untracked in `C:\Dev\plans\` (repo convention) — not in this repo.
-- The merged local branch `feat/rad-okf-plan-1` still exists and is redundant — safe to `git branch -d`.
+- rad-okf design/plan docs (Plans 1–3) are local & untracked in `C:\Dev\plans\` (repo convention) — not in this repo.
+- `docs/LAPTOP-SETUP.md` is a known loose doc (deliberately kept) — the SessionStart scan flags it; resolve via `/rad-repo-manager:repo-align` only if you decide to file/move it.
 - git `autocrlf` prints cosmetic "LF will be replaced by CRLF" warnings on commit; harmless (engine I/O works on raw bytes).
