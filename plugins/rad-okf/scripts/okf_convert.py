@@ -131,3 +131,87 @@ def to_markdown_body(text, ext):
     if ext == ".txt":
         return _txt_to_md(text)
     raise ValueError("unsupported extension for convert: %s" % ext)
+
+def _err(msg, as_json):
+    if as_json:
+        print(json.dumps({"error": msg}))
+    else:
+        print(msg, file=sys.stderr)
+    return 2
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description="Convert a non-markdown file into an OKF concept.")
+    ap.add_argument("src", help="source file (.txt/.html/.csv/.json)")
+    ap.add_argument("dest", help="destination .md path (relative to the bundle, or absolute)")
+    ap.add_argument("--type", required=True)
+    ap.add_argument("--title", required=True)
+    ap.add_argument("--description", default="")
+    ap.add_argument("--tag", action="append", default=[], dest="tags")
+    ap.add_argument("--timestamp", default=None)
+    ap.add_argument("--curated-by", default="agent", dest="curated_by")
+    ap.add_argument("--bundle", default=None)
+    ap.add_argument("--force", action="store_true")
+    ap.add_argument("--dry-run", action="store_true", dest="dry_run")
+    ap.add_argument("--json", action="store_true", dest="as_json")
+    args = ap.parse_args(argv)
+
+    src = Path(args.src)
+    if not src.exists():
+        return _err("source not found: %s" % src, args.as_json)
+    ext = src.suffix.lower()
+    if ext == ".md":
+        return _err("markdown is already a concept format — use the `add` command", args.as_json)
+    if ext not in SUPPORTED:
+        return _err("unsupported source type %s (supported: %s); for PDF/docx, extract the "
+                    "text yourself and use `new --body`" % (ext, ", ".join(SUPPORTED)),
+                    args.as_json)
+
+    dest = Path(args.dest)
+    root = Path(args.bundle) if args.bundle else Path(ob.find_bundle_root(
+        dest if dest.is_absolute() else Path.cwd()))
+    root = root.resolve()
+    dest = (dest if dest.is_absolute() else root / dest).resolve()
+    try:
+        dest.relative_to(root)
+    except ValueError:
+        return _err("destination is outside the bundle: %s" % dest, args.as_json)
+
+    if args.timestamp:
+        try:
+            datetime.fromisoformat(args.timestamp.replace("Z", "+00:00"))
+        except ValueError:
+            return _err("invalid --timestamp (use ISO 8601): %s" % args.timestamp, args.as_json)
+
+    if dest.exists() and not args.force:
+        return _err("refusing to overwrite %s (use --force)" % dest, args.as_json)
+
+    config = cfg.load_config(root)
+    name = config["name"]
+    ts = args.timestamp or onew.now_iso()
+
+    if args.dry_run:
+        updates = [str(p) for p in (root / "index.md", root / "log.md") if p.exists()]
+        creates, dest_str = [], str(dest)
+        (updates if dest.exists() else creates).append(dest_str)
+        out = {"root": str(root), "source": str(src), "format": ext,
+               "creates": creates, "updates": updates}
+        print(json.dumps(out, indent=2) if args.as_json
+              else "Would convert %s -> %s" % (src, dest))
+        return 0
+
+    raw, _ = oio.read(src)
+    body = to_markdown_body(raw, ext)
+    text = onew.build_concept(args.type, args.title, args.description,
+                              args.tags, ts, args.curated_by, body)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    oio.write(dest, text)
+    oi.regenerate(root, name)
+    cid = ob.concept_id(dest, root)
+    olog.append(root, name, ts[:10], "Convert", "converted %s -> %s" % (src.name, cid))
+
+    print(json.dumps({"converted": str(dest), "id": cid, "format": ext}) if args.as_json
+          else "Converted %s -> %s" % (src, dest))
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
