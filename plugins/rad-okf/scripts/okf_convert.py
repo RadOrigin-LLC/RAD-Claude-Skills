@@ -36,6 +36,9 @@ class _HTMLToText(HTMLParser):
         self.href = None       # current <a> target
 
     def handle_starttag(self, tag, attrs):
+        if tag == "br":
+            self._flush()
+            return
         if tag in ("script", "style"):
             self.skip += 1
         elif tag in self.HEAD:
@@ -93,7 +96,9 @@ def _csv_to_table(text):
     width = max(len(r) for r in rows)
     norm = [r + [""] * (width - len(r)) for r in rows]
     def line(cells):
-        return "| " + " | ".join(c.replace("|", r"\|").strip() for c in cells) + " |"
+        return "| " + " | ".join(
+            c.replace("\n", " ").replace("|", r"\|").strip() for c in cells
+        ) + " |"
     out = [line(norm[0]), "| " + " | ".join(["---"] * width) + " |"]
     out += [line(r) for r in norm[1:]]
     return "\n".join(out) + "\n"

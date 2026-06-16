@@ -44,5 +44,18 @@ class T(unittest.TestCase):
         with self.assertRaises(ValueError):
             cv.to_markdown_body("x", ".pdf")
 
+    def test_html_br_splits_blocks(self):
+        out = cv.to_markdown_body("<p>a<br>b</p>", ".html")
+        self.assertIn("a", out)
+        self.assertIn("b", out)
+        self.assertNotIn("ab", out)          # must not be concatenated
+
+    def test_csv_multiline_cell_collapsed(self):
+        out = cv.to_markdown_body('"a\nb",c\nd,e\n', ".csv")
+        lines = out.strip().splitlines()
+        self.assertEqual(lines[0], "| a b | c |")   # newline collapsed to space
+        self.assertEqual(lines[1], "| --- | --- |")
+        self.assertEqual(lines[2], "| d | e |")
+
 if __name__ == "__main__":
     unittest.main()
