@@ -14,7 +14,7 @@ In active development.
 - **`/rad-okf:start`** — guided onboarding: short interview, teaches the capture filter, scaffolds the bundle, and walks through the first concepts.
 - **`/rad-okf:new`** — create a new concept file with validated frontmatter; supports `--init` to bootstrap a fresh bundle.
 - **`/rad-okf:add`** — import an existing markdown file into the bundle: fill in missing frontmatter, place it, and wire it into the index.
-- **`/rad-okf:convert`** — convert a non-markdown file (`.txt`/`.html`/`.csv`/`.json`, or an agent-extracted PDF/docx) into a conformant concept and wire it into the index.
+- **`/rad-okf:convert`** — convert a non-markdown file (`.txt`/`.html`/`.htm`/`.csv`/`.json`, or an agent-extracted PDF/docx) into a conformant concept and wire it into the index.
 - **`/rad-okf:move`** — rename or relocate a concept and rewrite all inbound links bundle-wide so nothing breaks.
 - **`/rad-okf:check`** — validate a bundle: frontmatter + required `type`, broken cross-links, orphaned concepts, and staleness. Supports `--fix` (preview-gated index/frontmatter repair).
 - **`/rad-okf:map`** — generate a self-contained HTML graph of the bundle (no dependencies, opens in a browser).

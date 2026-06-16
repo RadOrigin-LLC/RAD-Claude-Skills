@@ -45,6 +45,9 @@ class _HTMLToText(HTMLParser):
             self._flush(); self.heading = int(tag[1])
         elif tag == "li":
             self._flush(); self.bullet = True
+        elif tag in ("td", "th"):
+            if "".join(self.buf).strip():
+                self.buf.append(" | ")
         elif tag in self.BLOCK:
             self._flush()
         elif tag == "a":

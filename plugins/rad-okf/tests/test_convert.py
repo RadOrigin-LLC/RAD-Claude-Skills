@@ -50,6 +50,12 @@ class T(unittest.TestCase):
         self.assertIn("b", out)
         self.assertNotIn("ab", out)          # must not be concatenated
 
+    def test_html_table_cells_separated(self):
+        out = cv.to_markdown_body(
+            "<table><tr><td>a</td><td>b</td></tr></table>", ".html")
+        self.assertIn("a | b", out)      # cells separated
+        self.assertNotIn("ab", out)      # not glued together
+
     def test_csv_multiline_cell_collapsed(self):
         out = cv.to_markdown_body('"a\nb",c\nd,e\n', ".csv")
         lines = out.strip().splitlines()
