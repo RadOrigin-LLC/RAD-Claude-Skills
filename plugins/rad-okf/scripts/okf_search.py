@@ -25,8 +25,9 @@ def related(model, cid):
 def search(model, text="", ctype=None, tag=None, status=None, limit=None):
     """Return ranked results: [{id, path, title, type, score, related}].
     Filters (ctype/tag/status) are exact, case-insensitive, and ANDed. `text` is
-    a term match scored title(5) > description(3) > body(1); a text query with no
-    hit is dropped. With no text, every match scores 0 and results are id-sorted.
+    a substring match scored title(5) > description(3) > body(1); a text query
+    with no hit is dropped. With no text, every match scores 0 and results are
+    id-sorted.
     Reserved files (index.md/log.md) are excluded."""
     terms = _terms(text)
     ct = ctype.lower() if ctype else None
@@ -58,4 +59,4 @@ def search(model, text="", ctype=None, tag=None, status=None, limit=None):
                         "type": f.get("type", ""), "score": score,
                         "related": related(model, cid)})
     results.sort(key=lambda r: (-r["score"], r["id"]))
-    return results[:limit] if limit else results
+    return results[:limit] if limit is not None else results

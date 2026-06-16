@@ -55,5 +55,14 @@ class T(unittest.TestCase):
         self.assertEqual([r["id"] for r in res], ["a", "b"])
         self.assertTrue(all(r["score"] == 0 for r in res))
 
+    def test_limit_zero_returns_empty(self):
+        self.assertEqual(se.search(self.model(), limit=0), [])
+
+    def test_multi_term_scoring_sums_per_term(self):
+        # b's body has both "widget" and "pipeline"; a's body has only "widget"
+        res = se.search(self.model(), text="widget pipeline")
+        self.assertEqual(res[0]["id"], "b")
+        self.assertGreater(res[0]["score"], res[1]["score"])
+
 if __name__ == "__main__":
     unittest.main()
