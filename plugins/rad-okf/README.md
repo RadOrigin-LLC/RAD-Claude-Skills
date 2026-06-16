@@ -7,17 +7,19 @@ An OKF bundle is just a directory of markdown files with YAML frontmatter: human
 ## Status
 
 In active development.
-- **Available now:** `start` (guided onboarding), `new` (create concept/bundle), `add` (import existing markdown), `move` (link-safe rename/relocate), `check` (validate, with `--fix`), and `map` (visualize), plus an always-on `okf` conventions skill.
-- **Landing next:** ingestion (`convert`, `scan`, `find`).
+- **Available now:** `start` (guided onboarding), `new` (create concept/bundle), `add` (import existing markdown), `convert` (non-markdown → concept), `move` (link-safe rename/relocate), `check` (validate, with `--fix`), `map` (visualize), `find` (search), and `scan` (triage a folder for import), plus an always-on `okf` conventions skill.
 
 ## Commands
 
 - **`/rad-okf:start`** — guided onboarding: short interview, teaches the capture filter, scaffolds the bundle, and walks through the first concepts.
 - **`/rad-okf:new`** — create a new concept file with validated frontmatter; supports `--init` to bootstrap a fresh bundle.
 - **`/rad-okf:add`** — import an existing markdown file into the bundle: fill in missing frontmatter, place it, and wire it into the index.
+- **`/rad-okf:convert`** — convert a non-markdown file (`.txt`/`.html`/`.csv`/`.json`, or an agent-extracted PDF/docx) into a conformant concept and wire it into the index.
 - **`/rad-okf:move`** — rename or relocate a concept and rewrite all inbound links bundle-wide so nothing breaks.
 - **`/rad-okf:check`** — validate a bundle: frontmatter + required `type`, broken cross-links, orphaned concepts, and staleness. Supports `--fix` (preview-gated index/frontmatter repair).
 - **`/rad-okf:map`** — generate a self-contained HTML graph of the bundle (no dependencies, opens in a browser).
+- **`/rad-okf:find`** — search the bundle by text, type, tag, or status; returns ranked concepts and their linked (related) concepts.
+- **`/rad-okf:scan`** — walk a repo or notes folder, apply the capture filter, and propose what's worth importing and where — confirmation-gated.
 
 > **Link syntax:** rad-okf checks standard markdown links (`[text](path.md)`), which is what OKF requires. Obsidian `[[wikilink]]` syntax isn't parsed yet — if you author in Obsidian, enable its **"Use [[Wikilinks]]" → off / Markdown links** setting so links stay OKF-conformant and `check` can see them.
 
