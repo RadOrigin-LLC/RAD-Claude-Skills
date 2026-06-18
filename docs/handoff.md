@@ -8,7 +8,7 @@
 
 ## Last completed
 
-- **Extracted `rad-okf` into its own repository.** It is now the standalone **`okf-manager`** repo (`https://github.com/radesjardins/okf-manager`), with the plugin renamed `rad-okf` → **`okfm`** (commands are `/okfm:<skill>`). Before extraction it shipped **v0.4.0** (OKF-spec conformance: `okf_version`, `resource`, citations; nested per-directory `index.md`; a reader-first `map` browser with a needs-attention lens; and a producer surface — `seed` from SQLite/OpenAPI/tree and bounded `enrich`). 138 stdlib-unittest tests pass.
+- **Extracted `rad-okf` into its own repository.** It is now the standalone **`okf-manager`** repo (`https://github.com/RadOrigin-LLC/okf-manager`), with the plugin renamed `rad-okf` → **`okfm`** (commands are `/okfm:<skill>`). Before extraction it shipped **v0.4.0** (OKF-spec conformance: `okf_version`, `resource`, citations; nested per-directory `index.md`; a reader-first `map` browser with a needs-attention lens; and a producer surface — `seed` from SQLite/OpenAPI/tree and bounded `enrich`). 138 stdlib-unittest tests pass.
 - **Removed `rad-okf` from this repo:** deleted `plugins/rad-okf/` and its `marketplace.json` entry. Marketplace bumped **v1.32.0 → v1.33.0** (now **13 plugins**).
 
 ## Current focus
