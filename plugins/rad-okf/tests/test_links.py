@@ -9,6 +9,13 @@ class T(unittest.TestCase):
         targets = [l["target"] for l in links]
         self.assertEqual(targets, ["/tables/a.md", "../b.md", "http://x.com"])
 
+    def test_links_inside_code_fence_are_ignored(self):
+        body = ("See [Real](/a.md).\n\n"
+                "```md\nexample [Fake](/b.md) and [also](/c.md)\n```\n\n"
+                "Then [After](/d.md).\n")
+        targets = [l["target"] for l in ol.find_links(body)]
+        self.assertEqual(targets, ["/a.md", "/d.md"])   # fenced links skipped, offsets intact
+
     def test_external(self):
         self.assertTrue(ol.is_external("http://x.com"))
         self.assertFalse(ol.is_external("/tables/a.md"))

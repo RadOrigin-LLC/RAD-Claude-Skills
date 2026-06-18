@@ -4,10 +4,31 @@ import re, posixpath
 from pathlib import PurePosixPath
 
 LINK_RE = re.compile(r"\[(?P<text>[^\]]*)\]\((?P<target>[^)]+)\)")
+_FENCE_RE = re.compile(r"(`{3,}|~{3,})")
+
+def _fenced_spans(body):
+    """Char ranges covered by ``` / ~~~ fenced code blocks. Links inside these
+    are examples (e.g. seeded file content), not real OKF cross-links."""
+    spans, fence, start, pos = [], None, None, 0
+    for line in body.splitlines(keepends=True):
+        m = _FENCE_RE.match(line.lstrip())
+        if fence is None:
+            if m:
+                fence, start = m.group(1)[0], pos
+        elif m and m.group(1)[0] == fence:
+            spans.append((start, pos + len(line)))
+            fence = None
+        pos += len(line)
+    if fence is not None:                 # unclosed fence runs to end of body
+        spans.append((start, pos))
+    return spans
 
 def find_links(body):
+    spans = _fenced_spans(body)
     out = []
     for m in LINK_RE.finditer(body):
+        if any(s <= m.start() < e for s, e in spans):
+            continue                      # skip links inside fenced code blocks
         out.append({
             "text": m.group("text"),
             "target": m.group("target").strip(),

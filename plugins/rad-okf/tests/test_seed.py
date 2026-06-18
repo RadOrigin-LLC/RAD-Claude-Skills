@@ -84,7 +84,10 @@ class TCli(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, proc.stderr)
         f = self.root / "tables" / "users.md"
         self.assertTrue(f.exists())
-        self.assertIn("type: Table", f.read_text(encoding="utf-8"))
+        text = f.read_text(encoding="utf-8")
+        self.assertIn("type: Table", text)
+        self.assertIn("# Citations", text)      # seed records its source as provenance
+        self.assertIn("src.db", text)
         # wired into its directory index
         self.assertIn("[users](users.md)",
                       (self.root / "tables" / "index.md").read_text(encoding="utf-8"))

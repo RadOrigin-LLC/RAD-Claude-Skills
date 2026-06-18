@@ -198,6 +198,11 @@ def main(argv=None):
     if not specs:
         return _err("no concepts found in source (mode=%s)" % mode, args.as_json)
 
+    # provenance: every seeded concept cites the source it was generated from
+    src_label = "Seeded from `%s` (%s)" % (src.name, mode)
+    for s in specs:
+        s.setdefault("citations", [src_label])
+
     # keep every dest inside the bundle
     contained = []
     for s in specs:
