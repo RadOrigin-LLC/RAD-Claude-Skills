@@ -62,11 +62,7 @@ resting state.
 
 ## 2. Overwrite the handoff snapshot
 
-Overwrite `docs/handoff.md` from `${CLAUDE_PLUGIN_ROOT}/templates/handoff.md` (create
-the `docs/` folder first if it doesn't exist). This is the deliverable — write it; do
-not let the Validation line or anything else crowd it out. Keep it ~10–25 lines. Stamp
-`**Updated:**` with today's date (it's in your context; failing that, use the latest
-commit date from `git log -1 --format=%cs` — don't ask the user). The shape:
+Overwrite `docs/handoff.md` from `<plugin-root>/templates/handoff.md` (where `<plugin-root>` is either `${CLAUDE_PLUGIN_ROOT}`, global config `plugins/rad-repo-manager`, or local workspace `plugins/rad-repo-manager`). Create the `docs/` folder first if it doesn't exist. This is the deliverable — write it; do not let the Validation line or anything else crowd it out. Keep it ~10–25 lines. Stamp `**Updated:**` with today's date (it's in your context; failing that, use the latest commit date from `git log -1 --format=%cs` — don't ask the user). The shape:
 
 - **Last completed** — 1–3 bullets grounded in the diff / commits / test output.
 - **Current focus** — the current milestone or active task from `docs/plan.md`.
@@ -94,7 +90,7 @@ compare each against what the session did. Then split by ownership:
 - **Docs the user owns — `docs/prd.md`, `docs/design.md`,
   `docs/reference/decision-log.md`.** The user owns the *decision*, not the typing.
   Don't just describe the staleness — **draft the exact edit** (the precise wording,
-  shown as old → new) and ask per doc via AskUserQuestion: **apply / skip / let me
+  shown as old → new) and ask per doc via AskUserQuestion (or `ask_question` on Antigravity): **apply / skip / let me
   reword**. Apply only on an explicit "apply" for that specific edit — never bundle
   user-owned edits into a blanket OK, and never touch these docs without that
   per-edit confirmation. A skipped edit is restated in one line at the end so it
@@ -107,15 +103,20 @@ If nothing the session touched made a core doc stale, say so and change nothing 
 
 ## 4. Hygiene pulse — one line, no audit
 
-Run the cheap mechanical scan (use `python3`, or `python` on Windows):
+Run the cheap mechanical scan. 
 
+In PowerShell (pwsh) under Antigravity on Windows:
+```powershell
+$PluginRoot = if (Test-Path "$PWD/plugins/rad-repo-manager") { "$PWD/plugins/rad-repo-manager" } else { "$HOME/.gemini/config/plugins/rad-repo-manager" }
+python "$PluginRoot/scripts/repo-scan.py" . --json --no-record
+```
+Or run in Bash/sh under Claude Code (macOS/Linux/Windows):
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/repo-scan.py . --json --no-record
+PLUGIN_ROOT=$( [ -d "./plugins/rad-repo-manager" ] && echo "./plugins/rad-repo-manager" || echo "${CLAUDE_PLUGIN_ROOT:-$HOME/.gemini/config/plugins/rad-repo-manager}" )
+python3 "$PLUGIN_ROOT/scripts/repo-scan.py" . --json --no-record
 ```
 
-If it's green, say nothing. If loose ends exist, add **one line** to your closing
-summary naming them and pointing at `/rad-repo-manager:repo-align` — do not file,
-move, or fix anything here. (Skip silently if Python is unavailable.)
+If it's green, say nothing. If loose ends exist, add **one line** to your closing summary naming them and pointing at `repo-align` — do not file, move, or fix anything here. (Skip silently if Python is unavailable.)
 
 ## 5. Commit
 
@@ -134,5 +135,5 @@ the current branch with a short message — otherwise leave it.
 
 ## References
 
-- `${CLAUDE_PLUGIN_ROOT}/templates/handoff.md` — the snapshot shape
-- `${CLAUDE_PLUGIN_ROOT}/references/doc-model.md` — the active core and the plan ↔ handoff boundary
+- `<plugin-root>/templates/handoff.md` — the snapshot shape
+- `<plugin-root>/references/doc-model.md` — the active core and the plan ↔ handoff boundary

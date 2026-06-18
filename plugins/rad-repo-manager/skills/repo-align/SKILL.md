@@ -44,12 +44,23 @@ These are the drift signals — pure-stdlib, advisory. Capture each JSON; they s
 **candidates**, not verdicts. Your judgment decides which are real. (Use `python3`,
 or `python` on Windows.)
 
+Run in PowerShell (pwsh) under Antigravity on Windows:
+```powershell
+$PluginRoot = if (Test-Path "$PWD/plugins/rad-repo-manager") { "$PWD/plugins/rad-repo-manager" } else { "$HOME/.gemini/config/plugins/rad-repo-manager" }
+python "$PluginRoot/scripts/repo-scan.py" . --json --no-record
+python "$PluginRoot/scripts/doc-freshness.py" . --json
+python "$PluginRoot/scripts/doc-contradiction.py" . --json
+python "$PluginRoot/scripts/doc-redundancy.py" . --json
+python "$PluginRoot/scripts/audit-user-content.py" . --json
+```
+Or run in Bash/sh under Claude Code (macOS/Linux/Windows):
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/repo-scan.py . --json --no-record      # floating/misplaced docs, active-set growth, AGENTS.md bloat
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/doc-freshness.py . --json              # stale handoff; prd/plan unchanged while code churned
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/doc-contradiction.py . --json          # plan builds something the PRD lists as a non-goal (scope-creep)
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/doc-redundancy.py . --json             # the same fact stated in two active docs
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/audit-user-content.py . --json         # AGENTS.md orphan terms + dead paths
+PLUGIN_ROOT=$( [ -d "./plugins/rad-repo-manager" ] && echo "./plugins/rad-repo-manager" || echo "${CLAUDE_PLUGIN_ROOT:-$HOME/.gemini/config/plugins/rad-repo-manager}" )
+python3 "$PLUGIN_ROOT/scripts/repo-scan.py" . --json --no-record
+python3 "$PLUGIN_ROOT/scripts/doc-freshness.py" . --json
+python3 "$PLUGIN_ROOT/scripts/doc-contradiction.py" . --json
+python3 "$PLUGIN_ROOT/scripts/doc-redundancy.py" . --json
+python3 "$PLUGIN_ROOT/scripts/audit-user-content.py" . --json
 ```
 
 (If Python 3 is unavailable, do the same checks by reading the docs directly and say
@@ -108,7 +119,7 @@ fix in words a non-coder follows.
 ## 4. Offer fixes — closed disposition set, confirmed per item
 
 For each drifting or misplaced doc, propose ONE disposition and ask before acting
-(AskUserQuestion, or a clear yes/no per item):
+(via AskUserQuestion, `ask_question` on Antigravity, or a clear yes/no per item):
 
 1. **Fold** — merge durable content into a core/reference doc, then archive the original.
 2. **Extract** — pull action items into `docs/plan.md` or `docs/reference/lessons-learned.md`, then archive the original.
@@ -129,8 +140,8 @@ Rules:
 When a finding implies a change to a durable doc the manager doesn't own — `docs/prd.md`
 (product behavior) or `docs/reference/decision-log.md` (a decision) — the user owns the
 *decision*, not the typing. Draft the exact edit (precise wording, old → new) and ask
-per doc via AskUserQuestion: **apply / skip / let me reword**. Apply only on an explicit
-"apply" for that specific edit; a skip means hands off, restated in one line at the end.
+  per doc via AskUserQuestion (or `ask_question` on Antigravity): **apply / skip / let me
+  reword**. Apply only on an explicit "apply" for that specific edit; a skip means hands off, restated in one line at the end.
 Never bundle user-owned edits into a blanket OK. The manager drafts and flags; the user
 owns product and decisions.
 
@@ -144,5 +155,5 @@ owns product and decisions.
 
 ## References
 
-- `${CLAUDE_PLUGIN_ROOT}/references/doc-model.md` — tiers, active core, reference catalog, filing
-- `${CLAUDE_PLUGIN_ROOT}/scripts/` — the four drift-signal scans
+- `<plugin-root>/references/doc-model.md` — tiers, active core, reference catalog, filing
+- `<plugin-root>/scripts/` — the four drift-signal scans

@@ -35,12 +35,23 @@ not onboarding (that's `/rad-repo-manager:repo-init`) and not an audit (that's
 ## Procedure
 
 1. **Gather evidence** (read-only), in one batch — the git state plus the two cheap
-   mechanical scans (each ~1 second; use `python3`, or `python` on Windows):
+   mechanical scans. Determine the plugin root directory path (e.g., local `./plugins/rad-repo-manager` if developing in the monorepo, the global path `$HOME/.gemini/config/plugins/rad-repo-manager` for Antigravity, or `${CLAUDE_PLUGIN_ROOT}` for Claude Code).
+   
+   Run in PowerShell (pwsh) under Antigravity on Windows:
+   ```powershell
+   git status --short
+   git branch --show-current
+   $PluginRoot = if (Test-Path "$PWD/plugins/rad-repo-manager") { "$PWD/plugins/rad-repo-manager" } else { "$HOME/.gemini/config/plugins/rad-repo-manager" }
+   python "$PluginRoot/scripts/repo-scan.py" . --json --no-record    # loose/floating docs, active-set growth, AGENTS.md bloat
+   python "$PluginRoot/scripts/doc-freshness.py" . --json            # stale handoff; prd/plan unchanged while code churned
+   ```
+   Or run in Bash/sh under Claude Code (macOS/Linux/Windows):
    ```bash
    git status --short
    git branch --show-current
-   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/repo-scan.py . --json --no-record    # loose/floating docs, active-set growth, AGENTS.md bloat
-   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/doc-freshness.py . --json            # stale handoff; prd/plan unchanged while code churned
+   PLUGIN_ROOT=$( [ -d "./plugins/rad-repo-manager" ] && echo "./plugins/rad-repo-manager" || echo "${CLAUDE_PLUGIN_ROOT:-$HOME/.gemini/config/plugins/rad-repo-manager}" )
+   python3 "$PLUGIN_ROOT/scripts/repo-scan.py" . --json --no-record
+   python3 "$PLUGIN_ROOT/scripts/doc-freshness.py" . --json
    ```
    (If Python is unavailable, skip the scans and say so in the briefing — don't guess
    at hygiene from globs alone.)
@@ -81,5 +92,4 @@ Notes:            <anything material, or "None">
 
 ## References
 
-- `${CLAUDE_PLUGIN_ROOT}/references/doc-model.md` — the active core, the conditional
-  tiers, and what "aligned" means
+- `<plugin-root>/references/doc-model.md` — the active core, the conditional tiers, and what "aligned" means (where `<plugin-root>` is either `${CLAUDE_PLUGIN_ROOT}`, global config `plugins/rad-repo-manager`, or local workspace `plugins/rad-repo-manager`).

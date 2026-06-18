@@ -18,7 +18,7 @@ allowed-tools: Read Glob Grep Bash Write AskUserQuestion
 Lay the foundation for a fresh, nearly empty, or never-organized repo. Scaffold the
 structure and leave placeholders — **do not write product, plan, or design content**
 (that's the user's and `/rad-planner:plan`'s job). Use the templates in
-`${CLAUDE_PLUGIN_ROOT}/templates/`.
+`<plugin-root>/templates/` (where `<plugin-root>` is either `${CLAUDE_PLUGIN_ROOT}`, global config `plugins/rad-repo-manager`, or local workspace `plugins/rad-repo-manager`).
 
 Use this only for greenfield setup. An established repo with drift goes to
 `/rad-repo-manager:repo-align` instead.
@@ -39,7 +39,7 @@ If the repo is already established, stop and recommend `repo-align`.
 
 ## 2. Agent scope
 
-If `--agents` was passed, use it. Otherwise ask (AskUserQuestion): which coding agents
+If `--agents` was passed, use it. Otherwise ask (via AskUserQuestion or `ask_question` on Antigravity): which coding agents
 will use this repo — Claude, Codex, Gemini, or a mix? This decides which shims to
 create. Codex reads `AGENTS.md` natively (no shim). If unclear, ask before creating
 non-Codex shims.
@@ -100,5 +100,5 @@ Notes:
 
 ## References
 
-- `${CLAUDE_PLUGIN_ROOT}/templates/` — the doc-model skeletons
-- `${CLAUDE_PLUGIN_ROOT}/references/doc-model.md` — the tiers, the active core, the reference catalog
+- `<plugin-root>/templates/` — the doc-model skeletons
+- `<plugin-root>/references/doc-model.md` — the tiers, the active core, the reference catalog
