@@ -6,6 +6,7 @@ import okf_bundle as ob
 import okf_config as cfg
 import okf_model as om
 import okf_viz as ov
+import okf_validate as oval
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Generate a self-contained HTML view.")
@@ -18,8 +19,9 @@ def main(argv=None):
     root = ob.find_bundle_root(args.path)
     name = args.name or cfg.load_config(root)["name"]
     model = om.build_model(root)
+    findings = oval.validate(root)["findings"]   # the attention lens uses the same findings as `check`
     out = Path(args.out) if args.out else Path(root) / "viz.html"
-    out.write_text(ov.render_html(model, name), encoding="utf-8")
+    out.write_text(ov.render_html(model, name, findings), encoding="utf-8")
     print("Wrote %s" % out)
     return 0
 

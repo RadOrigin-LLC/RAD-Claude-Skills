@@ -46,6 +46,20 @@ class T(unittest.TestCase):
         self.assertIn("Backlinks", out)          # backlinks UI present
         self.assertIn("search", out.lower())     # search control present
 
+    def test_attention_lens_from_findings(self):
+        model = {
+            "root": "/x",
+            "files": {"a": {"id": "a", "type": "Thing", "reserved": False, "errors": [],
+                            "meta": {"title": "Alpha"}, "body": "x"}},
+            "links": [],
+        }
+        findings = [{"severity": "info", "code": "orphan", "id": "a", "message": "m"},
+                    {"severity": "warning", "code": "broken-link", "id": "a", "message": "m"}]
+        out = ov.render_html(model, name="B", findings=findings)
+        self.assertIn("Needs attention", out)   # the lens UI
+        self.assertIn("orphan", out)            # the issue rides along in node data
+        self.assertIn("broken-link", out)
+
     def test_script_breakout_is_escaped(self):
         # A concept id/type containing </script> must not terminate the inline
         # <script> block in the output.

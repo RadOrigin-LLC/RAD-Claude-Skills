@@ -19,7 +19,7 @@ In active development.
 - **`/rad-okf:enrich`** — grow a bundle from the web under hard guardrails (required domain allowlist, 50-page cap, a citation per page). Fetching happens in the skill; the engine stays offline.
 - **`/rad-okf:move`** — rename or relocate a concept and rewrite all inbound links bundle-wide so nothing breaks.
 - **`/rad-okf:check`** — validate a bundle: frontmatter + required `type`, broken cross-links, orphaned concepts, and staleness. Supports `--fix` (preview-gated index/frontmatter repair).
-- **`/rad-okf:map`** — generate a self-contained HTML graph of the bundle (no dependencies, opens in a browser).
+- **`/rad-okf:map`** — generate a self-contained HTML browser for the bundle (no dependencies, opens in a browser): search, a directory-grouped concept list, a reader panel with links and backlinks, a "needs attention" lens mirroring `check`, and an optional graph view.
 - **`/rad-okf:find`** — search the bundle by text, type, tag, or status; returns ranked concepts and their linked (related) concepts.
 - **`/rad-okf:scan`** — walk a repo or notes folder, apply the capture filter, and propose what's worth importing and where — confirmation-gated.
 
