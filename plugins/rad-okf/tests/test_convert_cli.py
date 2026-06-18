@@ -33,10 +33,28 @@ class T(unittest.TestCase):
         out = (self.root / "concepts" / "data.md").read_text(encoding="utf-8")
         self.assertIn("type: Dataset", out)
         self.assertIn("| name | role |", out)              # converted body
-        idx = (self.root / "index.md").read_text(encoding="utf-8")
-        self.assertIn("[Data](concepts/data.md)", idx)      # wired into index
+        idx = (self.root / "concepts" / "index.md").read_text(encoding="utf-8")
+        self.assertIn("[Data](data.md)", idx)               # wired into its directory index
         log = (self.root / "log.md").read_text(encoding="utf-8")
         self.assertIn("**Convert**", log)
+
+    def test_resource_and_citation_recorded(self):
+        proc = run(str(self.src), "concepts/d2.md", "--bundle", str(self.root),
+                   "--type", "Dataset", "--title", "D2",
+                   "--resource", "bq://proj.ds.tbl", "--citation", "https://docs.example/tbl")
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        out = (self.root / "concepts" / "d2.md").read_text(encoding="utf-8")
+        self.assertIn("resource: bq://proj.ds.tbl", out)
+        self.assertIn("# Citations", out)
+        self.assertIn("https://docs.example/tbl", out)
+
+    def test_convert_auto_cites_source(self):
+        proc = run(str(self.src), "concepts/d3.md", "--bundle", str(self.root),
+                   "--type", "Dataset", "--title", "D3")
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        out = (self.root / "concepts" / "d3.md").read_text(encoding="utf-8")
+        self.assertIn("# Citations", out)
+        self.assertIn("data.csv", out)              # source filename recorded as provenance
 
     def test_markdown_routed_to_add(self):
         md = self.root / "note.md"

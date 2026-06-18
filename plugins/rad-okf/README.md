@@ -7,7 +7,7 @@ An OKF bundle is just a directory of markdown files with YAML frontmatter: human
 ## Status
 
 In active development.
-- **Available now:** `start` (guided onboarding), `new` (create concept/bundle), `add` (import existing markdown), `convert` (non-markdown → concept), `move` (link-safe rename/relocate), `check` (validate, with `--fix`), `map` (visualize), `find` (search), and `scan` (triage a folder for import), plus an always-on `okf` conventions skill.
+- **Available now:** `start` (guided onboarding), `new` (create concept/bundle), `add` (import existing markdown), `convert` (non-markdown → concept), `seed` (generate concepts from a database/OpenAPI/repo), `enrich` (bounded web sourcing), `move` (link-safe rename/relocate), `check` (validate, with `--fix`), `map` (visualize), `find` (search), and `scan` (triage a folder for import), plus an always-on `okf` conventions skill.
 
 ## Commands
 
@@ -15,6 +15,8 @@ In active development.
 - **`/rad-okf:new`** — create a new concept file with validated frontmatter; supports `--init` to bootstrap a fresh bundle.
 - **`/rad-okf:add`** — import an existing markdown file into the bundle: fill in missing frontmatter, place it, and wire it into the index.
 - **`/rad-okf:convert`** — convert a non-markdown file (`.txt`/`.html`/`.htm`/`.csv`/`.json`, or an agent-extracted PDF/docx) into a conformant concept and wire it into the index.
+- **`/rad-okf:seed`** — generate many concepts at once from a structured source: a SQLite database (one concept per table), an OpenAPI/JSON-Schema file (per endpoint/definition), or a directory tree (per file). Offline, preview-gated.
+- **`/rad-okf:enrich`** — grow a bundle from the web under hard guardrails (required domain allowlist, 50-page cap, a citation per page). Fetching happens in the skill; the engine stays offline.
 - **`/rad-okf:move`** — rename or relocate a concept and rewrite all inbound links bundle-wide so nothing breaks.
 - **`/rad-okf:check`** — validate a bundle: frontmatter + required `type`, broken cross-links, orphaned concepts, and staleness. Supports `--fix` (preview-gated index/frontmatter repair).
 - **`/rad-okf:map`** — generate a self-contained HTML graph of the bundle (no dependencies, opens in a browser).

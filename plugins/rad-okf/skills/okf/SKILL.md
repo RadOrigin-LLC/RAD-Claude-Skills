@@ -31,6 +31,15 @@ How to behave inside an OKF bundle so it stays healthy.
 - `index.md` is engine-owned: regenerate it with `check --fix` rather than hand-editing (your frontmatter `title`/`description` are the source of truth for each bullet).
 - `log.md` is newest-first, ISO `## YYYY-MM-DD` headings, bullets prefixed with a bold action (`* **Update**: ...`). Add an entry on any automated change.
 
+## Fields
+- `type` is the only required key. Recommended: `title`, `description`, `resource`, `tags`, `timestamp`.
+- `resource` is a URI uniquely identifying the underlying asset (a table, an endpoint, a document). It is the stable identity key for catalog-style concepts; omit it for abstract concepts.
+
+## Body sections (conventional)
+- `# Schema` — structured field/column descriptions. `# Examples` — usage in code blocks. `# Citations` — numbered sources (absolute URLs, bundle-relative paths, or concepts under `references/`).
+- `convert` writes a `# Citations` block automatically (the source file, or explicit `--citation` URLs). Agent-curated concepts with no citations are flagged `no-citations` by `check` — a nudge, not an error.
+- `references/` holds external-source concepts (`type: Reference`) that other concepts cite.
+
 ## Trust tiers
 - Machine-drafted concepts carry `curated_by: agent`. When a human reviews and verifies one, change it to `curated_by: human` so AI drafts never blend invisibly into verified knowledge.
 

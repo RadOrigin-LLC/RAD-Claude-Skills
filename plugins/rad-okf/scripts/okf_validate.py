@@ -4,6 +4,14 @@ import okf_model as om
 import okf_index as oi
 import okf_log as olog
 
+def _has_citations(body):
+    """True if the body has a '# Citations' heading at any level."""
+    for ln in body.splitlines():
+        s = ln.strip()
+        if s.startswith("#") and s.lstrip("#").strip().lower() == "citations":
+            return True
+    return False
+
 def validate(root, max_age_days=180, now=None):
     model = om.build_model(root)
     findings = []
@@ -18,6 +26,8 @@ def validate(root, max_age_days=180, now=None):
             add("error", "frontmatter", cid, e)
         if not f["errors"] and not f["type"]:
             add("error", "missing-type", cid, "frontmatter has no non-empty 'type'")
+        if f["meta"].get("curated_by") == "agent" and not _has_citations(f["body"]):
+            add("info", "no-citations", cid, "agent-curated concept has no # Citations section")
 
     for lk in model["links"]:
         if not lk["resolved"]:
@@ -31,6 +41,10 @@ def validate(root, max_age_days=180, now=None):
         add("info", "stale", s["id"], s["reason"])
 
     findings.extend(oi.validate_index(model))
+
+    if model["files"].get("index") is not None and oi.index_version(model) != oi.OKF_VERSION:
+        add("info", "okf-version", "index",
+            "root index.md missing or unexpected okf_version (expected %s)" % oi.OKF_VERSION)
 
     log = model["files"].get("log")
     if log is not None:

@@ -14,11 +14,11 @@ def build_fix_plan(root, name):
     model = om.build_model(root)
     changes = []
 
-    new_index = oi.generate_index_text(model, name)
-    idx_path = root / "index.md"
-    cur_index = oio.read(idx_path)[0] if idx_path.exists() else ""
-    if cur_index != new_index:
-        changes.append({"path": str(idx_path), "action": "index", "after": new_index})
+    for d, text in oi.generate_index_tree(model, name, oi.root_fm_pairs(root)).items():
+        idx_path = root / d / "index.md"
+        cur = oio.read(idx_path)[0] if idx_path.exists() else ""
+        if cur != text:
+            changes.append({"path": str(idx_path), "action": "index", "after": text})
 
     for cid, f in model["files"].items():
         if f["reserved"]:

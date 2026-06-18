@@ -25,6 +25,27 @@ class T(unittest.TestCase):
         self.assertNotIn("<script src", out)
         self.assertNotIn("//cdn", out)
 
+    def test_includes_detail_legend_and_backlinks(self):
+        rich = {
+            "root": "/x",
+            "files": {
+                "a": {"id": "a", "type": "Thing", "reserved": False, "errors": [],
+                      "meta": {"title": "Alpha", "description": "first", "resource": "urn:a"},
+                      "body": "Alpha body text"},
+                "b": {"id": "b", "type": "Other", "reserved": False, "errors": [],
+                      "meta": {"title": "Beta"}, "body": "Beta body"},
+                "index": {"id": "index", "type": "", "reserved": True, "errors": [],
+                          "meta": {}, "body": ""},
+            },
+            "links": [{"src": "a", "dst": "b", "resolved": True}],
+        }
+        out = ov.render_html(rich, name="B")
+        self.assertIn("Thing", out)              # type drives the legend/colours
+        self.assertIn("Alpha body text", out)    # body embedded for the detail panel
+        self.assertIn("urn:a", out)              # resource embedded
+        self.assertIn("Backlinks", out)          # backlinks UI present
+        self.assertIn("search", out.lower())     # search control present
+
     def test_script_breakout_is_escaped(self):
         # A concept id/type containing </script> must not terminate the inline
         # <script> block in the output.

@@ -41,8 +41,8 @@ class T(unittest.TestCase):
         ref = (self.root / "ref.md").read_text(encoding="utf-8")
         self.assertIn("[Old](/archive/old.md)", ref)       # rewritten
         self.assertIn("and keep text.", ref)                # surrounding bytes intact
-        self.assertIn("[Old](archive/old.md)",
-                      (self.root / "index.md").read_text(encoding="utf-8"))
+        self.assertIn("[Old](old.md)",
+                      (self.root / "archive" / "index.md").read_text(encoding="utf-8"))
 
     def test_rejects_dest_outside_bundle(self):
         proc = run("old.md", "../escape.md", "--bundle", str(self.root))

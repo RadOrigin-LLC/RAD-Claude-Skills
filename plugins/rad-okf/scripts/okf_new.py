@@ -15,15 +15,22 @@ import okf_fmwrite as fmw
 def now_iso():
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
-def build_concept(ctype, title, description, tags, timestamp, curated_by, body):
+def build_concept(ctype, title, description, tags, timestamp, curated_by, body,
+                  resource="", citations=None):
     pairs = [("type", ctype), ("title", title)]
     if description:
         pairs.append(("description", description))
+    if resource:
+        pairs.append(("resource", resource))
     if tags:
         pairs.append(("tags", tags))
     pairs += [("timestamp", timestamp), ("curated_by", curated_by)]
     block = fmw.render_frontmatter(pairs)
     body = (body or "").strip()
+    if citations:
+        cites = "\n".join("%d. %s" % (i + 1, c) for i, c in enumerate(citations))
+        section = "# Citations\n\n" + cites
+        body = (body + "\n\n" + section) if body else section
     return block + "\n" + (body + "\n" if body else "")
 
 def _err(msg, as_json):
@@ -40,6 +47,9 @@ def main(argv=None):
     ap.add_argument("--title", required=True)
     ap.add_argument("--description", default="")
     ap.add_argument("--tag", action="append", default=[], dest="tags")
+    ap.add_argument("--resource", default="", help="URI identifying the underlying asset")
+    ap.add_argument("--citation", action="append", default=[], dest="citations",
+                    help="source URL/path; repeatable; emitted as a # Citations section")
     ap.add_argument("--body", default="")
     ap.add_argument("--timestamp", default=None)
     ap.add_argument("--curated-by", default="agent", dest="curated_by")
@@ -108,7 +118,8 @@ def main(argv=None):
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     oio.write(dest, build_concept(args.type, args.title, args.description,
-                                  args.tags, ts, args.curated_by, args.body))
+                                  args.tags, ts, args.curated_by, args.body,
+                                  resource=args.resource, citations=args.citations))
     oi.regenerate(root, name)
     cid = ob.concept_id(dest, root)
     olog.append(root, name, ts[:10], "New", "added %s" % cid)

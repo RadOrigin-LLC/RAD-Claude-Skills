@@ -3,6 +3,7 @@ import sys, os, unittest, tempfile, pathlib
 from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 import okf_validate as ov
+import okf_index as oi
 
 def write(root, rel, text):
     p = root / rel
@@ -49,6 +50,35 @@ class T(unittest.TestCase):
             write(root, "a.md", "---\ntype: Thing\n---\nx\n")
             codes = {f["code"] for f in ov.validate(root)["findings"]}
             self.assertNotIn("log-format", codes)   # absent log.md must not crash or flag
+
+    def test_okf_version_missing_flags_info(self):
+        # setUp's index.md has no frontmatter -> no okf_version declared
+        res = ov.validate(self.root)
+        vf = [f for f in res["findings"] if f["code"] == "okf-version"]
+        self.assertEqual(len(vf), 1)
+        self.assertEqual(vf[0]["severity"], "info")
+
+    def test_okf_version_present_clears(self):
+        write(self.root, "index.md",
+              "---\nokf_version: %s\n---\n# root\n* [A](/a.md)\n" % oi.OKF_VERSION)
+        codes = {f["code"] for f in ov.validate(self.root)["findings"]}
+        self.assertNotIn("okf-version", codes)
+
+    def test_no_citations_flags_agent_concept(self):
+        write(self.root, "drafted.md", "---\ntype: Thing\ncurated_by: agent\n---\nbody\n")
+        codes = {(f["code"], f["id"]) for f in ov.validate(self.root)["findings"]}
+        self.assertIn(("no-citations", "drafted"), codes)
+
+    def test_citations_section_clears_no_citations(self):
+        write(self.root, "drafted.md",
+              "---\ntype: Thing\ncurated_by: agent\n---\nbody\n\n# Citations\n\n1. https://x\n")
+        ids = {f["id"] for f in ov.validate(self.root)["findings"] if f["code"] == "no-citations"}
+        self.assertNotIn("drafted", ids)
+
+    def test_human_curated_not_flagged_for_citations(self):
+        write(self.root, "verified.md", "---\ntype: Thing\ncurated_by: human\n---\nbody\n")
+        ids = {f["id"] for f in ov.validate(self.root)["findings"] if f["code"] == "no-citations"}
+        self.assertNotIn("verified", ids)
 
     def test_index_links_missing_concept_is_drift(self):
         # index points at a concept that does not exist -> phantom-link drift

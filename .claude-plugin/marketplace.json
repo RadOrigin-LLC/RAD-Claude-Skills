@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Curated marketplace of Claude Code plugins for developer frameworks, productivity, accessibility, SEO, and DevOps. Each plugin is built for a specific job — code review, project planning, accessibility audits, secret management, Coolify ops, and so on — with explicit honesty about what each does and doesn't do. Pair them where it makes sense; use them standalone where it doesn't. Version history lives in CHANGELOG.md.",
-    "version": "1.31.0",
+    "version": "1.32.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -117,7 +117,7 @@
     {
       "name": "rad-okf",
       "source": "./plugins/rad-okf",
-      "description": "Build and maintain Open Knowledge Format (OKF) knowledge bases — directories of markdown + YAML frontmatter readable by humans and any AI agent, with no SDK or server. Dependency-free stdlib Python 3 engine that never overwrites your files without a preview. Nine commands plus an always-on `okf` conventions skill: `start` (guided onboarding), `new` (scaffold a concept or whole bundle), `add` (import existing markdown), `convert` (turn .txt/.html/.csv/.json — or agent-extracted PDF/docx — into one conformant concept), `move` (link-safe rename/relocate that rewrites inbound links bundle-wide), `check` (validate frontmatter + required `type`, broken cross-links, orphaned and stale concepts, index drift — with a preview-gated `--fix`), `map` (self-contained zero-dependency HTML graph), `find` (ranked search by text/type/tag/status with related concepts), and `scan` (triage a repo or notes folder for importable knowledge, confirmation-gated). The engine owns `index.md`/`log.md`; every write previews first and is never destructive. Sync-agnostic: manage the knowledge here, sync the folder however you like (git, cloud folder, Obsidian, Syncthing).",
+      "description": "Build and maintain Open Knowledge Format (OKF) knowledge bases — directories of markdown + YAML frontmatter readable by humans and any AI agent, with no SDK or server. Dependency-free stdlib Python 3 engine that never overwrites your files without a preview. Eleven commands plus an always-on `okf` conventions skill: `start` (guided onboarding), `new` (scaffold a concept or whole bundle), `add` (import existing markdown), `convert` (turn .txt/.html/.csv/.json — or agent-extracted PDF/docx — into one conformant concept), `seed` (generate concepts in bulk from a SQLite database, OpenAPI/JSON-Schema file, or directory tree), `enrich` (grow a bundle from the web under a required domain allowlist and a hard page cap, with a citation per page), `move` (link-safe rename/relocate that rewrites inbound links bundle-wide), `check` (validate frontmatter + required `type`, broken cross-links, orphaned and stale concepts, index drift, `okf_version`, and agent-curated concepts missing citations — with a preview-gated `--fix`), `map` (self-contained zero-dependency HTML graph with type colours, search, and backlinks), `find` (ranked search by text/type/tag/status with related concepts), and `scan` (triage a repo or notes folder for importable knowledge, confirmation-gated). The engine owns the nested `index.md` tree and `log.md`; every write previews first and is never destructive. Sync-agnostic: manage the knowledge here, sync the folder however you like (git, cloud folder, Obsidian, Syncthing).",
       "category": "productivity",
       "homepage": "https://github.com/RadOrigin-LLC/RAD-Claude-Skills/tree/main/plugins/rad-okf",
       "license": "Apache-2.0"

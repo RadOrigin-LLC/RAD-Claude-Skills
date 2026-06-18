@@ -51,6 +51,7 @@ def main(argv=None):
     ap.add_argument("--title", required=True)
     ap.add_argument("--description", default="")
     ap.add_argument("--tag", action="append", default=[], dest="tags")
+    ap.add_argument("--resource", default="", help="URI identifying the underlying asset")
     ap.add_argument("--timestamp", default=None)
     ap.add_argument("--curated-by", default="agent", dest="curated_by")
     ap.add_argument("--bundle", default=None)
@@ -95,8 +96,8 @@ def main(argv=None):
         return 0
 
     defaults = [("type", args.type), ("title", args.title),
-                ("description", args.description), ("tags", args.tags),
-                ("timestamp", ts), ("curated_by", args.curated_by)]
+                ("description", args.description), ("resource", args.resource),
+                ("tags", args.tags), ("timestamp", ts), ("curated_by", args.curated_by)]
     text, nl = oio.read(src)
     dest.parent.mkdir(parents=True, exist_ok=True)
     oio.write(dest, normalize_import(text, defaults), nl)   # preserve the source file's newline

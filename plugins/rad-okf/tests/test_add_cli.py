@@ -24,6 +24,12 @@ class TUnit(unittest.TestCase):
         self.assertIn("title: Keep", out)
         self.assertIn("description: added", out)       # missing key filled
 
+    def test_normalize_includes_resource(self):
+        out = add.normalize_import("body\n",
+            [("type", "Note"), ("title", "T"), ("resource", "urn:x"),
+             ("timestamp", "2026-06-15T00:00:00Z")])
+        self.assertIn("resource: urn:x", out)
+
     def test_normalize_fenced_block_not_treated_as_body(self):
         # a fenced frontmatter block that parses to no clean keys must stay a
         # frontmatter block (filled), not be shoved into the body with a new fence
@@ -54,8 +60,16 @@ class TCli(unittest.TestCase):
         dest = self.root / "notes" / "loose.md"
         self.assertTrue(dest.exists())
         self.assertIn("type: Note", dest.read_text(encoding="utf-8"))
-        self.assertIn("[Loose](notes/loose.md)",
-                      (self.root / "index.md").read_text(encoding="utf-8"))
+        self.assertIn("[Loose](loose.md)",
+                      (self.root / "notes" / "index.md").read_text(encoding="utf-8"))
+
+    def test_import_with_resource(self):
+        proc = run(str(self.src), "notes/r.md", "--bundle", str(self.root),
+                   "--type", "Note", "--title", "R", "--resource", "urn:abc",
+                   "--timestamp", "2026-06-15T00:00:00Z")
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertIn("resource: urn:abc",
+                      (self.root / "notes" / "r.md").read_text(encoding="utf-8"))
 
     def test_refuses_overwrite(self):
         (self.root / "dup.md").write_text("x", encoding="utf-8")

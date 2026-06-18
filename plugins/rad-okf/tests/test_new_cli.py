@@ -35,10 +35,22 @@ class T(unittest.TestCase):
         self.assertIn("type: Concept", text)
         self.assertIn("tags: [x, y]", text)
         self.assertIn("curated_by: agent", text)
-        self.assertIn("[Foo](concepts/foo.md) — A test.",
-                      (self.root / "index.md").read_text(encoding="utf-8"))
+        self.assertIn("[Foo](foo.md) — A test.",
+                      (self.root / "concepts" / "index.md").read_text(encoding="utf-8"))
         self.assertIn("* **New**: added concepts/foo",
                       (self.root / "log.md").read_text(encoding="utf-8"))
+
+    def test_resource_and_citation_round_trip(self):
+        proc = run("concepts/bar.md", "--bundle", str(self.root),
+                   "--type", "Concept", "--title", "Bar",
+                   "--resource", "https://example.com/bar",
+                   "--citation", "https://src.example/page",
+                   "--timestamp", "2026-06-15T00:00:00Z", "--json")
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        text = (self.root / "concepts" / "bar.md").read_text(encoding="utf-8")
+        self.assertIn("resource: https://example.com/bar", text)
+        self.assertIn("# Citations", text)
+        self.assertIn("1. https://src.example/page", text)
 
     def test_refuses_overwrite(self):
         (self.root / "dup.md").write_text("x", encoding="utf-8")
@@ -69,8 +81,8 @@ class T(unittest.TestCase):
             self.assertEqual(proc.returncode, 0, proc.stderr)
             self.assertTrue((fresh / "okf.json").exists())
             self.assertTrue((fresh / "log.md").exists())
-            self.assertIn("[First](concepts/first.md)",
-                          (fresh / "index.md").read_text(encoding="utf-8"))
+            self.assertIn("[First](first.md)",
+                          (fresh / "concepts" / "index.md").read_text(encoding="utf-8"))
 
     def test_force_overwrites_and_reindexes(self):
         run("dup.md", "--bundle", str(self.root), "--type", "Concept",

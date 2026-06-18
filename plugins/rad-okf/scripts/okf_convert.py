@@ -150,6 +150,9 @@ def main(argv=None):
     ap.add_argument("--title", required=True)
     ap.add_argument("--description", default="")
     ap.add_argument("--tag", action="append", default=[], dest="tags")
+    ap.add_argument("--resource", default="", help="URI identifying the underlying asset")
+    ap.add_argument("--citation", action="append", default=[], dest="citations",
+                    help="source URL/path; repeatable; defaults to the source filename")
     ap.add_argument("--timestamp", default=None)
     ap.add_argument("--curated-by", default="agent", dest="curated_by")
     ap.add_argument("--bundle", default=None)
@@ -204,8 +207,11 @@ def main(argv=None):
 
     raw, _ = oio.read(src)
     body = to_markdown_body(raw, ext)
+    # provenance: cite explicit --citation values, else record the source file
+    citations = args.citations or ["Converted from `%s`" % src.name]
     text = onew.build_concept(args.type, args.title, args.description,
-                              args.tags, ts, args.curated_by, body)
+                              args.tags, ts, args.curated_by, body,
+                              resource=args.resource, citations=citations)
     dest.parent.mkdir(parents=True, exist_ok=True)
     oio.write(dest, text)
     oi.regenerate(root, name)
