@@ -76,3 +76,14 @@ python3 audit-user-content.py <project-dir> --json
 - No semantic reasoning — token-overlap surfaces *candidates*; the user judges.
 - No auto-fix — `repo-align` proposes; the user confirms every change.
 - `repo-scan` never mixes fuzzy signals with its mechanical ones — only hard, mechanical checks.
+
+## Tests
+
+Pure-stdlib, no pytest. `tests/test_repo_scan.py` pins `repo-scan`'s floating-doc
+allowlist to the Conditional tier declared in `references/doc-model.md` — so the scan
+can't silently start (or stop) flagging a model-sanctioned doc. Exits non-zero on
+failure.
+
+```bash
+python3 tests/test_repo_scan.py
+```

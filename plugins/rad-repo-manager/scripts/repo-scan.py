@@ -45,6 +45,11 @@ ALLOWED_ROOT = {
     "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "CHANGELOG.md",
 }
 
+# Conditional-tier docs the model sanctions directly under docs/ — allowed, never
+# "floating". Technical/system docs live in the closed docs/reference/ catalog (a
+# subdir the shallow glob never reaches), so they're deliberately not listed here.
+ALLOWED_DOCS = {"design.md", "README.md"}
+
 AGENTS_SOFT_LINE_CAP = 250
 SEVERITY_YELLOW = 1
 SEVERITY_RED = 5
@@ -56,7 +61,8 @@ NUMBERED_ITEM = re.compile(r"^\s*\d+\.\s+")
 
 def find_floating(root: Path) -> list[str]:
     """Floating = a .md at repo root (not in ALLOWED_ROOT) or directly under docs/
-    (not a core doc). Deliberately shallow — code-adjacent .md is ignored."""
+    (not a core doc or a model-sanctioned conditional doc). Deliberately shallow —
+    code-adjacent .md is ignored."""
     floating: list[str] = []
 
     for p in sorted(root.glob("*.md")):
@@ -65,9 +71,9 @@ def find_floating(root: Path) -> list[str]:
 
     docs = root / "docs"
     if docs.is_dir():
-        core_names = {Path(c).name for c in CORE_DOCS}
+        allowed = {Path(c).name for c in CORE_DOCS} | ALLOWED_DOCS
         for p in sorted(docs.glob("*.md")):
-            if p.name not in core_names:
+            if p.name not in allowed:
                 floating.append(f"docs/{p.name}")
 
     return floating
