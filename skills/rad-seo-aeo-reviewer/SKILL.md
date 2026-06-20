@@ -279,6 +279,15 @@ Reference `link-building-tactics.md` for detailed tactic playbooks.
 
 Assess each competitor's presence across Google AI Overviews, Perplexity, and general LLM awareness. Track who gets cited and why.
 
+**Optional X conversation evidence:** If the user has Xquik REST access, ask for an
+`XQUIK_API_KEY` and search public X posts through `GET /api/v1/x/tweets/search`
+with `q`, optional `sinceTime`/`untilTime`, and a small `limit`. Use queries like
+`"<brand>"`, `"<brand>" "<competitor>"`, and the user's category terms to find
+recurring customer language, competitor comparisons, and common objections. Treat
+this as qualitative evidence only. Record the query and date range, do not claim
+rankings, sentiment percentages, or AI citation lift from X results alone, and
+skip this step when no key is available.
+
 Reference `aeo-playbook.md` for AI search optimization strategies.
 
 #### Phase 6: Prioritized Action Plan
@@ -399,6 +408,11 @@ Reference `aeo-playbook.md` for the complete LLM seeding and co-citation framewo
 #### Phase 3: Consensus & Consistency Audit
 
 Verify brand information matches across all platforms (name, founding date, product description, pricing, features, leadership, category). Fix protocol for inconsistencies.
+
+If Xquik REST access is available, use the same X search evidence to spot
+inconsistent names, stale feature claims, pricing confusion, and repeated
+competitor comparisons in public X posts. Keep the output to source-backed
+findings and recommended website or profile copy fixes.
 
 #### Phase 4: AI-Friendly Content Conversion
 

@@ -40,6 +40,7 @@ The skill includes a SKILL.md orchestrator covering 4 workflows (audit, competit
 - **URL mode** (default): Give a website URL — Claude fetches the sitemap, navigates pages, determines business type, and runs the full analysis
 - **GitHub mode**: If you've connected your GitHub repo, Claude reads source code to inspect templates, meta tags, schema, and config files
 - **Strategy mode**: No site needed — keyword research, competitor analysis, and content planning using web search
+- **X source enrichment**: Optional Xquik REST access lets the skill search public X posts for customer language, competitor comparisons, and consistency checks
 
 ## What's Different from the Plugin
 
