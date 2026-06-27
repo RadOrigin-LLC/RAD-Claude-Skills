@@ -30,6 +30,19 @@ Short-term efforts in your work or personal life that you are actively committed
 - "Learn photography" (no specific outcome — this is an Area or Resource)
 - "Someday write a novel" (dream without a deadline — this is a someday/maybe item)
 
+**Promote actionable units out of Areas into Projects.** The most commonly miscategorized
+pattern: a specific, time-bound initiative living *inside* a broad area instead of standing on
+its own. When something inside an Area has a goal and a rough deadline, pull it out into its
+own Project folder — visibility matters more than taxonomy.
+
+- "2025 Tax Filing" → Project, not buried in Areas/Finances. Once filed, it archives.
+- "Establish Workout Routine" → Project, not under Areas/Health.
+- "Onboard [New Hire]" → Project, not under Areas/Direct Reports.
+- "Q3 Board Report" → Project, not under Areas/Reporting.
+
+The Area stays in place for the *ongoing* responsibility; the finite initiative gets promoted
+so it's visible, trackable, and completable. Almost every Area hides one or two.
+
 ### 2. Areas of Responsibility — What You Are Committed to Over Time
 
 Ongoing roles or responsibilities that you must manage over time.
@@ -78,6 +91,23 @@ When deciding where new information goes, evaluate strictly by actionability (mo
 2. If none: In which **Area** will this be most useful?
 3. If none: Which **Resource** does this belong to?
 4. If none: Place it in **Archives** (or don't save it at all).
+
+## Classification Edge Cases
+
+- **Screenshots and images — never auto-archive.** Almost always captured for a reason
+  (documentation, evidence, reference, content for a project). If you can't tell what an image
+  is for, flag it and ask. Only archive clearly ephemeral captures (notifications, memes,
+  throwaway confirmations). When a screenshot belongs to an active project, place it inside
+  that project's folder.
+- **Unreadable files — ask, don't guess.** For encrypted, password-protected, corrupted, or
+  unrecognized files, describe the file by name and type and offer 2-3 plausible placements as
+  a multiple-choice question rather than silently misfiling it.
+- **No loose files at the root of a category.** Every file lives inside a named subfolder — a
+  specific project, area, or resource. Nothing sits loose at the root of Projects/, Areas/,
+  Resources/, or Archives/. No appropriate subfolder yet is a signal the file needs its own or
+  belongs elsewhere.
+- **Default to the more actionable category on ties.** Project over Area, Area over Resource.
+  Better to over-promote toward action than bury something in Archives.
 
 ## The 10-to-15 Project Rule
 
