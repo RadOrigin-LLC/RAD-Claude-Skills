@@ -27,7 +27,8 @@ Parse $ARGUMENTS for:
 - **Scope**: repo | diff | commit | tree (if missing, ask user)
 - **Incremental**: --since <commit> (review changes since a specific commit)
 - **Scan mode**: --full-scan (override blame-aware default; flag all issues regardless of authorship)
-- **Strictness**: mvp | production | public (default: production)
+- **Strictness**: mvp | production | public | launch (default: production)
+- **Security-deep mode**: `--security-deep` flag (or `--strictness launch`, which implies it). Activates the launch-readiness security pass — see "Security-deep activation" below.
 - **Local-only**: --local-only flag (default: internet-enabled)
 - **Fix mode**: --fix blockers | --fix critical-major | --fix <ids> (default: no fixes)
 - **Non-interactive**: --non-interactive (skip the findings menu, return findings + save report directly — for agent/loop invocation)
@@ -63,6 +64,28 @@ What would you like me to review?
 ```
 
 If user chooses option 5, prompt for the commit hash.
+
+### Security-deep activation
+
+Set `security_deep = true` if `--security-deep` was passed OR `strictness == launch`.
+If `strictness == launch`, it inherits all `public` blocking rules. When
+`security_deep` is true:
+- In Step 4, also load `${RADCR_DIR}/references/security-deep-mode.md`.
+- In Step 6, prepend the security-deep procedure to the subagent's task: run phases
+  (a)–(d) from that reference (trust boundaries → data-exposure surface →
+  authorization model → secrets), de-prioritize style/perf/nits, and concentrate on
+  data exposure + authorization + privileged credentials. The four-level severity
+  model and finding format are unchanged.
+- In Step 9, enforce the no-false-assurance contract: the report must NOT contain a
+  "secure/safe/good to launch" verdict, MUST include the verified-vs-could-not-verify
+  ledger, MUST state residual risk, and MUST recommend an independent human
+  penetration test of the auth + data-access surface.
+- In Step 12, insert the "Launch-Readiness: Data Exposure & Authorization" report
+  section (threat-model-lite + honest verdict) per the reference, using the verbatim
+  honest-verdict wording.
+
+A BaaS stack (detected in Step 3b) makes security-deep especially relevant, but the
+mode is not BaaS-only — it applies the same data-exposure lens to any stack.
 
 ## Step 0.5: Checkpoint / Resume
 
@@ -187,6 +210,16 @@ Detect languages, frameworks, and tooling by checking for:
 | `react-native.config.*`, `app.json` (expo) | React Native |
 | `.github/workflows/` | GitHub Actions CI |
 | `Makefile` | Make-based build |
+| `@supabase/supabase-js`/`@supabase/ssr` dep, or a `supabase/` dir | **Supabase BaaS** — load security-checklist §2.5 (RLS/PostgREST) |
+| `supabase/migrations/*.sql` with `create policy`/`enable row level security`/`security definer` | Supabase RLS in use — diff for `using (true)`, missing ownership, `user_metadata` trust |
+| `firestore.rules`, `database.rules.json`, `storage.rules`, `firebase.json`, `firebase`/`@firebase/*`/`firebase-admin` dep | **Firebase BaaS** — load §2.5 (Firestore/RTDB/Storage rules + Admin SDK) |
+| `appwrite`/`node-appwrite`/`appwrite.json`, `pocketbase`/`pb_migrations/`, `@nhost/*`, `aws-amplify`/`amplify/` + `@auth` in `*.graphql` | **Other BaaS** — load §2.5.3 |
+
+When any BaaS marker is present, treat the datastore's row/rule layer as the primary
+authorization boundary for the security review (the §2.4 server-IDOR heuristics may
+not apply). Also run the public-env-prefix scan for leaked `service_role`/Admin keys:
+grep `.env*`, `next.config.*`, `vite.config.*`, `app.config.*`/`app.json` for
+`(NEXT_PUBLIC_|VITE_|EXPO_PUBLIC_|PUBLIC_)\w*(SERVICE_ROLE|SERVICE_ACCOUNT|ADMIN|SECRET|PRIVATE_KEY)`.
 
 Read detected config files to determine:
 - Framework version
@@ -339,6 +372,11 @@ Also load universal references:
 @{{RADCR_DIR}}/references/ux-accessibility-checklist.md
 @{{RADCR_DIR}}/references/performance-heuristics.md
 @{{RADCR_DIR}}/references/release-readiness.md
+```
+
+If `security_deep` is true (Step 0), also load:
+```
+@{{RADCR_DIR}}/references/security-deep-mode.md
 ```
 
 ## Step 5: Run Automated Checks (if available and permitted)

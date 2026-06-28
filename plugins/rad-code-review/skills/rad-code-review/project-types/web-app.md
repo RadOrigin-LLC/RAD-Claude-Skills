@@ -116,6 +116,12 @@ Activate this module when any of the following are found:
 - `process.env.NEXT_PUBLIC_` containing values that look like secrets
 - `window.addEventListener('message',` without `event.origin` check nearby
 
+> **Backend-as-a-Service note:** for a Supabase/Firebase web app, the highest-risk
+> client-bundle secret is a **`service_role`/Admin key** (bypasses RLS) behind a
+> `NEXT_PUBLIC_`/`VITE_`/`EXPO_PUBLIC_` var — critical. The **anon/publishable** key in
+> the bundle is *expected and not a finding*; the real risk is a table with no RLS
+> policy behind it. See **security-checklist §2.5** (and §2.5.5 false positives).
+
 ---
 
 ## Performance

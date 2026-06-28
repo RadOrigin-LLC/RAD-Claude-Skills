@@ -357,6 +357,78 @@ session\.tenantId|currentTenant|req\.user\.tenantId|request\.user\.tenant
 
 ---
 
+### 2.5 Backend-as-a-Service: the Database Is Your Authorization Layer
+
+**What to check**: In a Backend-as-a-Service (BaaS) app — Supabase, Firebase, Appwrite, PocketBase, Nhost, AWS Amplify/AppSync — the client SDK often talks *directly* to the datastore with no server tier you control in between. The browser is fully attacker-controlled: anyone can open DevTools, lift the (public, non-secret) config/anon key, and issue arbitrary reads/writes against the project. **The datastore's row/rule layer IS the trust boundary**, and it must be reviewed as the primary access control, not a hardening nice-to-have. The §2.4 framework IDOR heuristics assume a server authz layer; BaaS apps frequently have *none*, so those checks don't fire — this section covers that gap.
+
+**The reachability rule (read before flagging anything as critical)**: a table/collection is only exposed if it is *reachable by a client key*. That means three things must all be true: (1) it lives in a schema the Data API exposes (Supabase `public`/`graphql_public`; any Firestore/RTDB path), (2) the low-trust role (`anon`/`authenticated`) holds a GRANT or the rules permit it, and (3) there is no restricting policy/rule. **Do not flag an RLS-off table as critical without confirming grant-reachability** — an RLS-enabled table with zero policies is *deny-all* (safe), and on newer Supabase projects the automatic `public`-schema grants are being revoked, so "no RLS" may be unreachable. The leak is *reachable + unrestricted*, not "RLS off" alone.
+
+---
+
+#### 2.5.1 Supabase / PostgREST (Postgres RLS)
+
+| Smell | Severity | Why it leaks / the fix |
+|---|---|---|
+| `create table public.<t>` reachable by `anon`/`authenticated` (GRANT present, exposed schema) with **no** matching `enable row level security` + restricting policy | **Critical** (block) | No RLS + a grant = full table dump via PostgREST for anyone with the public anon key (the CVE-2025-48757 / Lovable class). Fix: `enable row level security` **and** a scoped policy. Exempt deny-all (RLS on, 0 policies) and private/un-granted schemas. |
+| Permissive policy: `using (true)`, `with check (true)`, or `for all`/`to anon`/`to authenticated` with **no** `auth.uid()` / ownership predicate | **Critical** (block) | Every row readable, or any row writable (incl. spoofing another user's `user_id`). Fix: scope to caller, e.g. `using ( (select auth.uid()) = user_id )`; distinct policy per operation; never reuse a read predicate as a write `with check`. |
+| Policy trusts **`user_metadata`** — `auth.jwt() -> 'user_metadata' ->> 'role'` / `... ->> 'tenant_id'` / `raw_user_meta_data` — for authorization | **Critical** (block) | `user_metadata` is **end-user-writable** via `supabase.auth.updateUser({ data })`. An attacker sets `user_metadata.role='admin'` on their own account and the policy grants escalation. Only **`app_metadata`** or a custom-access-token-hook claim is trustworthy. `auth.jwt()->'user_metadata'` is the single most dangerous thing in a policy. |
+| `to authenticated` / `auth.role() = 'authenticated'` policy with no ownership predicate, on a project with **Anonymous Sign-Ins** enabled | **Critical** (block) | Anonymous sign-in mints a real `authenticated` JWT for anyone, frictionless — so "authenticated" ≠ authorized and the policy is world-open. Fix: add an ownership predicate; gate permanence with `(auth.jwt()->>'is_anonymous')::boolean is false`. |
+| `service_role` / secret key in client code, a committed file, or **any** public-prefixed env var (`NEXT_PUBLIC_`, `VITE_`, `EXPO_PUBLIC_`, `PUBLIC_`) | **Critical** (block) | `service_role` **bypasses RLS entirely** — DB admin. In the browser it exports the whole database. Smells: `SUPABASE_SERVICE_ROLE_KEY`, `"role":"service_role"`, `sb_secret_…`, `createClient(url, serviceRoleKey)` outside a server-only file. Fix: server-side runtime env only; **rotate** on exposure, don't just delete. |
+| RLS missing on a table reached via **JOIN / embed** — `from('parent').select('*, child(*)')` / `pg_graphql` nested selection where the *child* lacks its own policy | **Major** (Critical if PII) | RLS is per-table and **does not inherit through embeds**. A locked parent + un-policied child = the child's rows leak through the embed. Fix: every embeddable table needs its own policy. |
+| Client-supplied filter as authorization: `.from(t).select/update/delete` + `.eq('user_id'/'tenant_id', <client value>)` with no enforcing policy | **Major** (Critical if sensitive) | The `.eq()` is client-controlled — an attacker removes/changes it in DevTools. It's a UX convenience, not a control. Confidence is **Probable** unless you confirm no matching policy in `supabase/migrations/`. Fix: enforce ownership in the policy. |
+| Policy filters on a non-identity column — `using (is_published)`, `using (active = true)` — with no caller predicate | **Major** | Restricts *some* rows but not *by caller*; every user sees every other user's matching rows. Fix: add `(select auth.uid()) = user_id` or a membership join. |
+| `security definer` function/RPC or pre-PG15 view that bypasses RLS without its own check | **Major** (Critical if PII) | Runs as owner (often superuser), evaluating RLS as the owner, not the caller — an RLS-bypass data pump callable from the anon client, especially `setof <user_table>` RPCs. Also a **mutable `search_path`** allows object-shadowing as the owner. Fix: prefer `security invoker`; if definer, add an in-body `auth.uid()` guard **and** `set search_path = ''`; for views set `with (security_invoker = on)`. |
+| Public Storage bucket, missing `storage.objects` policy, `using(true)` **list** policy, or `createSignedUrl(clientPath, …)` with no path validation / long TTL | **Major** (Critical if PII/financial) | Public bucket = unauth download of every object; a `list` policy leaks object *paths* (filenames often carry emails/order-ids); an unvalidated signed-URL path lets a user sign `../other-user/…`. Fix: private buckets, `storage.objects` policy scoping path prefix to `auth.uid()`, short server-generated signed URLs. |
+| Realtime leak: `on('postgres_changes', …)` on an RLS-off table, or a Broadcast/Presence channel with no `realtime.messages` policy | **Major** | Row changes / broadcast payloads (cursors, typing, user data) pushed over websockets to any subscriber. `realtime.messages` is a **separate** authorization surface from `postgres_changes`. Fix: RLS on every Realtime-exposed table; enable Realtime authorization per channel. |
+| Edge Function with `service_role` that doesn't verify the caller, **or** verifies the JWT but doesn't re-scope the query to the verified uid | **Major** | No JWT check = unauthenticated admin endpoint. Verifying *who* you are ≠ authorizing *what* you touch — a `service_role` query keyed by a body-supplied `id` after authenticating a different user is still BOLA. Fix: `getUser(jwt)`, authorize, then scope the query to the verified uid. |
+| `select('*')` on a **mixed-sensitivity** table with no column GRANT restriction; PostgREST returning Postgres error `details`/`hint`; anon-reachable OpenAPI (`/rest/v1/?`) / GraphQL introspection | **Moderate** | Over-fetch ships PII columns the client never needs (RLS controls rows, not columns); error `details` leak constraint/column names and a 403-vs-404 existence oracle; introspection maps every table/RPC for the attacker. Fix: explicit columns / column GRANTs; move internal tables to an unexposed schema; uniform error handling. |
+
+---
+
+#### 2.5.2 Firebase (Firestore / Realtime Database / Storage)
+
+Firestore, Realtime Database, and Storage are **three separate rule files with three separate deploys** (`firestore.rules`, `database.rules.json`, `storage.rules`). Securing one says nothing about the other two — confirm all three. Server SDKs (Admin SDK) bypass all of them.
+
+| Smell | Severity | Why it leaks / the fix |
+|---|---|---|
+| `allow read, write: if true;` (Firestore/Storage) or `".read": true` / `".write": true` (RTDB) on a non-public collection/bucket/node | **Critical** (block) | World read+write to anyone with the public config. RTDB rules also **cascade** — a `true` high in the tree grants every descendant and a stricter child can't revoke it. Fix: scope to `request.auth.uid == resource.data.ownerId` (Firestore) / `auth.uid === $uid` under a keyed path (RTDB); place the most permissive rule at the deepest node. |
+| Leftover console **test-mode** rule: `allow read, write: if request.time < timestamp.date(<date>);` | **Critical** (block) | During the live window it is open to all. **After** the date the condition is `false` → deny (safe but the app breaks) — the danger is the panic-fix to `if true`. Flag the time-gate itself; do **not** call the expired/locked state the vulnerability. Fix: replace with real auth/ownership rules before any deploy. |
+| `allow … : if request.auth != null;` — authenticated but **no ownership** check | **Major** (block) | Any logged-in user (incl. a throwaway anonymous-auth account) reads/writes every other user's docs. The most common Firestore mistake. Fix: `… && request.auth.uid == resource.data.ownerId`; for roles, `get(/databases/$(db)/documents/users/$(request.auth.uid)).data.role == 'admin'`. |
+| `allow get` vs `allow list` not separated; ownership rule on a queried collection without a matching `list` rule + mandatory `where(owner==uid)` | **Major** | **Rules are not filters** — a query that *could* return disallowed docs fails wholesale, so devs "fix" it by loosening to `allow list: if true`. Fix: separate `get`/`list`; require the client query to carry `where('ownerId','==',uid)` AND a `list` rule that enforces it. |
+| Role gate via `get()`/`exists()` without awareness of cost & the 2-lookup limit; the looked-up role doc itself client-writable | **Major** | Each `get()` is a **billed read even on deny** (billing-DoS lever) and only **2 lookups per evaluation** are allowed — exceed it and rules deny, which devs "fix" by deleting the auth lookup. If the user can write `role` on their own user doc (mass assignment), the gate is self-defeating. |
+| `allow create: if request.auth.uid == request.resource.data.ownerId;` with no field allowlist | **Major** | Caller can set any *other* field in the same write (`role:'admin'`, `isAdmin:true`) — privilege escalation via self-write. Fix: validate `request.resource.data.keys()` against an allowlist; reject authority fields. |
+| Service-account JSON (`"private_key"` + `"type":"service_account"`, `*-firebase-adminsdk-*.json`) committed or client-reachable; `firebase-admin` imported into client-bundle-reachable code | **Critical** (block) | The Admin SDK bypasses **all** rules, auth, and rate limits — total project takeover. Fix: server-side secrets only; `.gitignore` the key; rotate on exposure. Scope the `firebase-admin` import check to client-bundle-reachable modules (`'use client'`, RN screens) — it legitimately appears in SSR/API routes. |
+| No **App Check** on a public-facing project | **Moderate** | App Check is the anti-replay control that stops a lifted (public, by-design) config from being driven by non-app clients/scripts. Its absence enables abuse/enumeration even with correct rules. |
+
+---
+
+#### 2.5.3 Other BaaS (Amplify/AppSync, Appwrite, PocketBase, Nhost)
+
+| Platform | What to check | Severity |
+|---|---|---|
+| AWS Amplify / AppSync | `@auth(rules:[{allow: public}])` (apiKey-open model); `{allow: owner}` without an enforced `ownerField`; **field-level `@auth` missing** on a sensitive field (AppSync resolves field-by-field); custom VTL/JS resolvers bypassing model `@auth`; long-lived API-key read tokens | Major (Critical if PII/public model) |
+| Appwrite | Collection/document permissions left at `any`/`users` instead of scoped `user:<id>`; over-scoped server API keys | Major |
+| PocketBase | Collection API rules (`listRule`/`viewRule`/`createRule`) set to empty/open; admin token in client | Major |
+| Nhost (Hasura + Postgres) | Hasura permissions for the `public`/`anonymous` role; missing Postgres RLS behind Hasura; over-permissive `select`/`update` column permissions | Major |
+
+---
+
+#### 2.5.4 Static vs. live verification
+
+Migrations and rule files show *declared* intent, not the *effective* live state (a later migration may drop a policy; the dashboard may differ). Static review confirms "a correct policy/rule exists in code." It cannot confirm the policy is live, survived later migrations, or holds under every role at runtime. For the live check, use the **Supabase MCP / `supabase` CLI** (run the **security advisors**; query `pg_policies`, `pg_class.relrowsecurity`, and `information_schema.role_table_grants` for grantee `anon`) or the Firebase console rules playground. State this limitation in any report (it is the backbone of the `--security-deep` no-false-assurance contract).
+
+#### 2.5.5 False positives — do NOT flag
+
+- **The anon / publishable key in client code is expected and correct** (`NEXT_PUBLIC_SUPABASE_ANON_KEY`, Firebase `apiKey`/`appId`). It is a public, low-privilege identifier meant to ship in the browser. The risk is a **missing policy behind it** or a `service_role`/Admin key, never the anon key itself.
+- **`service_role` inside a server-only path that verifies the caller** (edge function under `supabase/functions/`, API route, server action, non-`'use client'` module that calls `getUser()`) is the correct pattern — not a finding.
+- **RLS enabled with zero policies** is deny-all (safe), and a table in a **private/un-granted schema** is not reachable — neither is a critical.
+- **`(select auth.uid())` wrapping** vs bare `auth.uid()` is a *performance* idiom (per-statement caching), not a security issue — don't flag the unwrapped form as a vuln.
+- **`firebase-admin` / `BYPASSRLS` in server code or migrations** is expected — scope the "in client" check to client-bundle-reachable code, and treat `BYPASSRLS` as a role-config review item, not a client-bundle secret.
+
+**Common AI mistakes**: scaffolding a table migration with no `enable row level security`; copying a `using (true)` policy from a tutorial; reading `user_metadata` for roles because it's easier than `app_metadata`; leaving Firebase test-mode rules in; shipping the `service_role` key in a `NEXT_PUBLIC_` var to "fix" a server/client boundary error.
+
+---
+
 ## 3. Injection
 
 ### 3.1 SQL Injection

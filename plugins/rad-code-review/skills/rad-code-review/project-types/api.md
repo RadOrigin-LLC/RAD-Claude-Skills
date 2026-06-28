@@ -123,6 +123,12 @@ Activate this module when any of the following are found:
 - Loop containing `await db.find()` or `await Model.findOne()`
 - Missing `.limit()` on query builders; missing `LIMIT` in raw SQL
 
+> **Backend-as-a-Service note:** if the "API" is an auto-generated data API (Supabase
+> PostgREST, Hasura, Firebase) the browser queries the database directly — there is no
+> handler to put these checks in, and authorization is enforced by **RLS / Security
+> Rules**. Review the policy layer per **security-checklist §2.5**, and treat an
+> un-policied table reachable by the anon key as a critical data-exposure finding.
+
 ---
 
 ## Authentication

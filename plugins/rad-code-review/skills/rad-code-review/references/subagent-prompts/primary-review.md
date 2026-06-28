@@ -79,6 +79,13 @@ pre-existing issue BUT:
 - Injection (SQL, XSS, CSRF, SSRF, command, path traversal, template)
 - Deserialization, open redirect, IDOR — **use Section 2.4 framework-specific
   IDOR heuristics for the detected stack**
+- **If the stack is Backend-as-a-Service (Supabase/Firebase/Appwrite/PocketBase/
+  Nhost/Amplify — see Project Context), the database/rules layer IS the authorization
+  boundary: apply Section 2.5.** Check RLS/Security-Rules enablement and policy
+  scoping (apply the §2.5 reachability gate before rating critical), `user_metadata`
+  trust, anonymous-sign-in `authenticated`≠authorized, RLS-not-traversing-joins, and
+  `service_role`/Admin keys in client/public-env. Honor the §2.5.5 false-positives
+  list (anon key in client is NOT a finding).
 - Weak validation, unsafe file handling
 - Secrets in code, insecure defaults, session/token handling
 - Dependency vulnerabilities, supply chain concerns

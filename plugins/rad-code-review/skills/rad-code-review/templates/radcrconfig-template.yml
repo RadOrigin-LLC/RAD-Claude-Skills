@@ -155,7 +155,7 @@ custom_rules:
 # Categories: security, architecture, performance, accessibility, ux,
 #             testing, reliability, documentation, dependency, configuration
 #
-# Values: mvp, production, public
+# Values: mvp, production, public, launch
 
 # strictness_overrides:
 #   security: "public"          # Always hold security to the highest standard
@@ -196,6 +196,12 @@ custom_rules:
 #             - "mvp"        Minimum viable — only critical and major issues
 #             - "production" Standard — critical, major, and moderate (default)
 #             - "public"     Public release — all severity levels matter
+#             - "launch"     Public + the security-deep launch-readiness pass
+#                            (data-exposure / authorization / secrets, no-false-assurance
+#                            verdict). For an app about to handle real customer data.
+#
+# security_deep: true | false — run the security-deep pass on any strictness
+#                (implied by strictness "launch"). Equivalent to the --security-deep flag.
 #
 # review_model:      Default primary-review model: "opus" (default) | "sonnet" | "haiku".
 # adversarial_model: Optional cross-model challenge pass — set a model different from

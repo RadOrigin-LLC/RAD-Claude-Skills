@@ -99,6 +99,16 @@ Activate this module when any of the following are found:
 [ ] Permission changes take effect immediately (not cached indefinitely)
 ```
 
+### Backend-as-a-Service apps (Supabase / Firebase / etc.)
+
+If this SaaS is built on a BaaS where the browser talks directly to the datastore,
+the authorization model above is enforced by **database RLS / Security Rules, not
+server middleware** — the checks here may have no server tier to live in. Review the
+rules layer as the primary control: see **security-checklist §2.5** (missing/permissive
+RLS, `user_metadata` trust, anonymous-sign-in, `service_role`/Admin keys in client,
+tenant isolation via policy). For an app about to handle real customer data, run
+`--security-deep` / `--strictness launch`.
+
 ---
 
 ## Billing Integration

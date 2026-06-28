@@ -26,8 +26,13 @@ This document defines the severity classification system used by all RADCR revie
 | Open redirect with data | Unvalidated redirect that carries session tokens, auth codes, or PII to attacker-controlled URL |
 | Missing encryption | Sensitive data (passwords, PII, financial data) stored in plaintext or transmitted over unencrypted channel |
 | Deserialization | Untrusted data deserialized with pickle, yaml.load(), Java ObjectInputStream, or equivalent |
+| BaaS data exposure | A PII/customer-data table reachable by the client key (exposed schema + grant to `anon`/`authenticated`) with RLS/Security Rules disabled or a permissive policy (`using (true)`, `allow … if true`) — the missing-RLS-behind-anon-key class (CVE-2025-48757) |
+| BaaS untrusted claim | An RLS policy or rule that authorizes off `user_metadata` / `raw_user_meta_data` (end-user-writable via `updateUser`) instead of `app_metadata` or a custom-claim hook — self-service privilege escalation |
+| Privileged BaaS key exposed | `service_role` (Supabase) or Firebase Admin/service-account key in a client bundle, committed file, or any public-prefixed env var (`NEXT_PUBLIC_`/`VITE_`/`EXPO_PUBLIC_`/`PUBLIC_`) — bypasses all RLS/rules |
 
 **Evidence threshold**: Must point to specific file, line number, and code path. Must demonstrate the vulnerability is reachable from user input or normal operation. Theoretical vulnerabilities behind multiple unlikely conditions are not Critical.
+
+**BaaS reachability gate**: Before rating a BaaS data-exposure finding Critical, confirm the table/collection is actually reachable by a low-trust client key — exposed schema **and** a GRANT to `anon`/`authenticated` (or permissive rule) **and** no restricting policy. RLS-enabled-with-zero-policies (deny-all) and tables in a private/un-granted schema are **not** Critical. See security-checklist §2.5.
 
 **Blocks release**: Always. At every strictness level (mvp, production, public).
 
@@ -52,6 +57,8 @@ This document defines the severity classification system used by all RADCR revie
 | Vulnerable dependency | Direct dependency with a known HIGH or CRITICAL CVE that is exploitable in the context of this application |
 | Tenant isolation failure | In multi-tenant apps: any path where tenant A can see or modify tenant B's data |
 | Missing TLS | HTTP used where HTTPS is required (API calls with credentials, webhook endpoints) |
+| BaaS authz gap | Authorization on a BaaS table/collection enforced only by a client-supplied filter with no enforcing policy; a policy/rule that checks authentication but not ownership (`auth != null`, `to authenticated`); RLS missing on a table reached via JOIN/embed; or a `security definer` RPC / open Storage list policy exposing data. Critical when the data is PII/financial or cross-tenant. |
+| BaaS over-exposure | `select('*')` / whole-record return shipping PII columns to a lower-trust client; AppSync/Amplify model missing field-level `@auth` on a sensitive field |
 
 **Evidence threshold**: Must identify the specific code pattern and explain the attack vector or failure mode. May reference documentation for CVEs. Should demonstrate the condition is reachable, not merely theoretical.
 
@@ -190,6 +197,7 @@ Downgrade severity when:
 - The finding involves PII, financial data, or authentication credentials
 - The finding is a committed secret (always Critical, regardless of context)
 - The finding involves a known exploited CVE
+- The finding is a BaaS table/collection reachable by the public anon key (or anonymous sign-in) with no restricting policy — anonymous reachability is the whole exposure
 
 ---
 
@@ -219,3 +227,14 @@ Blocks release:
 - 5+ Moderate findings of any category (systemic quality concern)
 - Missing LICENSE file
 - Committed secrets of any kind (even revoked ones -- they indicate process failure)
+
+### launch
+
+The launch-readiness level (implies `--security-deep`; see `references/security-deep-mode.md`). For an app about to handle real customer data.
+
+Blocks release:
+- Everything that blocks at `public`, plus:
+- Any Critical from the security-deep data-exposure / authorization / secrets phases (always blocks)
+- Any Major from the authorization model (phase c) or privileged-credential check (phase d)
+- A missing/absent authorization model ("Neither" — no server middleware and no DB RLS/rules on a client-reachable datastore) blocks on its own, even with no other findings
+- A report that violates the no-false-assurance contract (missing residual-risk statement or pen-test recommendation, or any "secure/safe/good to launch" verdict) blocks until regenerated

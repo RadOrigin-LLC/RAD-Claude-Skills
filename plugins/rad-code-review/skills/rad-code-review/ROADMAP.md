@@ -1,6 +1,16 @@
 # RAD Code Review — Roadmap
 
-## v5.0 (current)
+## v5.1 (current)
+
+**Backend-as-a-Service data-exposure coverage + security-deep launch-readiness mode.** Closes the biggest gap for BaaS-backed apps, where the database (RLS / Security Rules) is the authorization layer rather than server middleware — the realistic customer-data-leak path that the framework-IDOR heuristics (§2.4) don't cover.
+
+- **Security checklist §2.5 "Backend-as-a-Service: the database is your authorization layer"** — Supabase/PostgREST RLS, Firebase (Firestore/RTDB/Storage rules + Admin SDK), and Appwrite/PocketBase/Nhost/Amplify. Covers missing/permissive RLS, the `user_metadata` untrusted-claim escalation, anonymous-sign-in `authenticated`≠authorized, RLS-not-traversing-joins, `service_role`/Admin keys in client/public-env, `security definer` bypass, Storage/Realtime/edge-function leaks, and a **reachability gate** (exposed schema + grant + no policy) so RLS-off-but-unreachable tables don't false-positive. Includes a "do NOT flag" list (the anon/publishable key in client code is correct by design).
+- **`severity-model.md`** — BaaS data-exposure rows in the Critical/Major tables, a reachability gate, and a never-downgrade rule for anon-reachable tables.
+- **Stack detection (Step 3b)** — Supabase/Firebase/Appwrite/PocketBase/Nhost/Amplify markers, plus a public-env-prefix scan for leaked `service_role`/Admin keys.
+- **`--security-deep` mode / `launch` strictness** (realizes the v3.1-planned threat-model + security-only ideas) — a focused launch-readiness pass (trust boundaries → data-exposure surface → authorization model → secrets) with a threat-model-lite report section and a **no-false-assurance contract**: never emits a "safe to launch" verdict, reports verified-vs-could-not-verify, and recommends an independent human pen-test. See `references/security-deep-mode.md`.
+- Grounded in current advisories (the CVE-2025-48757 missing-RLS class, Supabase publishable/secret key model, OWASP API Security Top 10 BOLA/BOPLA/BFLA) and adversarially reviewed for missing vectors and false positives before shipping.
+
+## v5.0
 
 **Shorter IDs, honest flags, wired validator.** Finding IDs `CR-NNN` (config/state paths unchanged); `check-hallucinated-imports.py` wired into automated checks (Step 5g, offline); fingerprint-based history comparison (per-run IDs never compared across runs); `--engine claude|codex|both` removed — it implied Codex execution that was never implemented; `--adversarial-model` provides the real cross-model pass; reports save to `.radcr/history/` only; model references de-versioned.
 
@@ -57,13 +67,13 @@ The foundation. A complete, production-ready code review skill.
 
 ## v3.1 (planned — deferred from v2.1 roadmap)
 
-Deeper domain-specific review capabilities.
+Deeper domain-specific review capabilities. *(Threat-model mode and the `security-only`-style focused pass shipped in v5.1 as `--security-deep` / `launch`; the remaining items below are still planned.)*
 
-- **Threat model mode** — Given an architecture description or diagram, enumerate attack surfaces, trust boundaries, and data flow risks. Produce a lightweight threat model alongside the code review.
+- **Threat model mode** — ✅ shipped in v5.1 as the security-deep threat-model-lite output (attack surfaces, trust boundaries, data-flow risks).
 - **API contract review** — Validate that implementation matches OpenAPI/Swagger schema. Detect undocumented endpoints, missing error responses, request/response type mismatches, and breaking changes between schema versions.
 - **Schema/migration review** — Analyze database migrations for: data loss risk, missing rollback, index performance, constraint correctness, and compatibility with ORM models. Support for SQL migrations, Prisma, Alembic, ActiveRecord, and Flyway.
 - **Infra/deploy config deep review** — Extended analysis of Dockerfiles, Kubernetes manifests, Terraform/Pulumi configs, CI/CD pipelines, and cloud IAM policies.
-- **`security-only` strictness level** — skip architecture/UX/a11y/perf; run security + AI-slop + secrets only. Common PR-check use case.
+- **`security-only` strictness level** — ✅ effectively shipped in v5.1: `--security-deep` concentrates the review on data-exposure/authorization/secrets and de-prioritizes architecture/UX/a11y/perf.
 
 ## v4.0 (planned)
 

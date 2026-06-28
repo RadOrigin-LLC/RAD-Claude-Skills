@@ -9,7 +9,7 @@ description: >
   comparison, optional fix application. Parallel tool calls, JSON-first subagent output,
   compaction-safe checkpointing, non-interactive mode for agents/CI, cross-model
   adversarial pass via --adversarial-model.
-argument-hint: "[repo|diff|commit] [--since commit] [--strictness mvp|production|public] [--model opus|sonnet|haiku] [--adversarial-model name] [--non-interactive] [--resume RUN-ID] [--fix blockers|critical-major|IDs]"
+argument-hint: "[repo|diff|commit] [--since commit] [--strictness mvp|production|public|launch] [--security-deep] [--model opus|sonnet|haiku] [--adversarial-model name] [--non-interactive] [--resume RUN-ID] [--fix blockers|critical-major|IDs]"
 allowed-tools: Read Write Edit Bash Glob Grep Agent AskUserQuestion WebSearch WebFetch mcp__context7__resolve-library-id mcp__context7__query-docs
 ---
 
@@ -85,10 +85,13 @@ Arguments: $ARGUMENTS
 - `--full-scan` — override blame-aware default, flag all issues regardless of authorship
 - Blame-aware mode still flags pre-existing issues when a new change depends on broken existing code
 
-**Strictness:** mvp | production | public (default: production)
+**Strictness:** mvp | production | public | launch (default: production)
 - `mvp` — focus on functional correctness, critical security, and stated goals
 - `production` — full review across all dimensions
 - `public` — production + open-source readiness, public scrutiny resilience, trust signals
+- `launch` — public + the **security-deep** launch-readiness pass (data-exposure surface, authorization model, privileged credentials) with a no-false-assurance verdict. For an app about to handle real customer data.
+
+**Security-deep mode:** `--security-deep` runs the launch-readiness security pass on any strictness — trust boundaries → data-exposure surface → authorization model → secrets, concentrated on BaaS/RLS data exposure (see `references/security-deep-mode.md`). Never emits a "safe to launch" verdict; reports verified-vs-could-not-verify and recommends a human pen-test. Implied by `--strictness launch`.
 
 **Adversarial pass:** self-adversarial by default (same model challenges its own
 findings); `--adversarial-model <name>` switches to a cross-model pass (a different
