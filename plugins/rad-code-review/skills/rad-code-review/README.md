@@ -86,6 +86,9 @@ When reviewing a diff or commit, it only flags issues on lines you changed. This
 | `mvp` | Focus on blockers and critical bugs. Skip style, docs, minor issues. Fast. |
 | `production` | Full review across all 12 dimensions. Default. |
 | `public` | Everything in production plus: public API surface, docs completeness, license compliance, security hardening. |
+| `launch` | Public plus the **security-deep** launch-readiness pass (data-exposure surface, authorization model, privileged credentials) with a no-false-assurance verdict. For an app about to handle real customer data. |
+
+`--security-deep` runs that launch-readiness pass on any strictness — trust boundaries → data-exposure surface → authorization model → secrets, concentrated on BaaS/RLS data exposure. It never emits a "safe to launch" verdict, reports verified-vs-could-not-verify, and recommends an independent human pen-test. Implied by `--strictness launch`.
 
 ### Adversarial Pass Options
 
@@ -104,7 +107,7 @@ When reviewing a diff or commit, it only flags issues on lines you changed. This
 
 2. **Architecture Reviewer** — Structure, coupling, naming, abstraction quality, test coverage gaps, performance anti-patterns (N+1 queries, unbounded lists, sync blocking, bundle bloat), and maintainability.
 
-3. **Release Gate** — Security (OWASP + framework-specific IDOR for 6 frameworks), accessibility (WCAG 2.2 + dynamic ARIA state detection), license compliance, dependency vulnerabilities, secret exposure, and documentation completeness.
+3. **Release Gate** — Security (OWASP + framework-specific IDOR for 6 frameworks + a Backend-as-a-Service data-exposure lane: Supabase/Firebase/Appwrite RLS + Security Rules, with a reachability gate so deny-all tables don't false-positive), accessibility (WCAG 2.2 + dynamic ARIA state detection), license compliance, dependency vulnerabilities, secret exposure, and documentation completeness.
 
 ### 12 Review Dimensions
 
@@ -119,6 +122,8 @@ Web app, API/backend, Chrome extension, CLI tool, library/package, Electron app,
 - **Blame-aware diff scoping** — only flag issues you introduced, with dependency chain detection
 - **Incremental `--since` review** — review changes across multiple commits
 - **Framework-specific IDOR detection** — Next.js Server Actions, Express, Fastify, Django, Rails, Go
+- **Backend-as-a-Service data-exposure lane** — Supabase/PostgREST RLS, Firebase rules + Admin SDK, Appwrite/PocketBase/Nhost/Amplify; reachability gate, `user_metadata` escalation, `service_role`/Admin-key leak detection, do-NOT-flag list
+- **`--security-deep` / `--strictness launch` launch-readiness pass** — trust boundaries → data-exposure surface → authorization model → secrets, with a no-false-assurance verdict
 - **Performance profiling heuristics** — N+1, re-renders, unbounded lists, sync blocking, bundle bloat
 - **Dynamic ARIA state detection** — hardcoded `aria-expanded`, `aria-selected`, `aria-checked`, `aria-pressed`
 - **14-pattern AI slop detection** — hallucinated imports, fake error handling, placeholder stubs, silent failures, cargo-cult patterns, fabricated comments, fake completeness
@@ -220,13 +225,15 @@ rad-code-review/
   LICENSE                          # Apache-2.0 License
   references/
     ai-slop-patterns.md            # 14 AI slop detection patterns
-    security-checklist.md           # Security checklist + IDOR framework heuristics
+    security-checklist.md           # Security checklist + IDOR heuristics + BaaS/RLS §2.5
+    security-deep-mode.md           # 4-phase launch-readiness pass (--security-deep / launch)
     ux-accessibility-checklist.md   # UX/a11y checklist + dynamic ARIA states
     performance-heuristics.md       # Performance detection patterns
-    severity-model.md               # Severity classification
+    severity-model.md               # Severity classification (incl. BaaS rows)
     trust-model.md                  # Trust boundaries
     adversarial-protocol.md         # Adversarial review protocol
     release-readiness.md            # Release readiness checklist
+    subagent-prompts/               # Externalized primary/adversarial/self-adversarial prompts
   workflows/
     orchestrate-review.md           # Main workflow with blame-aware scoping
     report-generation.md            # Report generation
@@ -240,9 +247,7 @@ rad-code-review/
     triage-report-template.md       # Triage report template
     radcrconfig-template.yml          # Default config template
   scripts/
-    dep-audit.sh                    # Dependency vulnerability audit
-    license-check.sh                # License compliance check
-    secrets-scan.sh                 # Secrets detection
+    check-hallucinated-imports.py   # Mechanical AI-slop validator (offline, lockfile-verified)
 ```
 
 ## License

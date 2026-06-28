@@ -21,7 +21,11 @@ allowed-tools: Read Write Edit Bash Glob Grep Agent AskUserQuestion WebSearch We
 Run a professional-grade, diff-aware code review and produce a structured report with
 severity-ranked findings, release verdict, and optional fix application.
 
-**v5.0 differentiators (new):**
+**v5.1 differentiators (new):**
+- **Backend-as-a-Service data-exposure lane** — for apps where the database (RLS / Security Rules) is the authorization layer, not server middleware: Supabase/PostgREST, Firebase, Appwrite/PocketBase/Nhost/Amplify (security-checklist §2.5, with a reachability gate so deny-all/un-granted tables don't false-positive)
+- **`--security-deep` mode / `--strictness launch`** — a 4-phase launch-readiness pass (trust boundaries → data-exposure surface → authorization model → secrets) under a no-false-assurance contract (never emits a "safe to launch" verdict)
+
+**v5.0 differentiators (retained):**
 - **`CR-NNN` finding IDs** — short to type and reference (previously `RADCR-NNN`)
 - **Mechanical hallucinated-imports validator wired into Step 5g** — deterministic, offline, lockfile-verified; runs before the LLM phases
 - **Fingerprint-based history comparison** — findings match across runs by category+file+title fingerprint, never by per-run IDs
