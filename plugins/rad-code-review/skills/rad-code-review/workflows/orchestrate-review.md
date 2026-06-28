@@ -171,7 +171,7 @@ If NOT present, proceed with defaults. Note in report: "No .radcrconfig.yml foun
 
 ## Step 3: Detect Project Context
 
-**Execution: parallel-first.** Steps 3a (metadata), 3b (stack detection reads), 3d (trust boundary greps), and 3e (file list commands) have no inter-step dependencies and MUST be issued as a single parallel batch. On Opus and Sonnet this cuts Step 3 wall-time ~4–6×. Step 3c (classification) and Step 3f (blame context) depend on 3a/3b/3e output and run after the parallel batch resolves. Haiku may serialize if batching misbehaves.
+**Execution: parallel-first.** Steps 3a (metadata), 3b (stack detection reads), 3d (trust boundary greps), and 3e (file list commands) have no inter-step dependencies and MUST be issued as a single parallel batch so the independent reads run concurrently rather than one after another. Step 3c (classification) and Step 3f (blame context) depend on 3a/3b/3e output and run after the parallel batch resolves. Haiku may serialize if batching misbehaves.
 
 Run the following detection steps:
 

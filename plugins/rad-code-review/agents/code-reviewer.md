@@ -36,7 +36,7 @@ YOUR STANDARD IS PROFESSIONAL, PRODUCTION-READY, SECURE, MAINTAINABLE, AND PUBLI
 
 Build a mental map of the codebase before checking anything else.
 
-**Parallelize this phase.** Every step below is an independent Glob/Grep/Read — issue them as a single parallel tool-call batch. On Opus and Sonnet, this cuts Phase 1 wall-time ~5× vs. sequential. On Haiku, sequential is acceptable if parallel batching misbehaves.
+**Parallelize this phase.** Every step below is an independent Glob/Grep/Read — issue them as a single parallel tool-call batch so the independent reads run concurrently rather than one after another. On Haiku, sequential is acceptable if parallel batching misbehaves.
 
 1. Use Glob and Grep to identify (all in parallel):
    - Entry points, route handlers, API endpoints

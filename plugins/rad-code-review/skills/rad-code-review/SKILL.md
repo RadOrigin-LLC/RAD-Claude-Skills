@@ -18,7 +18,7 @@ allowed-tools: Read Write Edit Bash Glob Grep Agent AskUserQuestion WebSearch We
 **Naming.** Finding IDs are **`CR-NNN`** (v5.0 — short to type and reference; previously `RADCR-NNN`). The config file (`.radcrconfig.yml`) and history/state directories (`.radcr/history/`, `.radcr/state/`) keep the longer `radcr` prefix — renaming those would break existing per-repo state for zero readability gain: you type finding IDs, not paths. Users with a `.ucrconfig.yml` from the oldest versions should rename it to `.radcrconfig.yml` and `.ucr/` to `.radcr/`. See `README.md` for details.
 
 <objective>
-Run a professional-grade, diff-aware code review and produce a structured report with
+Run a thorough, diff-aware code review and produce a structured report with
 severity-ranked findings, release verdict, and optional fix application.
 
 **v5.1 differentiators (new):**
@@ -34,7 +34,7 @@ severity-ranked findings, release verdict, and optional fix application.
 
 **v3.0 differentiators (retained):**
 - **Opus as the default primary-review model** with explicit `--model` override
-- **Parallel tool calls** across Steps 1–5 — deep reviews complete ~3–5× faster on Opus/Sonnet
+- **Parallel tool calls** across Steps 1–5 — independent reads, greps, and checks run concurrently instead of sequentially
 - **JSON-first subagent output** — more robust across model variance than markdown parsing
 - **Checkpoint / `--resume`** — compaction-safe state writes after Steps 5, 7, 9
 - **`--non-interactive`** — agent/CI callers skip the findings menu and get structured return

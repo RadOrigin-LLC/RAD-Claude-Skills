@@ -19,7 +19,7 @@
 **Optimized for Claude Opus** — major platform-level upgrade, no new review dimensions. Retains full compatibility with Sonnet and (for narrow scopes) Haiku.
 
 - **Opus as default primary-review model** — agent and skill both default to Opus; `--model sonnet|haiku` overrides per-run; `.radcrconfig.yml` `review_model` sets a project default.
-- **Parallel tool-call pipeline** — agent Phase 1 issues Glob/Grep/Read as a single parallel batch. Orchestrator Steps 3a–3e run in parallel. Step 5 automated checks (npm audit, pip-audit, gitleaks, tsc, eslint, etc.) run concurrently via `run_in_background`. Deep reviews ~3–5× faster on Opus/Sonnet.
+- **Parallel tool-call pipeline** — agent Phase 1 issues Glob/Grep/Read as a single parallel batch. Orchestrator Steps 3a–3e run in parallel. Step 5 automated checks (npm audit, pip-audit, gitleaks, tsc, eslint, etc.) run concurrently via `run_in_background` instead of one after another.
 - **JSON-first subagent output** — primary and adversarial subagents emit structured JSON per the schema in `references/subagent-prompts/*.md`. Orchestrator parses JSON as authoritative. Markdown fallback retained for legacy resilience.
 - **Compaction-safe checkpointing** — state written to `.radcr/state/<run-id>.json` after Steps 5, 7, 9. `--resume <run-id>` rehydrates mid-review and continues from the last checkpoint. Long reviews of 500+ file repos no longer lose progress when context compacts.
 - **`--non-interactive` mode** — Step 10 menu is skipped; findings, verdict, and report path return as structured data. Used by the `code-reviewer` agent, `/loop` sessions, and CI integrations.
@@ -48,7 +48,7 @@ Diff-aware scoping, actionable detection heuristics, and practical PR workflow s
 
 ## v1.0
 
-The foundation. A complete, production-ready code review skill.
+The foundation. A complete code review skill.
 
 - Full 10-category review (functional, security, AI slop, architecture, tests, performance, UX, accessibility, release readiness, documentation)
 - 8 project-type modules (web app, API, Chrome extension, CLI, library, Electron, mobile, SaaS)
@@ -58,9 +58,8 @@ The foundation. A complete, production-ready code review skill.
 - Structured JSON report with severity-ranked findings
 - Report history and comparison between runs
 - `.radcrconfig.yml` project-level configuration
-- GitHub Action for CI/CD (PR comments, check runs, artifact upload)
 - Local-only mode (no network dependencies)
-- Dependency vulnerability audit (npm, yarn, pnpm, pip, cargo, go, gem, composer)
+- Dependency vulnerability audit (npm, pip, cargo, go — when the matching tool is installed)
 - License compliance checking with copyleft detection
 - Secrets scanning (gitleaks + pattern fallback, never exposes values)
 - Cross-platform install (bash + PowerShell)
