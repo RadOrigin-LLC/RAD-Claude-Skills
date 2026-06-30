@@ -79,7 +79,9 @@ Stop and ask before touching:
 - Active decisions belong in `docs/reference/decision-log.md`.
 - A new doc with no home yet is filed into the reference catalog or archived via `/rad-repo-manager:repo-align` — not left loose at the root or under `docs/`.
 - Historical summaries, old plans, smoke notes, superseded decisions, and audit handoffs belong in `docs/archive/` with an archive banner.
+- Content overtaken but kept in place (not yet archived) gets a superseded banner: `> **Superseded YYYY-MM-DD:** replaced by <doc> — kept for context.` No active doc carries obsolete direction without one.
 - Do not edit archived files except to add an archive/supersession banner or move them.
+- Optional: maintain a `## Retired terminology` table in this file mapping dead terms to their replacements; `/rad-repo-manager:repo-align` greps the active docs for stray uses.
 
 ## Validation commands
 

@@ -85,6 +85,31 @@ The question that matters for fuzzy findings: **does this mean a decision is nee
 A prd↔plan contradiction usually does — frame it as a decision for the user, not an
 error to silently patch.
 
+**Resolve contradictions by authority order** (see `references/doc-model.md`): owner's
+session instruction > `prd.md` > `decision-log.md` > `plan.md` > `design.md` >
+`reference/*` > `handoff.md` > `archive/*`. The higher doc wins — propose bringing the
+lower into line as a drafted edit (step 5). **If authority can't decide** — same-tier
+conflict, or a genuine product decision the owner hasn't made — **STOP and surface it
+under "Needs a decision." Never silently merge two conflicting decisions.**
+
+**Check the role boundaries** — each core doc should hold only its own kind of content:
+
+- `docs/prd.md` carrying execution detail (milestones, task lists, "next we build X") → belongs in `docs/plan.md`.
+- `docs/plan.md` carrying permanent product rules / principles → belongs in `docs/prd.md`.
+- `docs/handoff.md` carrying durable facts that must outlive the session → belongs in `plan.md` / `prd.md` / a reference doc; handoff keeps only the resume snapshot.
+- `AGENTS.md` carrying product summaries, roadmap, or duplicated architecture → replace with a pointer to the owning doc.
+
+**Promote stranded decisions.** An accepted decision living only in a brainstorm, the
+handoff, or `AGENTS.md` belongs in `docs/prd.md` or `docs/reference/decision-log.md` —
+propose promoting it (drafted edit, per-doc confirm in step 5).
+
+**Terminology / superseded sweep.** If `AGENTS.md` has a `## Retired terminology` table,
+grep the active docs for each retired term and flag stray uses (suggest the replacement).
+Regardless of the table, flag any active doc that calls something "current," "now," or
+"the plan" when a higher-authority doc has overtaken it, and any superseded content that
+lacks a superseded banner. If no table exists and the user wants this sweep, offer to seed
+one.
+
 ## 3. Present findings — plain language, grouped
 
 ```markdown
@@ -95,6 +120,16 @@ error to silently patch.
 
 ## Active-doc conflicts / redundancy
 - `docs/prd.md` and `AGENTS.md` both define the validation steps — pick one home.
+
+## Role-boundary leaks
+- `docs/prd.md` lists sprint milestones — execution detail belongs in `docs/plan.md`.
+
+## Decisions to promote
+- The "anonymous-by-default" rule lives only in a brainstorm — promote into the PRD / decision-log.
+
+## Obsolete terminology / superseded content
+- `docs/plan.md` still says "Trip Kit" (retired → "Fieldbook").
+- `docs/design.md` describes the old funnel as "current" with no superseded banner.
 
 ## Off-model docs
 - `docs/status.md` exists — this model has no status doc; fold its live bits into docs/handoff.md, archive the rest.
@@ -126,6 +161,7 @@ For each drifting or misplaced doc, propose ONE disposition and ask before actin
 3. **Promote** — it's a real reference doc → move to a `docs/reference/` catalog slot (decision-log, architecture, api-contracts, commands, lessons-learned, testing) or to top-level `docs/design.md`.
 4. **Archive** — historical / done → `git mv` into `docs/archive/`, add the archive banner.
 5. **Relocate** — a misplaced core doc → move to its proper home.
+6. **Banner** — content is overtaken but staying in place for now → add a superseded banner pointing to the current authority (don't move the file).
 
 Rules:
 

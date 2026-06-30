@@ -46,6 +46,30 @@ status/roadmap docs.
 - **drafted, applied only on explicit per-edit confirmation:** a change to `prd.md` / `design.md` / `decision-log.md` is drafted as the exact edit (old → new) and applied only when the user says "apply" for that specific edit — at `wrapup` (session-scoped) and `repo-align` (whole-repo). The user owns the decision; the manager does the typing. A skip means hands off.
 - **freshness stamps:** `docs/prd.md`, `docs/plan.md`, and `docs/handoff.md` carry an `**Updated:**` date (templates include it; `AGENTS.md` deliberately doesn't — staying unchanged is normal for it). Whoever edits a stamped doc refreshes the stamp — the freshness scan keys off it.
 
+## Authority order — resolving contradictions
+
+When two active docs disagree on an accepted decision, the conflict is resolved by
+authority, highest wins:
+
+1. The owner's instruction in the current session
+2. `docs/prd.md` — product behavior and rules
+3. `docs/reference/decision-log.md` — recorded active decisions
+4. `docs/plan.md` — execution, scope, milestones
+5. `docs/design.md` — brand / UI / visual direction
+6. `docs/reference/*` — the rest of the catalog
+7. `docs/handoff.md` — the resume snapshot
+8. `docs/archive/*` — history (never current authority)
+
+The higher doc wins; the lower is brought into line as a **drafted** edit under the
+per-edit confirmation rule — never silently. Two rules bound this:
+
+- **Decisions live in their authority doc.** An accepted decision belongs in `docs/prd.md`
+  or `docs/reference/decision-log.md`, not stranded only in a brainstorm, the handoff, or
+  `AGENTS.md`. A stranded decision is promoted to its authority doc.
+- **Stop, don't merge.** If authority can't decide which version is right — two same-tier
+  docs disagree, or the conflict is a genuine product decision the owner hasn't made —
+  **STOP and surface it as a decision.** Never silently merge two conflicting decisions.
+
 ## Reference catalog (closed)
 
 A fixed, named set of slots — not a free-for-all folder. A doc that matches a slot is
@@ -64,6 +88,33 @@ Brand / UI/UX / visual design direction lives at top-level `docs/design.md`
 (conditional), not in the catalog — technical/system design belongs in
 `architecture.md` above, never in `design.md`. Reference docs are **scaffolded by none** — each appears only when a
 project needs it. The catalog is the menu, not the starter set.
+
+## Superseded content & retired terminology
+
+Two lightweight conventions keep "what's current" honest without moving everything to
+archive:
+
+- **Superseded banner.** When an active doc's content has been overtaken but is worth
+  keeping in place for context (not yet ready to move to archive), add a banner at the
+  top: `> **Superseded YYYY-MM-DD:** replaced by <doc/section> — kept for context.` This
+  is distinct from the archive banner, which marks a file *moved* into `docs/archive/`. No
+  active doc should carry obsolete product direction without one of the two.
+- **Retired terminology (optional config).** A project may maintain a `## Retired
+  terminology` table in `AGENTS.md` mapping each dead term to its replacement.
+  `repo-align` reads it and greps the active docs for every retired term, flagging stray
+  uses. The list is project-supplied — no terms are hardcoded. Format:
+
+  ```
+  ## Retired terminology
+
+  | Retired | Use instead |
+  |---|---|
+  | Trip Kit | Fieldbook |
+  | Phase 1 / Phase 2 | named milestones in docs/plan.md |
+  ```
+
+  The section is exempt from the orphan-terminology audit (retired terms are *meant* to be
+  absent from active docs).
 
 ## Drift signals (mechanical)
 

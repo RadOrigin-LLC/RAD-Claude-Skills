@@ -63,6 +63,9 @@ PLUGIN_OWNED_SECTIONS = frozenset({
     "agent work modes",
     "documentation rules",
     "definition of done",
+    # Optional retired-terminology config: its entries are MEANT to be absent from
+    # active docs, so they'd be false-positive "orphan terms" without this exemption.
+    "retired terminology",
     # legacy variants (harmless to keep recognized)
     "project", "read order", "hard boundaries", "engineering rules",
     "lanes", "escalate triggers", "escalate instead of guessing",
